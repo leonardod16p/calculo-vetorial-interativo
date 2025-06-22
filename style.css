@@ -1,0 +1,17 @@
+body {
+  font-family: sans-serif;
+  margin: 40px;
+  background-color: #f9f9f9;
+  color: #333;
+}
+
+h1 {
+  color: #004466;
+}
+
+canvas {
+  border: 1px solid #ccc;
+  display: block;
+  margin-top: 20px;
+}
+
