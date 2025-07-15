@@ -26,3 +26,10 @@ if(canvas) {
   ctx.textAlign = 'center';
   ctx.fillText('Canvas Interativo', canvas.width / 2, canvas.height / 2);
 }
+
+// Carregar sidebar dinamicamente
+fetch('/components/sidebar.html') // ajuste o caminho se estiver em outro lugar
+  .then(response => response.text())
+  .then(data => {
+    document.getElementById('sidebar-placeholder').innerHTML = data;
+  });
