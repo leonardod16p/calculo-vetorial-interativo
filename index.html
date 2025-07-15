@@ -1,25 +1,104 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title>Formas Diferenciais Interativo</title>
-  <script src="https://cdn.jsdelivr.net/npm/p5@1.9.0/lib/p5.min.js"></script>
-  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-  <script id="MathJax-script" async
-    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Formas diferenciais, topologia e física</title>
+
+  <!-- KaTeX para LaTeX -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"
+    onload="renderMathInElement(document.body, {
+      delimiters: [
+        { left: '$$', right: '$$', display: true },
+        { left: '\\[', right: '\\]', display: true },
+        { left: '\\(', right: '\\)', display: false }
+      ]
+    });">
   </script>
-  <link rel="stylesheet" href="style.css">
+
+  <style>
+    body {
+      font-family: sans-serif;
+      line-height: 1.6;
+      margin: 0;
+      padding: 0;
+      background: #fdfdfd;
+      color: #222;
+    }
+    header {
+      background: #1a202c;
+      color: white;
+      padding: 1rem;
+    }
+    nav {
+      background: #edf2f7;
+      padding: 1rem;
+    }
+    nav a {
+      display: block;
+      margin: 0.5rem 0;
+      text-decoration: none;
+      color: #2b6cb0;
+    }
+    nav a:hover {
+      text-decoration: underline;
+    }
+    main {
+      padding: 2rem;
+    }
+  </style>
 </head>
 <body>
-  <h1>Formas Diferenciais Interativo</h1>
-  <p>Este projeto explora formas diferenciais e cohomologia por meio de visualizações interativas.</p>
 
-  <div id="canvas-holder"></div>
+  <header>
+    <h1>Formas diferenciais, topologia e física</h1>
+    <p><em>um resgate à intuição</em> — Leonardo</p>
+  </header>
 
-  <p>Exemplo: Campo vetorial ω = x dy.</p>
-  <p>$$ \omega = x\,dy $$</p>
+  <nav>
+    <strong>Sumário</strong>
+    <a href="cap1.html">1. Prefácio</a>
+    <a href="cap2.html">2. Preparando o Terreno</a>
+    <a href="cap3.html">3. Trabalho e Energia</a>
+    <a href="cap4.html">4. Coordenadas Esféricas em ℝⁿ</a>
+    <a href="cap5.html">5. Variação de Ângulo – Integral de Linha</a>
+    <a href="cap6.html">6. Campos – Fluxos</a>
+    <a href="cap7.html">7. Ângulo Sólido</a>
+    <a href="cap8.html">8. Determinante</a>
+    <a href="cap9.html">9. Voltando ao Trabalho</a>
+    <a href="cap10.html">10. Bordo</a>
+    <a href="cap11.html">11. Voltando ao Trabalho, Parte 2</a>
+    <a href="cap12.html">12. ???</a>
+    <a href="cap13.html">13. Reinterpretando a Derivada</a>
+    <a href="cap14.html">14. O que é Álgebra Exterior?</a>
+    <a href="cap15.html">15. Pullback</a>
+    <hr>
+    <strong>Apêndices</strong>
+    <a href="apendiceA.html">Apêndice A: Curvas e Superfícies</a>
+    <a href="apendiceB.html">Apêndice B: Derivada como Aproximação Linear</a>
+    <a href="apendiceC.html">Apêndice C: Gradientes e Derivadas Direcionais</a>
+  </nav>
 
-  <script src="sketch.js"></script>
+  <main>
+    <h2>Bem-vindo</h2>
+    <p>Esse site reúne o conteúdo do livro <strong>Formas diferenciais, topologia e física</strong>. Você pode navegar pelos capítulos usando o menu à esquerda.</p>
+
+    <p>Aqui você encontrará:</p>
+    <ul>
+      <li>Exposições matemáticas com notação LaTeX</li>
+      <li>Visualizações interativas (futuramente)</li>
+      <li>Conexões entre cálculo, topologia e física</li>
+    </ul>
+
+    <p>Exemplo de LaTeX renderizado:</p>
+    <div>
+      \[
+        \int_a^b \vec{F}(\vec{c}(t)) \cdot \vec{c}'(t) \, dt = f(\vec{c}(b)) - f(\vec{c}(a))
+      \]
+    </div>
+  </main>
+
 </body>
 </html>
-
