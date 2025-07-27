@@ -1,4 +1,4 @@
-# calculo-vetorial-interativo
+# livro-interativo
 
 ## Acesse
 [Abrir o site](https://leonardod16p.github.io/calculo-vetorial-interativo/index.html)
