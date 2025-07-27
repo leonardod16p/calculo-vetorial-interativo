@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Determinantes, Áreas e Formas Diferenciais</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+        
+        h1 {
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            background: linear-gradient(45deg, #ff6b6b, #ffa726);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .canvas-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .canvas-container::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, #ff6b6b, #ffa726, #26a69a, #42a5f5);
+            border-radius: 17px;
+            z-index: -1;
+            animation: borderGlow 3s ease-in-out infinite alternate;
+        }
+        
+        @keyframes borderGlow {
+            0% { opacity: 0.5; }
+            100% { opacity: 0.8; }
+        }
+        
+        canvas {
+            border: 2px solid transparent;
+            border-radius: 10px;
+            cursor: crosshair;
+            transition: all 0.3s ease;
+        }
+        
+        canvas:hover {
+            transform: scale(1.02);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .controls {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 25px;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .control-group {
+            margin-bottom: 25px;
+        }
+        
+        .control-group h3 {
+            margin: 0 0 15px 0;
+            font-size: 1.1em;
+            color: #fff;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #f0f0f0;
+        }
+        
+        input[type="range"] {
+            width: 100%;
+            margin-bottom: 15px;
+            height: 8px;
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.3);
+            outline: none;
+            -webkit-appearance: none;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #ff6b6b, #ffa726);
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+        }
+        
+        button {
+            background: linear-gradient(45deg, #ff6b6b, #ffa726);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            margin: 5px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .matrix-display {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 1.2em;
+            text-align: center;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .determinant-value {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #ffa726;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+        
+        .area-display {
+            background: rgba(42, 165, 245, 0.2);
+            border: 2px solid #42a5f5;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            text-align: center;
+        }
+        
+        .differential-forms {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 20px;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .form-equation {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 1.1em;
+            border-left: 4px solid #26a69a;
+        }
+        
+        .interpretation {
+            background: rgba(38, 166, 154, 0.2);
+            border: 2px solid #26a69a;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .vector-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .vector-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .animation-controls {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        
+        .highlight-area {
+            background: rgba(255, 193, 7, 0.3);
+            border: 2px solid #ffc107;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            animation: highlightPulse 2s ease-in-out infinite alternate;
+        }
+        
+        @keyframes highlightPulse {
+            0% { background: rgba(255, 193, 7, 0.2); }
+            100% { background: rgba(255, 193, 7, 0.4); }
+        }
+        
+        .negative-area {
+            background: rgba(244, 67, 54, 0.3);
+            border: 2px solid #f44336;
+        }
+        
+        .positive-area {
+            background: rgba(76, 175, 80, 0.3);
+            border: 2px solid #4caf50;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 Determinantes, Áreas e Formas Diferenciais</h1>
+        
+        <div class="main-grid">
+            <div class="canvas-container">
+                <h3 style="color: #333; text-align: center; margin-bottom: 15px;">
+                    🎨 Visualização Geométrica
+                </h3>
+                <canvas id="geometryCanvas" width="500" height="400"></canvas>
+                <p style="color: #666; font-size: 0.9em; text-align: center; margin-top: 10px;">
+                    Arraste os pontos para modificar os vetores
+                </p>
+            </div>
+            
+            <div class="controls">
+                <div class="control-group">
+                    <h3>🎛️ Controles dos Vetores</h3>
+                    <label>Vetor u₁: <span id="u1Value">(2.0, 1.0)</span></label>
+                    <input type="range" id="u1x" min="-4" max="4" step="0.1" value="2">
+                    <input type="range" id="u1y" min="-4" max="4" step="0.1" value="1">
+                    
+                    <label>Vetor u₂: <span id="u2Value">(1.0, 3.0)</span></label>
+                    <input type="range" id="u2x" min="-4" max="4" step="0.1" value="1">
+                    <input type="range" id="u2y" min="-4" max="4" step="0.1" value="3">
+                </div>
+                
+                <div class="matrix-display">
+                    <div>Matriz de Transformação:</div>
+                    <div id="matrixDisplay">
+                        [2.0  1.0]<br>
+                        [1.0  3.0]
+                    </div>
+                    <div class="determinant-value" id="detValue">
+                        det = 5.0
+                    </div>
+                </div>
+                
+                <div class="area-display">
+                    <div><strong>Área do Paralelogramo:</strong></div>
+                    <div id="areaValue" style="font-size: 1.3em; font-weight: bold;">
+                        |det| = 5.0
+                    </div>
+                </div>
+                
+                <div class="animation-controls">
+                    <button onclick="animateTransformation()">🎬 Animar Transformação</button>
+                    <button onclick="showUnitSquare()">⬜ Quadrado Unitário</button>
+                    <button onclick="showEigenvectors()">🎯 Autovetores</button>
+                    <button onclick="resetView()">🔄 Resetar</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="differential-forms">
+            <h3>📐 Formas Diferenciais e Interpretação Geométrica</h3>
+            
+            <div class="form-equation">
+                <div><strong>Forma Diferencial de Área:</strong></div>
+                <div id="differentialForm">ω = 2dx ∧ dy + 1dx ∧ dy = 3dx ∧ dy</div>
+            </div>
+            
+            <div class="vector-info">
+                <div class="vector-card">
+                    <h4>🔹 Primeiro Vetor (u₁)</h4>
+                    <div id="vector1Info">
+                        Componentes: (2.0, 1.0)<br>
+                        Magnitude: 2.24<br>
+                        Ângulo: 26.57°
+                    </div>
+                </div>
+                
+                <div class="vector-card">
+                    <h4>🔹 Segundo Vetor (u₂)</h4>
+                    <div id="vector2Info">
+                        Componentes: (1.0, 3.0)<br>
+                        Magnitude: 3.16<br>
+                        Ângulo: 71.57°
+                    </div>
+                </div>
+            </div>
+            
+            <div class="interpretation" id="interpretation">
+                <h4>🎯 Interpretação Geométrica</h4>
+                <div id="interpretationText">
+                    O determinante det = 5.0 > 0 indica que a transformação preserva a orientação.
+                    A área do paralelogramo formado pelos vetores é |det| = 5.0 unidades².
+                    A forma diferencial ω = 5dx ∧ dy representa o elemento de área escalado por este fator.
+                </div>
+            </div>
+            
+            <div class="highlight-area" id="highlightArea">
+                <h4>✨ Conexão Fundamental</h4>
+                <div id="connectionText">
+                    <strong>Determinante ↔ Área ↔ Forma Diferencial</strong><br>
+                    det(A) = área orientada = coeficiente de dx ∧ dy<br>
+                    A transformação linear x' = Ax multiplica áreas por |det(A)|
+                </div>
+            </div>
+        </div>
+        
+        <div class="differential-forms">
+            <h3>🧮 Cálculos Detalhados</h3>
+            
+            <div class="form-equation">
+                <div><strong>Produto Vetorial (2D):</strong></div>
+                <div id="crossProduct">u₁ × u₂ = (2)(3) - (1)(1) = 6 - 1 = 5</div>
+            </div>
+            
+            <div class="form-equation">
+                <div><strong>Produto Exterior:</strong></div>
+                <div id="exteriorProduct">u₁ ∧ u₂ = (2dx + 1dy) ∧ (1dx + 3dy) = 2·3(dx ∧ dy) - 1·1(dy ∧ dx) = 5(dx ∧ dy)</div>
+            </div>
+            
+            <div class="form-equation">
+                <div><strong>Jacobiano da Transformação:</strong></div>
+                <div id="jacobian">J = ∂(x',y')/∂(x,y) = det([∂x'/∂x, ∂x'/∂y; ∂y'/∂x, ∂y'/∂y]) = det = 5</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('geometryCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Estado da aplicação
+        let u1 = {x: 2, y: 1};
+        let u2 = {x: 1, y: 3};
+        let isAnimating = false;
+        let showingUnitSquare = false;
+        let showingEigenvectors = false;
+        let isDragging = false;
+        let dragTarget = null;
+        
+        // Configuração do sistema de coordenadas
+        const centerX = canvas.width / 2;
+        const centerY = canvas.height / 2;
+        const scale = 40;
+        
+        // Event listeners para controles
+        document.getElementById('u1x').addEventListener('input', (e) => {
+            u1.x = parseFloat(e.target.value);
+            updateDisplay();
+        });
+        
+        document.getElementById('u1y').addEventListener('input', (e) => {
+            u1.y = parseFloat(e.target.value);
+            updateDisplay();
+        });
+        
+        document.getElementById('u2x').addEventListener('input', (e) => {
+            u2.x = parseFloat(e.target.value);
+            updateDisplay();
+        });
+        
+        document.getElementById('u2y').addEventListener('input', (e) => {
+            u2.y = parseFloat(e.target.value);
+            updateDisplay();
+        });
+        
+        // Event listeners para arrastar vetores
+        canvas.addEventListener('mousedown', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const mouseX = e.clientX - rect.left;
+            const mouseY = e.clientY - rect.top;
+            
+            const u1EndX = centerX + u1.x * scale;
+            const u1EndY = centerY - u1.y * scale;
+            const u2EndX = centerX + u2.x * scale;
+            const u2EndY = centerY - u2.y * scale;
+            
+            if (Math.abs(mouseX - u1EndX) < 15 && Math.abs(mouseY - u1EndY) < 15) {
+                isDragging = true;
+                dragTarget = 'u1';
+                canvas.style.cursor = 'grabbing';
+            } else if (Math.abs(mouseX - u2EndX) < 15 && Math.abs(mouseY - u2EndY) < 15) {
+                isDragging = true;
+                dragTarget = 'u2';
+                canvas.style.cursor = 'grabbing';
+            }
+        });
+        
+        canvas.addEventListener('mousemove', (e) => {
+            if (isDragging) {
+                const rect = canvas.getBoundingClientRect();
+                const mouseX = e.clientX - rect.left;
+                const mouseY = e.clientY - rect.top;
+                
+                const newX = (mouseX - centerX) / scale;
+                const newY = -(mouseY - centerY) / scale;
+                
+                if (dragTarget === 'u1') {
+                    u1.x = Math.max(-4, Math.min(4, newX));
+                    u1.y = Math.max(-4, Math.min(4, newY));
+                    document.getElementById('u1x').value = u1.x;
+                    document.getElementById('u1y').value = u1.y;
+                } else if (dragTarget === 'u2') {
+                    u2.x = Math.max(-4, Math.min(4, newX));
+                    u2.y = Math.max(-4, Math.min(4, newY));
+                    document.getElementById('u2x').value = u2.x;
+                    document.getElementById('u2y').value = u2.y;
+                }
+                
+                updateDisplay();
+            } else {
+                // Verificar se está sobre um vetor para mudar cursor
+                const rect = canvas.getBoundingClientRect();
+                const mouseX = e.clientX - rect.left;
+                const mouseY = e.clientY - rect.top;
+                
+                const u1EndX = centerX + u1.x * scale;
+                const u1EndY = centerY - u1.y * scale;
+                const u2EndX = centerX + u2.x * scale;
+                const u2EndY = centerY - u2.y * scale;
+                
+                if ((Math.abs(mouseX - u1EndX) < 15 && Math.abs(mouseY - u1EndY) < 15) ||
+                    (Math.abs(mouseX - u2EndX) < 15 && Math.abs(mouseY - u2EndY) < 15)) {
+                    canvas.style.cursor = 'grab';
+                } else {
+                    canvas.style.cursor = 'crosshair';
+                }
+            }
+        });
+        
+        canvas.addEventListener('mouseup', () => {
+            isDragging = false;
+            dragTarget = null;
+            canvas.style.cursor = 'crosshair';
+        });
+        
+        // Função para desenhar grade
+        function drawGrid() {
+            ctx.strokeStyle = 'rgba(200, 200, 200, 0.3)';
+            ctx.lineWidth = 1;
+            
+            // Linhas verticais
+            for (let x = 0; x <= canvas.width; x += scale) {
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, canvas.height);
+                ctx.stroke();
+            }
+            
+            // Linhas horizontais
+            for (let y = 0; y <= canvas.height; y += scale) {
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(canvas.width, y);
+                ctx.stroke();
+            }
+            
+            // Eixos principais
+            ctx.strokeStyle = 'rgba(100, 100, 100, 0.6)';
+            ctx.lineWidth = 2;
+            
+            // Eixo X
+            ctx.beginPath();
+            ctx.moveTo(0, centerY);
+            ctx.lineTo(canvas.width, centerY);
+            ctx.stroke();
+            
+            // Eixo Y
+            ctx.beginPath();
+            ctx.moveTo(centerX, 0);
+            ctx.lineTo(centerX, canvas.height);
+            ctx.stroke();
+        }
+        
+        // Função para desenhar vetor
+        function drawVector(startX, startY, endX, endY, color, label, thickness = 3) {
+            ctx.strokeStyle = color;
+            ctx.lineWidth = thickness;
+            
+            // Linha do vetor
+            ctx.beginPath();
+            ctx.moveTo(startX, startY);
+            ctx.lineTo(endX, endY);
+            ctx.stroke();
+            
+            // Ponta da seta
+            const angle = Math.atan2(endY - startY, endX - startX);
+            const headLength = 15;
+            
+            ctx.beginPath();
+            ctx.moveTo(endX, endY);
+            ctx.lineTo(endX - headLength * Math.cos(angle - Math.PI / 6),
+                      endY - headLength * Math.sin(angle - Math.PI / 6));
+            ctx.moveTo(endX, endY);
+            ctx.lineTo(endX - headLength * Math.cos(angle + Math.PI / 6),
+                      endY - headLength * Math.sin(angle + Math.PI / 6));
+            ctx.stroke();
+            
+            // Ponto na ponta (para arrastar)
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            ctx.arc(endX, endY, 6, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            // Label do vetor
+            ctx.fillStyle = color;
+            ctx.font = 'bold 16px Arial';
+            ctx.fillText(label, endX + 10, endY - 10);
+        }
+        
+        // Função para desenhar paralelogramo
+        function drawParallelogram() {
+            const u1EndX = centerX + u1.x * scale;
+            const u1EndY = centerY - u1.y * scale;
+            const u2EndX = centerX + u2.x * scale;
+            const u2EndY = centerY - u2.y * scale;
+            const sumX = centerX + (u1.x + u2.x) * scale;
+            const sumY = centerY - (u1.y + u2.y) * scale;
+            
+            // Determinar cor baseada no determinante
+            const det = u1.x * u2.y - u1.y * u2.x;
+            const fillColor = det > 0 ? 'rgba(76, 175, 80, 0.3)' : 'rgba(244, 67, 54, 0.3)';
+            const strokeColor = det > 0 ? '#4caf50' : '#f44336';
+            
+            ctx.fillStyle = fillColor;
+            ctx.strokeStyle = strokeColor;
+            ctx.lineWidth = 2;
+            
+            ctx.beginPath();
+            ctx.moveTo(centerX, centerY);
+            ctx.lineTo(u1EndX, u1EndY);
+            ctx.lineTo(sumX, sumY);
+            ctx.lineTo(u2EndX, u2EndY);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+            
+            // Desenhar linhas tracejadas
+            ctx.setLineDash([5, 5]);
+            ctx.strokeStyle = 'rgba(100, 100, 100, 0.6)';
+            ctx.lineWidth = 1;
+            
+            ctx.beginPath();
+            ctx.moveTo(u1EndX, u1EndY);
+            ctx.lineTo(sumX, sumY);
+            ctx.stroke();
+            
+            ctx.beginPath();
+            ctx.moveTo(u2EndX, u2EndY);
+            ctx.lineTo(sumX, sumY);
+            ctx.stroke();
+            
+            ctx.setLineDash([]);
+        }
+        
+        // Função para desenhar quadrado unitário transformado
+        function drawUnitSquare() {
+            if (!showingUnitSquare) return;
+            
+            // Vértices do quadrado unitário
+            const vertices = [
+                {x: 0, y: 0},
+                {x: 1, y: 0},
+                {x: 1, y: 1},
+                {x: 0, y: 1}
+            ];
+            
+            // Transformar vértices
+            const transformedVertices = vertices.map(v => ({
+                x: centerX + (u1.x * v.x + u2.x * v.y) * scale,
+                y: centerY - (u1.y * v.x + u2.y * v.y) * scale
+            }));
+            
+            // Desenhar quadrado transformado
+            ctx.fillStyle = 'rgba(255, 193, 7, 0.4)';
+            ctx.strokeStyle = '#ffc107';
+            ctx.lineWidth = 2;
+            
+            ctx.beginPath();
+            ctx.moveTo(transformedVertices[0].x, transformedVertices[0].y);
+            for (let i = 1; i < transformedVertices.length; i++) {
+                ctx.lineTo(transformedVertices[i].x, transformedVertices[i].y);
+            }
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+            
+            // Desenhar quadrado unitário original
+            ctx.fillStyle = 'rgba(158, 158, 158, 0.3)';
+            ctx.strokeStyle = '#9e9e9e';
+            ctx.lineWidth = 1;
+            
+            ctx.beginPath();
+            ctx.moveTo(centerX, centerY);
+            ctx.lineTo(centerX + scale, centerY);
+            ctx.lineTo(centerX + scale, centerY - scale);
+            ctx.lineTo(centerX, centerY - scale);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+        }
+        
+        // Função para mostrar autovetores
+        function drawEigenvectors() {
+            if (!showingEigenvectors) return;
+            
+            // Calcular autovalores e autovetores
+            const a = u1.x, b = u2.x;
+            const c = u1.y, d = u2.y;
+            
+            const trace = a + d;
+            const det = a * d - b * c;
+            const discriminant = trace * trace - 4 * det;
+            
+            if (discriminant >= 0) {
+                const lambda1 = (trace + Math.sqrt(discriminant)) / 2;
+                const lambda2 = (trace - Math.sqrt(discriminant)) / 2;
+                
+                // Calcular autovetores
+                let v1, v2;
+                
+                if (Math.abs(b) > 0.001) {
+                    v1 = {x: 1, y: (lambda1 - a) / b};
+                    v2 = {x: 1, y: (lambda2 - a) / b};
+                } else if (Math.abs(c) > 0.001) {
+                    v1 = {x: (lambda1 - d) / c, y: 1};
+                    v2 = {x: (lambda2 - d) / c, y: 1};
+                } else {
+                    v1 = {x: 1, y: 0};
+                    v2 = {x: 0, y: 1};
+                }
+                
+                // Normalizar autovetores
+                const norm1 = Math.sqrt(v1.x * v1.x + v1.y * v1.y);
+                const norm2 = Math.sqrt(v2.x * v2.x + v2.y * v2.y);
+                
+                if (norm1 > 0.001) {
+                    v1.x /= norm1;
+                    v1.y /= norm1;
+                    
+                    drawVector(centerX, centerY, 
+                              centerX + v1.x * scale * 2, centerY - v1.y * scale * 2,
+                              '#9c27b0', `λ₁=${lambda1.toFixed(2)}`, 2);
+                }
+                
+                if (norm2 > 0.001 && Math.abs(discriminant) > 0.001) {
+                    v2.x /= norm2;
+                    v2.y /= norm2;
+                    
+                    drawVector(centerX, centerY,
+                              centerX + v2.x * scale * 2, centerY - v2.y * scale * 2,
+                              '#e91e63', `λ₂=${lambda2.toFixed(2)}`, 2);
+                }
+            }
+        }
+        
+        // Função principal de desenho
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            drawGrid();
+            drawUnitSquare();
+            drawParallelogram();
+            drawEigenvectors();
+            
+            // Desenhar vetores
+            const u1EndX = centerX + u1.x * scale;
+            const u1EndY = centerY - u1.y * scale;
+            const u2EndX = centerX + u2.x * scale;
+            const u2EndY = centerY - u2.y * scale;
+            
+            drawVector(centerX, centerY, u1EndX, u1EndY, '#2196F3', 'u₁');
+            drawVector(centerX, centerY, u2EndX, u2EndY, '#FF5722', 'u₂');
+        }
+
+        // Função para atualizar todos os displays
+        function updateDisplay() {
+            // Atualizar valores dos vetores
+            document.getElementById('u1Value').textContent = `(${u1.x.toFixed(1)}, ${u1.y.toFixed(1)})`;
+            document.getElementById('u2Value').textContent = `(${u2.x.toFixed(1)}, ${u2.y.toFixed(1)})`;
+            
+            // Atualizar matriz e determinante
+            const det = u1.x * u2.y - u1.y * u2.x;
+            document.getElementById('matrixDisplay').innerHTML = 
+                `[${u1.x.toFixed(1)}  ${u2.x.toFixed(1)}]<br>` +
+                `[${u1.y.toFixed(1)}  ${u2.y.toFixed(1)}]`;
+            document.getElementById('detValue').textContent = `det = ${det.toFixed(2)}`;
+            
+            // Atualizar área
+            document.getElementById('areaValue').innerHTML = 
+                `|det| = ${Math.abs(det).toFixed(2)}`;
+            
+            // Atualizar forma diferencial
+            document.getElementById('differentialForm').textContent = 
+                `ω = ${det.toFixed(1)}dx ∧ dy`;
+            
+            // Atualizar informações dos vetores
+            const mag1 = Math.sqrt(u1.x * u1.x + u1.y * u1.y);
+            const angle1 = Math.atan2(u1.y, u1.x) * 180 / Math.PI;
+            document.getElementById('vector1Info').innerHTML = 
+                `Componentes: (${u1.x.toFixed(1)}, ${u1.y.toFixed(1)})<br>` +
+                `Magnitude: ${mag1.toFixed(2)}<br>` +
+                `Ângulo: ${angle1.toFixed(2)}°`;
+            
+            const mag2 = Math.sqrt(u2.x * u2.x + u2.y * u2.y);
+            const angle2 = Math.atan2(u2.y, u2.x) * 180 / Math.PI;
+            document.getElementById('vector2Info').innerHTML = 
+                `Componentes: (${u2.x.toFixed(1)}, ${u2.y.toFixed(1)})<br>` +
+                `Magnitude: ${mag2.toFixed(2)}<br>` +
+                `Ângulo: ${angle2.toFixed(2)}°`;
+            
+            // Atualizar interpretação
+            const interpretationText = det > 0 
+                ? `O determinante det = ${det.toFixed(2)} > 0 indica que a transformação preserva a orientação. 
+                   A área do paralelogramo formado pelos vetores é |det| = ${Math.abs(det).toFixed(2)} unidades². 
+                   A forma diferencial ω = ${det.toFixed(1)}dx ∧ dy representa o elemento de área escalado por este fator.`
+                : det < 0 
+                    ? `O determinante det = ${det.toFixed(2)} < 0 indica que a transformação inverte a orientação. 
+                       A área do paralelogramo formado pelos vetores é |det| = ${Math.abs(det).toFixed(2)} unidades². 
+                       A forma diferencial ω = ${det.toFixed(1)}dx ∧ dy mostra a inversão de orientação.`
+                    : `O determinante é zero (det = 0), indicando que a transformação colapsa o espaço em uma dimensão menor. 
+                       A área do paralelogramo é zero e os vetores são linearmente dependentes.`;
+            
+            document.getElementById('interpretationText').innerHTML = interpretationText;
+            
+            // Atualizar cálculos detalhados
+            document.getElementById('crossProduct').textContent = 
+                `u₁ × u₂ = (${u1.x.toFixed(1)})(${u2.y.toFixed(1)}) - (${u1.y.toFixed(1)})(${u2.x.toFixed(1)}) = ` +
+                `${(u1.x * u2.y).toFixed(1)} - ${(u1.y * u2.x).toFixed(1)} = ${det.toFixed(1)}`;
+            
+            document.getElementById('exteriorProduct').textContent = 
+                `u₁ ∧ u₂ = (${u1.x.toFixed(1)}dx + ${u1.y.toFixed(1)}dy) ∧ (${u2.x.toFixed(1)}dx + ${u2.y.toFixed(1)}dy) = ` +
+                `${u1.x.toFixed(1)}·${u2.y.toFixed(1)}(dx ∧ dy) - ${u1.y.toFixed(1)}·${u2.x.toFixed(1)}(dy ∧ dx) = ` +
+                `${det.toFixed(1)}(dx ∧ dy)`;
+            
+            document.getElementById('jacobian').textContent = 
+                `J = ∂(x',y')/∂(x,y) = det([∂x'/∂x, ∂x'/∂y; ∂y'/∂x, ∂y'/∂y]) = det = ${det.toFixed(1)}`;
+            
+            // Atualizar destaque de área
+            const highlightArea = document.getElementById('highlightArea');
+            if (det > 0) {
+                highlightArea.className = 'highlight-area positive-area';
+            } else if (det < 0) {
+                highlightArea.className = 'highlight-area negative-area';
+            } else {
+                highlightArea.className = 'highlight-area';
+            }
+            
+            // Redesenhar a cena
+            draw();
+        }
+
+        // Funções de animação
+        function animateTransformation() {
+            if (isAnimating) return;
+            
+            isAnimating = true;
+            const duration = 2000; // 2 segundos
+            const startTime = performance.now();
+            const originalU1 = {...u1};
+            const originalU2 = {...u2};
+            
+            function animate(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                
+                // Interpolação linear
+                u1.x = originalU1.x * (1 - progress);
+                u1.y = originalU1.y * (1 - progress);
+                u2.x = originalU2.x * (1 - progress);
+                u2.y = originalU2.y * (1 - progress);
+                
+                updateDisplay();
+                
+                if (progress < 1) {
+                    requestAnimationFrame(animate);
+                } else {
+                    // Restaurar vetores originais
+                    u1 = {...originalU1};
+                    u2 = {...originalU2};
+                    isAnimating = false;
+                    updateDisplay();
+                }
+            }
+            
+            requestAnimationFrame(animate);
+        }
+
+        function showUnitSquare() {
+            showingUnitSquare = !showingUnitSquare;
+            updateDisplay();
+        }
+
+        function showEigenvectors() {
+            showingEigenvectors = !showingEigenvectors;
+            updateDisplay();
+        }
+
+        function resetView() {
+            u1 = {x: 2, y: 1};
+            u2 = {x: 1, y: 3};
+            
+            document.getElementById('u1x').value = u1.x;
+            document.getElementById('u1y').value = u1.y;
+            document.getElementById('u2x').value = u2.x;
+            document.getElementById('u2y').value = u2.y;
+            
+            showingUnitSquare = false;
+            showingEigenvectors = false;
+            updateDisplay();
+        }
+
+        // Inicialização
+        updateDisplay();
+    </script>
+</body>
+</html>

@@ -1,80 +1,1446 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Formas diferenciais, topologia e física</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Árvore das Abstrações Matemáticas</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Georgia', serif;
+            background: linear-gradient(to bottom, #1a2b4c 0%, #2c4a78 30%, #4a6741 70%, #2d3b2d 100%);
+            color: #ffffff;
+            overflow: hidden;
+            height: 100vh;
+        }
 
-  <!-- KaTeX para LaTeX -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond&display=swap" rel="stylesheet">
+        .book-cover {
+            max-width: 100%;
+            margin: 0;
+            padding: 10px;
+            position: relative;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
 
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"
-    onload="renderMathInElement(document.body, {
-      delimiters: [
-        { left: '$$', right: '$$', display: true },
-        { left: '\\[', right: '\\]', display: true },
-        { left: '\\(', right: '\\)', display: false }
-      ]
-    });">
-  </script>
-  <link rel="stylesheet" href="style.css">
+        .header {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 100;
+            max-width: 320px;
+        }
+
+        .title {
+            font-size: 2rem;
+            font-weight: bold;
+            background: linear-gradient(45deg, #4fc3f7, #81c784, #ffb74d);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 5px;
+            text-shadow: 0 0 30px rgba(79, 195, 247, 0.3);
+        }
+
+        .subtitle {
+            font-size: 1rem;
+            color: #e0e0e0;
+            font-style: italic;
+            margin-bottom: 10px;
+        }
+
+        .instructions {
+            font-size: 0.85rem;
+            color: #b0bec5;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(79, 195, 247, 0.3);
+            line-height: 1.4;
+        }
+
+        .tree-container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            margin: 0 auto;
+            flex-grow: 1;
+        }
+
+        .controls {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 200;
+        }
+
+        .season-toggle {
+            background: linear-gradient(45deg, #4fc3f7, #81c784);
+            border: none;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            opacity: 0.3;
+            pointer-events: none;
+        }
+
+        .season-toggle.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .season-toggle:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(79, 195, 247, 0.4);
+        }
+
+        .season-toggle.winter {
+            background: linear-gradient(45deg, #607d8b, #90a4ae);
+        }
+
+        /* Raízes e Tronco SVG */
+        .roots-svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+        }
+
+        .root-path, .trunk-svg, .trunk-line, .branch-path {
+            transition: all 0.8s ease;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+        }
+
+        /* Slots do Tronco - Segmentos delimitados */
+        .trunk-slot {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 140px;
+            height: 50px;
+            border: 2px dashed rgba(255, 193, 7, 0.6);
+            border-radius: 4px;
+            background: transparent;
+            z-index: 40;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.7);
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .trunk-slot.disabled {
+            opacity: 0.3;
+            border-color: rgba(255, 193, 7, 0.2);
+            color: rgba(255, 255, 255, 0.3);
+            cursor: not-allowed;
+        }
+
+        .trunk-slot.highlight {
+            border-color: rgba(255, 193, 7, 1);
+            background: rgba(255, 193, 7, 0.1);
+            transform: translateX(-50%) scale(1.02);
+        }
+
+        .trunk-slot.filled {
+            background: transparent;
+            border-color: rgba(255, 193, 7, 0.9);
+            border-style: solid;
+            color: #ffffff;
+            font-weight: bold;
+            font-size: 11px;
+        }
+
+        /* Posicionamento dos slots do tronco */
+        .trunk-slot.intuition-slot { bottom: 380px; }
+        .trunk-slot.geometry-slot { bottom: 530px; }
+        .trunk-slot.analysis-slot { bottom: 680px; }
+        .trunk-slot.topology-slot { bottom: 830px; }
+
+        /* Delimitadores visuais do tronco */
+        .trunk-delimiter {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            z-index: 35;
+        }
+
+        .trunk-delimiter.d1 { bottom: 360px; }
+        .trunk-delimiter.d2 { bottom: 510px; }
+        .trunk-delimiter.d3 { bottom: 660px; }
+        .trunk-delimiter.d4 { bottom: 810px; }
+
+        /* Folhas SVG */
+        .leaves-group ellipse {
+            transition: all 1s ease;
+            transform-origin: center;
+            opacity: 0;
+        }
+
+        .leaves-group ellipse.visible {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .leaves-group ellipse.winter {
+            opacity: 0;
+            transform: scale(0.3) translateY(40px) rotate(180deg);
+        }
+
+        /* Perguntas e Nomes das Abstrações Arrastáveis */
+        .draggable-questions, .draggable-abstractions {
+            position: absolute;
+            left: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            z-index: 100;
+        }
+
+        .draggable-questions {
+            bottom: 300px;
+        }
+
+        .draggable-abstractions {
+            bottom: 420px;
+        }
+
+        .question-bubble, .abstraction-bubble {
+            background: transparent;
+            color: #ffffff;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 11px;
+            cursor: grab;
+            transition: all 0.2s ease;
+            font-family: 'Georgia', serif;
+            text-align: left;
+            user-select: none;
+            position: relative;
+            touch-action: none;
+            min-width: 140px;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .question-bubble {
+            border-color: rgba(79, 195, 247, 0.7);
+        }
+
+        .abstraction-bubble {
+            border-color: rgba(255, 193, 7, 0.7);
+        }
+
+        .abstraction-bubble.disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            border-color: rgba(255, 193, 7, 0.3);
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .question-bubble:hover, .abstraction-bubble:hover {
+            background: rgba(0, 0, 0, 0.2);
+            transform: translateX(2px);
+        }
+
+        .abstraction-bubble.disabled:hover {
+            background: transparent;
+            transform: none;
+        }
+
+        .question-bubble:active, .abstraction-bubble:active {
+            cursor: grabbing;
+        }
+
+        .question-bubble.dragging, .abstraction-bubble.dragging {
+            cursor: grabbing !important;
+            z-index: 1000 !important;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+            transition: none !important;
+            background: rgba(0, 0, 0, 0.3) !important;
+        }
+
+        .question-bubble.placed, .abstraction-bubble.placed {
+            opacity: 0.4;
+            pointer-events: none;
+        }
+
+        /* Slots das Raízes */
+        .root-slot {
+            position: absolute;
+            width: 80px;
+            height: 40px;
+            border: 2px dashed rgba(79, 195, 247, 0.6);
+            border-radius: 4px;
+            background: transparent;
+            z-index: 50;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .root-slot.highlight {
+            border-color: rgba(79, 195, 247, 1);
+            background: rgba(79, 195, 247, 0.1);
+            transform: scale(1.02);
+        }
+
+        .root-slot.filled {
+            background: transparent;
+            border-color: rgba(79, 195, 247, 0.9);
+            border-style: solid;
+            color: #ffffff;
+            font-weight: bold;
+        }
+
+        /* Tópicos nas Folhas - Melhor posicionamento */
+        .leaf-topic {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.8);
+            color: #ffffff;
+            padding: 6px 10px;
+            border-radius: 12px;
+            font-size: 9px;
+            font-weight: bold;
+            transition: all 0.5s ease;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            opacity: 0;
+            z-index: 20;
+            transform: translateX(-50%) scale(0.5);
+            cursor: pointer;
+            text-decoration: none;
+            display: block;
+            min-width: 120px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .leaf-topic.visible {
+            opacity: 1;
+            transform: translateX(-50%) scale(1);
+        }
+
+        .leaf-topic:hover {
+            background: rgba(79, 195, 247, 0.9);
+            transform: translateX(-50%) scale(1.05);
+            box-shadow: 0 4px 12px rgba(79, 195, 247, 0.4);
+            border-color: rgba(255, 255, 255, 0.8);
+        }
+
+        /* Animação de transição para capítulos */
+        .chapter-transition {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: radial-gradient(circle at center, 
+                rgba(79, 195, 247, 0.9) 0%, 
+                rgba(79, 195, 247, 0.7) 30%, 
+                rgba(26, 43, 76, 0.95) 70%, 
+                rgba(0, 0, 0, 1) 100%);
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.8s ease;
+        }
+
+        .chapter-transition.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .transition-content {
+            text-align: center;
+            color: white;
+            transform: translateY(30px);
+            transition: all 0.8s ease 0.2s;
+        }
+
+        .chapter-transition.active .transition-content {
+            transform: translateY(0);
+        }
+
+        .transition-title {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+        }
+
+        .transition-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.8;
+            margin-bottom: 30px;
+        }
+
+        .loading-animation {
+            width: 80px;
+            height: 80px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top: 3px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Progress Indicator */
+        .progress-container {
+            position: absolute;
+            top: 50%;
+            right: 20px;
+            transform: translateY(-50%);
+            z-index: 200;
+        }
+
+        .progress-bar {
+            width: 8px;
+            height: 200px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .progress-fill {
+            width: 100%;
+            background: linear-gradient(to top, #4caf50, #81c784, #a5d6a7);
+            border-radius: 4px;
+            transition: height 0.5s ease;
+            height: 0%;
+        }
+
+        .progress-text {
+            font-size: 10px;
+            color: #b0bec5;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+
+        .stage-indicator {
+            font-size: 9px;
+            color: #90a4ae;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 4px;
+            border-radius: 4px;
+        }
+
+        /* Efeito de inverno global */
+        .winter .root-path, .winter .branch-path {
+            stroke: #5a4a42;
+            filter: drop-shadow(0 0 3px rgba(200, 200, 200, 0.3));
+        }
+
+        .winter .trunk-svg {
+            fill: #5a4a42;
+        }
+        .winter .trunk-line {
+             stroke: #4a3a32;
+        }
+
+        .winter .question-bubble, .winter .abstraction-bubble {
+            opacity: 0.85;
+            border-color: rgba(200, 200, 200, 0.4);
+        }
+
+        /* Tooltip para tópicos */
+        .leaf-topic::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%) translateY(-5px);
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 5px 8px;
+            border-radius: 6px;
+            font-size: 8px;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .leaf-topic:hover::after {
+            opacity: 1;
+            transform: translateX(-50%) translateY(-10px);
+        }
+
+        @media (max-width: 768px) {
+            .title { font-size: 1.5rem; }
+            .subtitle { font-size: 0.9rem; }
+            .instructions { font-size: 0.8rem; }
+            .question-bubble, .abstraction-bubble { font-size: 10px; padding: 8px 12px; }
+            .leaf-topic { font-size: 8px; padding: 4px 8px; min-width: 100px; }
+            .draggable-questions, .draggable-abstractions { flex-direction: column; gap: 8px; }
+            .transition-title { font-size: 2rem; }
+            .transition-subtitle { font-size: 1rem; }
+        }
+    </style>
 </head>
 <body>
+    <div class="book-cover">
+        <div class="header">
+            <h1 class="title">Formas Diferenciais, Topologia e Fisica</h1>
+            <p class="subtitle">Um Resgate Interativo a Intuição</p>
+            <div class="instructions">
+                <strong>🎯 Como usar:</strong><br>
+                <strong>1º:</strong> Arraste as <span style="color: #4fc3f7;">perguntas fundamentais</span> para as raízes<br>
+                <strong>2º:</strong> Arraste os <span style="color: #ffc107;">nomes das abstrações</span> para os segmentos do tronco<br>
+                <strong>3º:</strong> Clique nos tópicos das folhas para navegar!
+            </div>
+        </div>
 
-  <header>
-    <h1>Formas diferenciais, topologia e física</h1>
-    <p><em>um resgate à intuição</em> — Leonardo</p>
-  </header>
+        <div class="controls">
+            <button class="season-toggle" id="seasonToggle" onclick="toggleSeason()">
+                🍃 Verão → ❄️ Inverno
+            </button>
+        </div>
 
-  <button id="toggleMenuBtn" aria-label="Abrir/fechar menu">☰</button>
-  <div class="container" id="container">
-    <nav class="sidebar" aria-label="Navegação dos capítulos">
-      <h2>Capítulos</h2>
-      <a href="index.html" class="active">Início</a>
-          <strong>Sumário</strong>
-      <a href="capitulos/cap1.html">1. Prefácio</a>
-      <a href="capitulos/cap2.html">2. Preparando o Terreno</a>
-      <a href="capitulos/cap3.html">3. Trabalho e Energia</a>
-      <a href="capitulos/cap4.html">4. Coordenadas Esféricas em ℝⁿ</a>
-      <a href="capitulos/cap5.html">5. Variação de Ângulo – Integral de Linha</a>
-      <a href="capitulos/cap6.html">6. Campos – Fluxos</a>
-      <a href="capitulos/cap7.html">7. Ângulo Sólido</a>
-      <a href="capitulos/cap8.html">8. Determinante</a>
-      <a href="capitulos/cap9.html">9. Voltando ao Trabalho</a>
-      <a href="capitulos/cap10.html">10. Bordo</a>
-      <a href="capitulos/cap11.html">11. Voltando ao Trabalho, Parte 2</a>
-      <a href="capitulos/cap12.html">12. ???</a>
-      <a href="capitulos/cap13.html">13. Reinterpretando a Derivada</a>
-      <a href="capitulos/cap14.html">14. O que é Álgebra Exterior?</a>
-      <a href="capitulos/cap15.html">15. Pullback</a>
-      <hr>
-      <strong>Apêndices</strong>
-      <a href="capitulos/apendiceA.html">Apêndice A: Curvas e Superfícies</a>
-      <a href="capitulos/apendiceB.html">Apêndice B: Derivada como Aproximação Linear</a>
-      <a href="capitulos/apendiceC.html">Apêndice C: Gradientes e Derivadas Direcionais</a>
-    </nav>
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-text" id="progressText">Raízes: 0/3</div>
+            <div class="stage-indicator" id="stageIndicator">Fase 1: Fundamentos</div>
+        </div>
 
-  <main>
-    <h2>Bem-vindo</h2>
-    <p>Esse site reúne o conteúdo do livro <strong>Formas diferenciais, topologia e física</strong>. Você pode navegar pelos capítulos usando o menu à esquerda.</p>
+        <div class="tree-container" id="treeContainer">
+            <!-- Delimitadores do Tronco -->
+            <div class="trunk-delimiter d1"></div>
+            <div class="trunk-delimiter d2"></div>
+            <div class="trunk-delimiter d3"></div>
+            <div class="trunk-delimiter d4"></div>
 
-    <p>Aqui você encontrará:</p>
-    <ul>
-      <li>Exposições matemáticas com notação LaTeX</li>
-      <li>Visualizações interativas (futuramente)</li>
-      <li>Conexões entre cálculo, topologia e física</li>
-    </ul>
+            <!-- Slots do Tronco (Camadas de Abstração) -->
+            <div class="trunk-slot intuition-slot disabled" id="trunkSlot1">
+                Complete as raízes primeiro
+            </div>
+            <div class="trunk-slot geometry-slot disabled" id="trunkSlot2">
+                Complete as raízes primeiro
+            </div>
+            <div class="trunk-slot analysis-slot disabled" id="trunkSlot3">
+                Complete as raízes primeiro
+            </div>
+            <div class="trunk-slot topology-slot disabled" id="trunkSlot4">
+                Complete as raízes primeiro
+            </div>
 
-    <p>Exemplo de LaTeX renderizado:</p>
-    <div>
-      \[
-        \int_a^b \vec{F}(\vec{c}(t)) \cdot \vec{c}'(t) \, dt = f(\vec{c}(b)) - f(\vec{c}(a))
-      \]
+            <!-- Slots das Raízes -->
+            <div class="root-slot" id="slot1" style="bottom: 50px; left: calc(50% - 200px);">
+                Arraste aqui
+            </div>
+            <div class="root-slot" id="slot2" style="bottom: 50px; left: calc(50% - 40px);">
+                Arraste aqui
+            </div>
+            <div class="root-slot" id="slot3" style="bottom: 50px; left: calc(50% + 120px);">
+                Arraste aqui
+            </div>
+
+            <svg class="roots-svg" viewBox="0 0 2000 1200" preserveAspectRatio="xMidYMax meet">
+                <rect x="-1000" y="900" width="50000" height="300" fill="#8d6e63" opacity="0.8"/>
+                
+                <!-- Raízes mais detalhadas -->
+                <path class="root-path" d="M1000 900 C 985 920, 975 950, 970 980 C 965 1010, 960 1040, 955 1070 C 950 1100, 945 1130, 940 1160 C 935 1180, 930 1195, 925 1200" stroke="#5d4037" stroke-width="6" fill="none" stroke-linecap="round"/>
+                <path class="root-path" d="M1000 900 C 1015 920, 1025 950, 1030 980 C 1035 1010, 1040 1040, 1045 1070 C 1050 1100, 1055 1130, 1060 1160 C 1065 1180, 1070 1195, 1075 1200" stroke="#5d4037" stroke-width="6" fill="none" stroke-linecap="round"/>
+                <path class="root-path" d="M1000 900 C 950 920, 900 945, 850 975 C 820 995, 790 1020, 760 1050 C 730 1080, 700 1110, 670 1140 C 650 1160, 630 1180, 610 1200" stroke="#4e342e" stroke-width="4" fill="none" stroke-linecap="round"/>
+                <path class="root-path" d="M1000 900 C 1050 920, 1100 945, 1150 975 C 1180 995, 1210 1020, 1240 1050 C 1270 1080, 1300 1110, 1330 1140 C 1350 1160, 1370 1180, 1390 1200" stroke="#4e342e" stroke-width="4" fill="none" stroke-linecap="round"/>
+                <path class="root-path" d="M850 975 C 830 990, 810 1010, 795 1035 C 780 1060, 765 1085, 750 1110 C 735 1135, 720 1160, 705 1185 C 695 1192, 685 1196, 675 1200" stroke="#3e2723" stroke-width="3" fill="none" stroke-linecap="round"/>
+                <path class="root-path" d="M1150 975 C 1170 990, 1190 1010, 1205 1035 C 1220 1060, 1235 1085, 1250 1110 C 1265 1135, 1280 1160, 1295 1185 C 1305 1192, 1315 1196, 1325 1200" stroke="#3e2723" stroke-width="3" fill="none" stroke-linecap="round"/>
+                
+                <!-- Tronco principal com segmentação visual -->
+                <path class="trunk-svg" d="M960 900 Q 950 700 950 500 T 960 100 L 1040 100 Q 1050 500 1050 700 T 1040 900 Z" fill="#8d6e63"/>
+                <line class="trunk-line" x1="1000" y1="120" x2="1000" y2="880" stroke="#6d4c41" stroke-width="8" />
+                
+                <!-- Linhas de segmentação do tronco -->
+                <line class="trunk-line" x1="960" y1="220" x2="1040" y2="220" stroke="#6d4c41" stroke-width="4" opacity="0.7" />
+                <line class="trunk-line" x1="960" y1="370" x2="1040" y2="370" stroke="#6d4c41" stroke-width="4" opacity="0.7" />
+                <line class="trunk-line" x1="960" y1="520" x2="1040" y2="520" stroke="#6d4c41" stroke-width="4" opacity="0.7" />
+                <line class="trunk-line" x1="960" y1="670" x2="1040" y2="670" stroke="#6d4c41" stroke-width="4" opacity="0.7" />
+                
+                <!-- Texturas do tronco -->
+                <path class="trunk-line" d="M970 200 C 1000 210, 1030 190, 1030 200" stroke="#6d4c41" stroke-width="6" fill="none" />
+                <path class="trunk-line" d="M970 500 C 1000 510, 1030 490, 1030 500" stroke="#6d4c41" stroke-width="6" fill="none" />
+                <path class="trunk-line" d="M970 800 C 1000 810, 1030 790, 1030 800" stroke="#6d4c41" stroke-width="6" fill="none" />
+                
+                <g class="branches-group">
+                    <path class="branch-path" d="M1000 450 C 975 400, 825 280, 725 150" stroke="#6d4c41" stroke-width="35" fill="none" stroke-linecap="round"/>
+                    <path class="branch-path" d="M1000 450 C 1025 400, 1175 280, 1275 150" stroke="#6d4c41" stroke-width="35" fill="none" stroke-linecap="round"/>
+                    
+                    <path class="branch-path" d="M1000 300 C 925 250, 850 180, 790 120" stroke="#6d4c41" stroke-width="28" fill="none" stroke-linecap="round"/>
+                    <path class="branch-path" d="M1000 300 C 1075 250, 1150 180, 1210 120" stroke="#6d4c41" stroke-width="28" fill="none" stroke-linecap="round"/>
+                    
+                    <path class="branch-path" d="M1000 200 C 963 150, 888 80, 838 50" stroke="#6d4c41" stroke-width="25" fill="none" stroke-linecap="round"/>
+                    <path class="branch-path" d="M1000 200 C 1037 150, 1112 80, 1162 50" stroke="#6d4c41" stroke-width="25" fill="none" stroke-linecap="round"/>
+                    
+                    <path class="branch-path" d="M825 280 C 775 230, 705 170, 645 140" stroke="#6d4c41" stroke-width="18" fill="none" stroke-linecap="round"/>
+                    <path class="branch-path" d="M790 120 C 755 90, 715 50, 685 30" stroke="#6d4c41" stroke-width="18" fill="none" stroke-linecap="round"/>
+                    <path class="branch-path" d="M975 400 C 925 350, 848 280, 805 240" stroke="#6d4c41" stroke-width="20" fill="none" stroke-linecap="round"/>
+                    
+                    <path class="branch-path" d="M1175 280 C 1225 230, 1295 170, 1355 140" stroke="#6d4c41" stroke-width="18" fill="none" stroke-linecap="round"/>
+                    <path class="branch-path" d="M1210 120 C 1245 90, 1285 50, 1315 30" stroke="#6d4c41" stroke-width="18" fill="none" stroke-linecap="round"/>
+                    <path class="branch-path" d="M1025 400 C 1075 350, 1152 280, 1195 240" stroke="#6d4c41" stroke-width="20" fill="none" stroke-linecap="round"/>
+                    
+                    <path class="branch-path" d="M725 150 C 675 120, 610 80, 565 60" stroke="#6d4c41" stroke-width="15" fill="none" stroke-linecap="round"/>
+                    <path class="branch-path" d="M1275 150 C 1325 120, 1390 80, 1435 60" stroke="#6d4c41" stroke-width="15" fill="none" stroke-linecap="round"/>
+                    
+                    <path class="branch-path" d="M645 140 C 615 110, 575 70, 545 50" stroke="#6d4c41" stroke-width="12" fill="none" stroke-linecap="round"/>
+                    <path class="branch-path" d="M1355 140 C 1385 110, 1425 70, 1455 50" stroke="#6d4c41" stroke-width="12" fill="none" stroke-linecap="round"/>
+                    
+                    <path class="branch-path" d="M838 50 C 815 30, 785 10, 763 5" stroke="#6d4c41" stroke-width="10" fill="none" stroke-linecap="round"/>
+                    <path class="branch-path" d="M1162 50 C 1185 30, 1215 10, 1237 5" stroke="#6d4c41" stroke-width="10" fill="none" stroke-linecap="round"/>
+                    
+                    <path class="branch-path" d="M805 240 C 765 200, 718 150, 685 120" stroke="#6d4c41" stroke-width="14" fill="none" stroke-linecap="round"/>
+                    <path class="branch-path" d="M1195 240 C 1235 200, 1282 150, 1315 120" stroke="#6d4c41" stroke-width="14" fill="none" stroke-linecap="round"/>
+                </g>
+
+                <g class="leaves-group" id="leavesGroup">
+                    <!-- GALHO PRINCIPAL ESQUERDO: M1000 450 C 975 400, 825 280, 725 150 -->
+                    <ellipse cx="975" cy="425" rx="50" ry="35" fill="#4caf50"/>
+                    <ellipse cx="950" cy="390" rx="45" ry="30" fill="#66bb6a"/>
+                    <ellipse cx="900" cy="340" rx="48" ry="32" fill="#4caf50"/>
+                    <ellipse cx="875" cy="310" rx="42" ry="28" fill="#81c784"/>
+                    <ellipse cx="825" cy="280" rx="50" ry="35" fill="#4caf50"/>
+                    <ellipse cx="800" cy="250" rx="45" ry="30" fill="#66bb6a"/>
+                    <ellipse cx="775" cy="220" rx="48" ry="32" fill="#a5d6a7"/>
+                    <ellipse cx="750" cy="185" rx="42" ry="28" fill="#4caf50"/>
+                    <ellipse cx="725" cy="150" rx="50" ry="35" fill="#66bb6a"/>
+
+                    <!-- GALHO PRINCIPAL DIREITO: M1000 450 C 1025 400, 1175 280, 1275 150 -->
+                    <ellipse cx="1025" cy="425" rx="50" ry="35" fill="#4caf50"/>
+                    <ellipse cx="1050" cy="390" rx="45" ry="30" fill="#66bb6a"/>
+                    <ellipse cx="1100" cy="340" rx="48" ry="32" fill="#4caf50"/>
+                    <ellipse cx="1125" cy="310" rx="42" ry="28" fill="#81c784"/>
+                    <ellipse cx="1175" cy="280" rx="50" ry="35" fill="#4caf50"/>
+                    <ellipse cx="1200" cy="250" rx="45" ry="30" fill="#66bb6a"/>
+                    <ellipse cx="1225" cy="220" rx="48" ry="32" fill="#a5d6a7"/>
+                    <ellipse cx="1250" cy="185" rx="42" ry="28" fill="#4caf50"/>
+                    <ellipse cx="1275" cy="150" rx="50" ry="35" fill="#66bb6a"/>
+
+                    <!-- GALHO MÉDIO ESQUERDO: M1000 300 C 925 250, 850 180, 790 120 -->
+                    <ellipse cx="925" cy="275" rx="45" ry="30" fill="#66bb6a"/>
+                    <ellipse cx="900" cy="240" rx="48" ry="32" fill="#4caf50"/>
+                    <ellipse cx="875" cy="210" rx="42" ry="28" fill="#81c784"/>
+                    <ellipse cx="850" cy="180" rx="50" ry="35" fill="#a5d6a7"/>
+                    <ellipse cx="820" cy="150" rx="45" ry="30" fill="#4caf50"/>
+                    <ellipse cx="790" cy="120" rx="48" ry="32" fill="#66bb6a"/>
+
+                    <!-- GALHO MÉDIO DIREITO: M1000 300 C 1075 250, 1150 180, 1210 120 -->
+                    <ellipse cx="1075" cy="275" rx="45" ry="30" fill="#66bb6a"/>
+                    <ellipse cx="1100" cy="240" rx="48" ry="32" fill="#4caf50"/>
+                    <ellipse cx="1125" cy="210" rx="42" ry="28" fill="#81c784"/>
+                    <ellipse cx="1150" cy="180" rx="50" ry="35" fill="#a5d6a7"/>
+                    <ellipse cx="1180" cy="150" rx="45" ry="30" fill="#4caf50"/>
+                    <ellipse cx="1210" cy="120" rx="48" ry="32" fill="#66bb6a"/>
+
+                    <!-- GALHO SUPERIOR ESQUERDO: M1000 200 C 963 150, 888 80, 838 50 -->
+                    <ellipse cx="963" cy="175" rx="40" ry="28" fill="#4caf50"/>
+                    <ellipse cx="930" cy="125" rx="42" ry="30" fill="#66bb6a"/>
+                    <ellipse cx="900" cy="95" rx="38" ry="26" fill="#81c784"/>
+                    <ellipse cx="870" cy="70" rx="45" ry="32" fill="#a5d6a7"/>
+                    <ellipse cx="838" cy="50" rx="40" ry="28" fill="#4caf50"/>
+
+                    <!-- GALHO SUPERIOR DIREITO: M1000 200 C 1037 150, 1112 80, 1162 50 -->
+                    <ellipse cx="1037" cy="175" rx="40" ry="28" fill="#4caf50"/>
+                    <ellipse cx="1070" cy="125" rx="42" ry="30" fill="#66bb6a"/>
+                    <ellipse cx="1100" cy="95" rx="38" ry="26" fill="#81c784"/>
+                    <ellipse cx="1130" cy="70" rx="45" ry="32" fill="#a5d6a7"/>
+                    <ellipse cx="1162" cy="50" rx="40" ry="28" fill="#4caf50"/>
+
+                    <!-- RAMIFICAÇÃO: M825 280 C 775 230, 705 170, 645 140 -->
+                    <ellipse cx="775" cy="255" rx="38" ry="26" fill="#66bb6a"/>
+                    <ellipse cx="740" cy="200" rx="40" ry="28" fill="#4caf50"/>
+                    <ellipse cx="720" cy="175" rx="35" ry="24" fill="#81c784"/>
+                    <ellipse cx="685" cy="155" rx="42" ry="30" fill="#a5d6a7"/>
+                    <ellipse cx="645" cy="140" rx="38" ry="26" fill="#66bb6a"/>
+
+                    <!-- RAMIFICAÇÃO: M1175 280 C 1225 230, 1295 170, 1355 140 -->
+                    <ellipse cx="1225" cy="255" rx="38" ry="26" fill="#66bb6a"/>
+                    <ellipse cx="1260" cy="200" rx="40" ry="28" fill="#4caf50"/>
+                    <ellipse cx="1280" cy="175" rx="35" ry="24" fill="#81c784"/>
+                    <ellipse cx="1315" cy="155" rx="42" ry="30" fill="#a5d6a7"/>
+                    <ellipse cx="1355" cy="140" rx="38" ry="26" fill="#66bb6a"/>
+
+                    <!-- RAMIFICAÇÃO: M790 120 C 755 90, 715 50, 685 30 -->
+                    <ellipse cx="755" cy="105" rx="35" ry="24" fill="#a5d6a7"/>
+                    <ellipse cx="735" cy="70" rx="38" ry="26" fill="#66bb6a"/>
+                    <ellipse cx="700" cy="40" rx="40" ry="28" fill="#4caf50"/>
+                    <ellipse cx="685" cy="30" rx="35" ry="24" fill="#81c784"/>
+
+                    <!-- RAMIFICAÇÃO: M1210 120 C 1245 90, 1285 50, 1315 30 -->
+                    <ellipse cx="1245" cy="105" rx="35" ry="24" fill="#a5d6a7"/>
+                    <ellipse cx="1265" cy="70" rx="38" ry="26" fill="#66bb6a"/>
+                    <ellipse cx="1300" cy="40" rx="40" ry="28" fill="#4caf50"/>
+                    <ellipse cx="1315" cy="30" rx="35" ry="24" fill="#81c784"/>
+
+                    <!-- RAMIFICAÇÃO: M975 400 C 925 350, 848 280, 805 240 -->
+                    <ellipse cx="925" cy="375" rx="42" ry="30" fill="#4caf50"/>
+                    <ellipse cx="890" cy="325" rx="40" ry="28" fill="#66bb6a"/>
+                    <ellipse cx="870" cy="300" rx="38" ry="26" fill="#81c784"/>
+                    <ellipse cx="830" cy="260" rx="45" ry="32" fill="#a5d6a7"/>
+                    <ellipse cx="805" cy="240" rx="42" ry="30" fill="#4caf50"/>
+
+                    <!-- RAMIFICAÇÃO: M1025 400 C 1075 350, 1152 280, 1195 240 -->
+                    <ellipse cx="1075" cy="375" rx="42" ry="30" fill="#4caf50"/>
+                    <ellipse cx="1110" cy="325" rx="40" ry="28" fill="#66bb6a"/>
+                    <ellipse cx="1130" cy="300" rx="38" ry="26" fill="#81c784"/>
+                    <ellipse cx="1170" cy="260" rx="45" ry="32" fill="#a5d6a7"/>
+                    <ellipse cx="1195" cy="240" rx="42" ry="30" fill="#4caf50"/>
+
+                    <!-- OUTRAS RAMIFICAÇÕES MENORES -->
+                    <!-- M725 150 C 675 120, 610 80, 565 60 -->
+                    <ellipse cx="675" cy="135" rx="35" ry="24" fill="#a5d6a7"/>
+                    <ellipse cx="640" cy="100" rx="38" ry="26" fill="#66bb6a"/>
+                    <ellipse cx="590" cy="70" rx="40" ry="28" fill="#4caf50"/>
+                    <ellipse cx="565" cy="60" rx="35" ry="24" fill="#81c784"/>
+
+                    <!-- M1275 150 C 1325 120, 1390 80, 1435 60 -->
+                    <ellipse cx="1325" cy="135" rx="35" ry="24" fill="#a5d6a7"/>
+                    <ellipse cx="1360" cy="100" rx="38" ry="26" fill="#66bb6a"/>
+                    <ellipse cx="1410" cy="70" rx="40" ry="28" fill="#4caf50"/>
+                    <ellipse cx="1435" cy="60" rx="35" ry="24" fill="#81c784"/>
+
+                    <!-- M645 140 C 615 110, 575 70, 545 50 -->
+                    <ellipse cx="615" cy="125" rx="32" ry="22" fill="#66bb6a"/>
+                    <ellipse cx="595" cy="90" rx="35" ry="24" fill="#4caf50"/>
+                    <ellipse cx="560" cy="60" rx="38" ry="26" fill="#81c784"/>
+                    <ellipse cx="545" cy="50" rx="32" ry="22" fill="#a5d6a7"/>
+
+                    <!-- M1355 140 C 1385 110, 1425 70, 1455 50 -->
+                    <ellipse cx="1385" cy="125" rx="32" ry="22" fill="#66bb6a"/>
+                    <ellipse cx="1405" cy="90" rx="35" ry="24" fill="#4caf50"/>
+                    <ellipse cx="1440" cy="60" rx="38" ry="26" fill="#81c784"/>
+                    <ellipse cx="1455" cy="50" rx="32" ry="22" fill="#a5d6a7"/>
+
+                    <!-- M838 50 C 815 30, 785 10, 763 5 -->
+                    <ellipse cx="815" cy="40" rx="30" ry="20" fill="#a5d6a7"/>
+                    <ellipse cx="800" cy="20" rx="32" ry="22" fill="#66bb6a"/>
+                    <ellipse cx="775" cy="8" rx="35" ry="24" fill="#4caf50"/>
+                    <ellipse cx="763" cy="5" rx="30" ry="20" fill="#81c784"/>
+
+                    <!-- M1162 50 C 1185 30, 1215 10, 1237 5 -->
+                    <ellipse cx="1185" cy="40" rx="30" ry="20" fill="#a5d6a7"/>
+                    <ellipse cx="1200" cy="20" rx="32" ry="22" fill="#66bb6a"/>
+                    <ellipse cx="1225" cy="8" rx="35" ry="24" fill="#4caf50"/>
+                    <ellipse cx="1237" cy="5" rx="30" ry="20" fill="#81c784"/>
+
+                    <!-- M805 240 C 765 200, 718 150, 685 120 -->
+                    <ellipse cx="765" cy="220" rx="35" ry="24" fill="#4caf50"/>
+                    <ellipse cx="740" cy="175" rx="38" ry="26" fill="#66bb6a"/>
+                    <ellipse cx="700" cy="135" rx="40" ry="28" fill="#81c784"/>
+                    <ellipse cx="685" cy="120" rx="35" ry="24" fill="#a5d6a7"/>
+
+                    <!-- M1195 240 C 1235 200, 1282 150, 1315 120 -->
+                    <ellipse cx="1235" cy="220" rx="35" ry="24" fill="#4caf50"/>
+                    <ellipse cx="1260" cy="175" rx="38" ry="26" fill="#66bb6a"/>
+                    <ellipse cx="1300" cy="135" rx="40" ry="28" fill="#81c784"/>
+                    <ellipse cx="1315" cy="120" rx="35" ry="24" fill="#a5d6a7"/>
+
+                    <!-- PREENCHIMENTO DA PARTE SUPERIOR DO TRONCO (região 450-200) -->
+                    <ellipse cx="990" cy="430" rx="45" ry="32" fill="#4caf50"/>
+                    <ellipse cx="1010" cy="420" rx="42" ry="30" fill="#66bb6a"/>
+                    <ellipse cx="985" cy="400" rx="48" ry="35" fill="#81c784"/>
+                    <ellipse cx="1015" cy="390" rx="40" ry="28" fill="#4caf50"/>
+                    <ellipse cx="995" cy="370" rx="45" ry="32" fill="#a5d6a7"/>
+                    <ellipse cx="1005" cy="350" rx="42" ry="30" fill="#66bb6a"/>
+                    <ellipse cx="990" cy="330" rx="48" ry="35" fill="#4caf50"/>
+                    <ellipse cx="1010" cy="320" rx="40" ry="28" fill="#81c784"/>
+                    <ellipse cx="985" cy="290" rx="45" ry="32" fill="#a5d6a7"/>
+                    <ellipse cx="1015" cy="280" rx="42" ry="30" fill="#66bb6a"/>
+                    <ellipse cx="995" cy="260" rx="48" ry="35" fill="#4caf50"/>
+                    <ellipse cx="1005" cy="240" rx="40" ry="28" fill="#81c784"/>
+                    <ellipse cx="990" cy="220" rx="45" ry="32" fill="#a5d6a7"/>
+                    <ellipse cx="1010" cy="210" rx="42" ry="30" fill="#66bb6a"/>
+
+                    <!-- PREENCHIMENTO DOS ESPAÇOS VAZIOS ENTRE GALHOS -->
+                    <!-- Região entre galhos principais esquerdo e direito (centro-superior) -->
+                    <ellipse cx="970" cy="360" rx="40" ry="28" fill="#66bb6a"/>
+                    <ellipse cx="1030" cy="360" rx="38" ry="26" fill="#4caf50"/>
+                    <ellipse cx="950" cy="320" rx="42" ry="30" fill="#81c784"/>
+                    <ellipse cx="1050" cy="320" rx="40" ry="28" fill="#a5d6a7"/>
+                    <ellipse cx="980" cy="280" rx="45" ry="32" fill="#4caf50"/>
+                    <ellipse cx="1020" cy="280" rx="42" ry="30" fill="#66bb6a"/>
+
+                    <!-- Região entre galhos médios -->
+                    <ellipse cx="960" cy="250" rx="38" ry="26" fill="#81c784"/>
+                    <ellipse cx="1040" cy="250" rx="40" ry="28" fill="#a5d6a7"/>
+                    <ellipse cx="975" cy="230" rx="42" ry="30" fill="#4caf50"/>
+                    <ellipse cx="1025" cy="230" rx="38" ry="26" fill="#66bb6a"/>
+
+                    <!-- Preenchimento entre ramificações esquerdas -->
+                    <ellipse cx="850" cy="200" rx="35" ry="24" fill="#a5d6a7"/>
+                    <ellipse cx="820" cy="180" rx="38" ry="26" fill="#66bb6a"/>
+                    <ellipse cx="880" cy="160" rx="40" ry="28" fill="#4caf50"/>
+                    <ellipse cx="860" cy="140" rx="35" ry="24" fill="#81c784"/>
+                    <ellipse cx="890" cy="120" rx="38" ry="26" fill="#a5d6a7"/>
+                    <ellipse cx="870" cy="100" rx="40" ry="28" fill="#66bb6a"/>
+                    <ellipse cx="850" cy="80" rx="35" ry="24" fill="#4caf50"/>
+                    <ellipse cx="880" cy="60" rx="38" ry="26" fill="#81c784"/>
+
+                    <!-- Preenchimento entre ramificações direitas -->
+                    <ellipse cx="1150" cy="200" rx="35" ry="24" fill="#a5d6a7"/>
+                    <ellipse cx="1180" cy="180" rx="38" ry="26" fill="#66bb6a"/>
+                    <ellipse cx="1120" cy="160" rx="40" ry="28" fill="#4caf50"/>
+                    <ellipse cx="1140" cy="140" rx="35" ry="24" fill="#81c784"/>
+                    <ellipse cx="1110" cy="120" rx="38" ry="26" fill="#a5d6a7"/>
+                    <ellipse cx="1130" cy="100" rx="40" ry="28" fill="#66bb6a"/>
+                    <ellipse cx="1150" cy="80" rx="35" ry="24" fill="#4caf50"/>
+                    <ellipse cx="1120" cy="60" rx="38" ry="26" fill="#81c784"/>
+
+                    <!-- Preenchimento das extremidades -->
+                    <ellipse cx="750" cy="120" rx="32" ry="22" fill="#66bb6a"/>
+                    <ellipse cx="780" cy="100" rx="35" ry="24" fill="#4caf50"/>
+                    <ellipse cx="720" cy="100" rx="38" ry="26" fill="#81c784"/>
+                    <ellipse cx="760" cy="80" rx="32" ry="22" fill="#a5d6a7"/>
+
+                    <ellipse cx="1250" cy="120" rx="32" ry="22" fill="#66bb6a"/>
+                    <ellipse cx="1220" cy="100" rx="35" ry="24" fill="#4caf50"/>
+                    <ellipse cx="1280" cy="100" rx="38" ry="26" fill="#81c784"/>
+                    <ellipse cx="1240" cy="80" rx="32" ry="22" fill="#a5d6a7"/>
+
+                    <!-- Preenchimento adicional nas áreas mais esparsas -->
+                    <ellipse cx="900" cy="250" rx="35" ry="24" fill="#4caf50"/>
+                    <ellipse cx="1100" cy="250" rx="35" ry="24" fill="#4caf50"/>
+                    <ellipse cx="880" cy="220" rx="32" ry="22" fill="#66bb6a"/>
+                    <ellipse cx="1120" cy="220" rx="32" ry="22" fill="#66bb6a"/>
+                    <ellipse cx="920" cy="190" rx="38" ry="26" fill="#81c784"/>
+                    <ellipse cx="1080" cy="190" rx="38" ry="26" fill="#81c784"/>
+
+                    <!-- Folhas nas pontas dos galhos menores -->
+                    <ellipse cx="530" cy="65" rx="30" ry="20" fill="#a5d6a7"/>
+                    <ellipse cx="1470" cy="65" rx="30" ry="20" fill="#a5d6a7"/>
+                    <ellipse cx="750" cy="10" rx="28" ry="18" fill="#66bb6a"/>
+                    <ellipse cx="1250" cy="10" rx="28" ry="18" fill="#66bb6a"/>
+
+                    <!-- Preenchimento final para eliminar espaços vazios -->
+                    <ellipse cx="950" cy="180" rx="35" ry="24" fill="#a5d6a7"/>
+                    <ellipse cx="1050" cy="180" rx="35" ry="24" fill="#a5d6a7"/>
+                    <ellipse cx="970" cy="160" rx="32" ry="22" fill="#4caf50"/>
+                    <ellipse cx="1030" cy="160" rx="32" ry="22" fill="#4caf50"/>
+                    <ellipse cx="940" cy="140" rx="38" ry="26" fill="#66bb6a"/>
+                    <ellipse cx="1060" cy="140" rx="38" ry="26" fill="#66bb6a"/>
+                    <ellipse cx="960" cy="120" rx="35" ry="24" fill="#81c784"/>
+                    <ellipse cx="1040" cy="120" rx="35" ry="24" fill="#81c784"/>
+                </g>
+            </svg>
+        </div>
+
+        <!-- Animação de transição para capítulos -->
+        <div class="chapter-transition" id="chapterTransition">
+            <div class="transition-content">
+                <div class="transition-title" id="transitionTitle">Carregando...</div>
+                <div class="transition-subtitle" id="transitionSubtitle">Preparando o capítulo</div>
+                <div class="loading-animation"></div>
+            </div>
+        </div>
+
+        <!-- Nomes das Abstrações Arrastáveis -->
+        <div class="draggable-abstractions">
+            <div class="abstraction-bubble disabled" draggable="false" data-abstraction="intuition">
+                Intuição
+            </div>
+            <div class="abstraction-bubble disabled" draggable="false" data-abstraction="geometry">
+                Geometria
+            </div>
+            <div class="abstraction-bubble disabled" draggable="false" data-abstraction="analysis">
+                Análise
+            </div>
+            <div class="abstraction-bubble disabled" draggable="false" data-abstraction="topology">
+                Topologia
+            </div>
+        </div>
+
+        <!-- Perguntas Arrastáveis -->
+        <div class="draggable-questions">
+            <div class="question-bubble" draggable="true" data-question="integral">
+                O que é uma integral?
+            </div>
+            <div class="question-bubble" draggable="true" data-question="area">
+                Como medir áreas curvas?
+            </div>
+            <div class="question-bubble" draggable="true" data-question="parts">
+                Por que integrar por partes?
+            </div>
+        </div>
     </div>
-  </main>
 
-    <script src="scripts.js"></script>
+    <script>
+        let isWinter = false;
+        let rootQuestionsPlaced = 0;
+        let trunkAbstractionsPlaced = 0;
+        let currentStage = 1; // 1 = raízes, 2 = tronco, 3 = completo
+        let draggedElement = null;
+        
+        // Ordem correta das abstrações (de baixo para cima)
+        const abstractionOrder = ['intuition', 'geometry', 'analysis', 'topology'];
+        const placedAbstractions = [];
+        
+        // Tópicos do livro com links e tooltips
+        const topics = [
+            {
+                title: "1. Prefácio",
+                link: "capitulos/prefacio.html",
+                tooltip: "Introdução ao cálculo integral avançado"
+            },
+            {
+                title: "2. Integrais sobre Elementos",
+                link: "capitulos/integrais-elementos.html",
+                tooltip: "Integrais sobre elementos de área e volume"
+            },
+            {
+                title: "3. Mecânica",
+                link: "capitulos/cap3.html",
+                tooltip: "Aplicações na mecânica clássica"
+            },
+            {
+                title: "4. Trabalho e Energia",
+                link: "capitulos/cap4.html",
+                tooltip: "Trabalho e energia no espaço tridimensional"
+            },
+            {
+                title: "5. Variação de Ângulo",
+                link: "capitulos/cap5.html",
+                tooltip: "Integral de linha e variação angular"
+            },
+            {
+                title: "6. Campos - Fluxos",
+                link: "capitulos/cap6.html",
+                tooltip: "Teoria dos campos vetoriais"
+            },
+            {
+                title: "7. Ângulo Sólido",
+                link: "capitulos/cap7.html",
+                tooltip: "Conceitos de ângulo sólido"
+            },
+            {
+                title: "8. Determinante",
+                link: "capitulos/cap8.html",
+                tooltip: "Determinantes e transformações"
+            },
+            {
+                title: "9. Voltando ao Trabalho",
+                link: "capitulos/cap9.html",
+                tooltip: "Revisitando conceitos de trabalho"
+            },
+            {
+                title: "10. Bordo",
+                link: "capitulos/cap10.html",
+                tooltip: "Teoria de bordos e fronteiras"
+            },
+            {
+                title: "11. Trabalho: Parte 2",
+                link: "capitulos/cap11.html",
+                tooltip: "Extensões da teoria do trabalho"
+            },
+            {
+                title: "12. Teorema de Stokes",
+                link: "capitulos/cap12.html",
+                tooltip: "Teorema fundamental de Stokes"
+            },
+            {
+                title: "13. Teorema de Green",
+                link: "capitulos/cap13.html",
+                tooltip: "Teorema de Green no plano"
+            },
+            {
+                title: "14. Reinterpretando a Derivada",
+                link: "capitulos/cap14.html",
+                tooltip: "Nova perspectiva sobre derivadas"
+            },
+            {
+                title: "15. Teorema da Divergência",
+                link: "capitulos/cap15.html",
+                tooltip: "Teorema da divergência de Gauss"
+            },
+            {
+                title: "16. Álgebra Exterior",
+                link: "capitulos/cap16.html",
+                tooltip: "Fundamentos da álgebra exterior"
+            },
+            {
+                title: "17. Pullback",
+                link: "capitulos/cap17.html",
+                tooltip: "Operações de pullback"
+            },
+            {
+                title: "Apêndice A - Curvas",
+                link: "capitulos/apendice-a.html",
+                tooltip: "Curvas e superfícies paramétricas"
+            },
+            {
+                title: "Apêndice B - Derivadas",
+                link: "capitulos/apendice-b.html",
+                tooltip: "Derivada como aproximação linear"
+            },
+            {
+                title: "Apêndice C - Gradientes",
+                link: "capitulos/apendice-c.html",
+                tooltip: "Gradientes e derivadas direcionais"
+            }
+        ];
+
+        // Posições otimizadas das folhas (sem sobreposição)
+        const leafPositions = [
+            // Lado esquerdo - tópicos básicos (1-10)
+            {x: 650, y: 140},   // 1. Prefácio
+            {x: 720, y: 165},   // 2. Integrais sobre Elementos
+            {x: 780, y: 195},   // 3. Mecânica
+            {x: 810, y: 235},   // 4. Trabalho e Energia
+            {x: 840, y: 275},   // 5. Variação de Ângulo
+            {x: 870, y: 315},   // 6. Campos - Fluxos
+            {x: 900, y: 355},   // 7. Ângulo Sólido
+            {x: 930, y: 395},   // 8. Determinante
+            {x: 960, y: 435},   // 9. Voltando ao Trabalho
+            {x: 990, y: 420},   // 10. Bordo
+            
+            // Lado direito - tópicos intermediários (11-17)
+            {x: 1310, y: 140},  // 11. Trabalho: Parte 2
+            {x: 1280, y: 175},  // 12. Teorema de Stokes
+            {x: 1250, y: 210},  // 13. Teorema de Green
+            {x: 1220, y: 245},  // 14. Reinterpretando Derivada
+            {x: 1190, y: 280},  // 15. Teorema da Divergência
+            {x: 1160, y: 315},  // 16. Álgebra Exterior
+            {x: 1130, y: 350},  // 17. Pullback
+            
+            // Apêndices - nas extremidades
+            {x: 580, y: 110},   // Apêndice A
+            {x: 540, y: 85},    // Apêndice B
+            {x: 1420, y: 110}   // Apêndice C
+        ];
+
+        // Função para navegar para capítulo com animação
+        function navigateToChapter(topic) {
+            const transition = document.getElementById('chapterTransition');
+            const title = document.getElementById('transitionTitle');
+            const subtitle = document.getElementById('transitionSubtitle');
+            
+            // Configurar textos da transição
+            title.textContent = topic.title;
+            subtitle.textContent = topic.tooltip;
+            
+            // Mostrar animação
+            transition.classList.add('active');
+            
+            // Simular carregamento e navegar
+            setTimeout(() => {
+                // Aqui você pode modificar o link conforme sua estrutura
+                window.location.href = topic.link;
+            }, 2000);
+        }
+
+        function createLeafTopics() {
+            leafPositions.forEach((pos, i) => {
+                if (topics[i]) {
+                    createLeafTopic(topics[i], pos.x, pos.y);
+                }
+            });
+        }
+
+        function createLeafTopic(topicData, x, y) {
+            const topicEl = document.createElement('a');
+            topicEl.className = 'leaf-topic';
+            topicEl.textContent = topicData.title;
+            topicEl.setAttribute('data-tooltip', topicData.tooltip);
+            topicEl.href = '#'; // Previne navegação padrão
+            
+            // Adicionar evento de clique personalizado
+            topicEl.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (currentStage >= 2) { // Só permite navegação após completar raízes
+                    navigateToChapter(topicData);
+                }
+            });
+            
+            // Obter as dimensões do container e do SVG
+            const container = document.getElementById('treeContainer');
+            
+            // Calcular a posição em porcentagem relativa ao container
+            const viewBoxWidth = 2000;
+            const viewBoxHeight = 1200;
+            
+            const leftPercent = (x / viewBoxWidth) * 100;
+            const topPercent = (y / viewBoxHeight) * 100;
+            
+            // Aplicar a posição
+            topicEl.style.left = `${leftPercent}%`;
+            topicEl.style.top = `${topPercent}%`;
+            
+            container.appendChild(topicEl);
+        }
+
+        function updateProgress() {
+            const progressFill = document.getElementById('progressFill');
+            const progressText = document.getElementById('progressText');
+            const stageIndicator = document.getElementById('stageIndicator');
+            
+            let totalProgress = 0;
+            let progressLabel = '';
+            let stageLabel = '';
+            
+            if (currentStage === 1) {
+                totalProgress = (rootQuestionsPlaced / 3) * 33.33;
+                progressLabel = `Raízes: ${rootQuestionsPlaced}/3`;
+                stageLabel = 'Fase 1: Fundamentos';
+            } else if (currentStage === 2) {
+                totalProgress = 33.33 + (trunkAbstractionsPlaced / 4) * 33.33;
+                progressLabel = `Abstrações: ${trunkAbstractionsPlaced}/4`;
+                stageLabel = 'Fase 2: Estrutura';
+            } else {
+                totalProgress = 100;
+                progressLabel = 'Completo!';
+                stageLabel = 'Fase 3: Conhecimento';
+            }
+            
+            progressFill.style.height = totalProgress + '%';
+            progressText.textContent = progressLabel;
+            stageIndicator.textContent = stageLabel;
+            
+            // Ativar botão de estação quando completar tudo
+            if (currentStage === 3) {
+                document.getElementById('seasonToggle').classList.add('active');
+            }
+        }
+
+        function enableTrunkSlots() {
+            const trunkSlots = document.querySelectorAll('.trunk-slot');
+            const abstractionBubbles = document.querySelectorAll('.abstraction-bubble');
+            
+            trunkSlots.forEach(slot => {
+                slot.classList.remove('disabled');
+                slot.textContent = 'Arraste o nome da camada';
+            });
+            
+            abstractionBubbles.forEach(bubble => {
+                bubble.classList.remove('disabled');
+                bubble.draggable = true;
+            });
+        }
+
+        function handleRootQuestionPlacement() {
+            rootQuestionsPlaced++;
+            updateProgress();
+            
+            if (rootQuestionsPlaced === 3) {
+                currentStage = 2;
+                updateProgress();
+                enableTrunkSlots();
+                // Mostrar algumas folhas iniciais
+                revealLeaves(8);
+            }
+        }
+
+        function handleTrunkAbstractionPlacement(abstractionType) {
+            trunkAbstractionsPlaced++;
+            placedAbstractions.push(abstractionType);
+            updateProgress();
+            
+            // Revelar mais folhas baseado na quantidade colocada
+            revealLeaves(8 + trunkAbstractionsPlaced * 5);
+            
+            if (trunkAbstractionsPlaced === 4) {
+                currentStage = 3;
+                updateProgress();
+                // Mostrar todas as folhas
+                setTimeout(() => {
+                    const allLeaves = document.querySelectorAll('.leaves-group ellipse');
+                    const allTopics = document.querySelectorAll('.leaf-topic');
+                    
+                    allLeaves.forEach((leaf, i) => {
+                        setTimeout(() => {
+                            leaf.classList.add('visible');
+                            if (allTopics[i]) {
+                                allTopics[i].classList.add('visible');
+                            }
+                        }, i * 15);
+                    });
+                }, 500);
+            }
+        }
+
+        function revealLeaves(count) {
+            const leaves = document.querySelectorAll('.leaves-group ellipse');
+            const topics = document.querySelectorAll('.leaf-topic');
+            
+            const toReveal = Math.min(count, leaves.length);
+            
+            for (let i = 0; i < toReveal; i++) {
+                setTimeout(() => {
+                    leaves[i].classList.add('visible');
+                    if (topics[i]) {
+                        topics[i].classList.add('visible');
+                    }
+                }, i * 25);
+            }
+        }
+
+        // Sistema de Drag and Drop
+        let isDragging = false;
+        let currentDragElement = null;
+        let offset = { x: 0, y: 0 };
+
+        function initializeDragAndDrop() {
+            const questions = document.querySelectorAll('.question-bubble');
+            const abstractions = document.querySelectorAll('.abstraction-bubble');
+            const rootSlots = document.querySelectorAll('.root-slot');
+            const trunkSlots = document.querySelectorAll('.trunk-slot');
+
+            // Eventos para perguntas
+            questions.forEach(question => {
+                question.addEventListener('mousedown', startDrag);
+                question.addEventListener('touchstart', startDrag, { passive: false });
+            });
+
+            // Eventos para abstrações
+            abstractions.forEach(abstraction => {
+                abstraction.addEventListener('mousedown', startDrag);
+                abstraction.addEventListener('touchstart', startDrag, { passive: false });
+            });
+
+            // Eventos globais
+            document.addEventListener('mousemove', drag);
+            document.addEventListener('mouseup', endDrag);
+            document.addEventListener('touchmove', drag, { passive: false });
+            document.addEventListener('touchend', endDrag);
+
+            // Eventos dos slots
+            [...rootSlots, ...trunkSlots].forEach(slot => {
+                slot.addEventListener('mouseenter', highlightSlot);
+                slot.addEventListener('mouseleave', unhighlightSlot);
+            });
+        }
+
+        function startDrag(e) {
+            e.preventDefault();
+            
+            if (e.target.classList.contains('placed') || e.target.classList.contains('disabled')) return;
+            
+            isDragging = true;
+            currentDragElement = e.target;
+            currentDragElement.classList.add('dragging');
+            
+            const rect = currentDragElement.getBoundingClientRect();
+            const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+            const clientY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
+            
+            offset.x = clientX - rect.left;
+            offset.y = clientY - rect.top;
+            
+            currentDragElement.style.zIndex = '1000';
+            currentDragElement.style.position = 'fixed';
+            currentDragElement.style.pointerEvents = 'none';
+            
+            updateDragPosition(clientX, clientY);
+        }
+
+        function drag(e) {
+            if (!isDragging || !currentDragElement) return;
+            
+            e.preventDefault();
+            
+            const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+            const clientY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
+            
+            updateDragPosition(clientX, clientY);
+            
+            // Determinar tipo de slots válidos
+            const isQuestion = currentDragElement.classList.contains('question-bubble');
+            const validSlots = isQuestion ? 
+                document.querySelectorAll('.root-slot') : 
+                document.querySelectorAll('.trunk-slot:not(.disabled)');
+            
+            let overSlot = null;
+            
+            validSlots.forEach(slot => {
+                const slotRect = slot.getBoundingClientRect();
+                if (clientX >= slotRect.left && clientX <= slotRect.right &&
+                    clientY >= slotRect.top && clientY <= slotRect.bottom) {
+                    overSlot = slot;
+                }
+            });
+            
+            // Highlight do slot correto
+            validSlots.forEach(slot => {
+                if (slot === overSlot && !slot.classList.contains('filled')) {
+                    slot.classList.add('highlight');
+                } else {
+                    slot.classList.remove('highlight');
+                }
+            });
+        }
+
+        function updateDragPosition(clientX, clientY) {
+            if (!currentDragElement) return;
+            
+            currentDragElement.style.left = (clientX - offset.x) + 'px';
+            currentDragElement.style.top = (clientY - offset.y) + 'px';
+        }
+
+        function endDrag(e) {
+            if (!isDragging || !currentDragElement) return;
+            
+            const clientX = e.type.includes('touch') ? e.changedTouches[0].clientX : e.clientX;
+            const clientY = e.type.includes('touch') ? e.changedTouches[0].clientY : e.clientY;
+            
+            // Determinar tipo de slots válidos
+            const isQuestion = currentDragElement.classList.contains('question-bubble');
+            const validSlots = isQuestion ? 
+                document.querySelectorAll('.root-slot') : 
+                document.querySelectorAll('.trunk-slot:not(.disabled)');
+            
+            let targetSlot = null;
+            
+            validSlots.forEach(slot => {
+                const slotRect = slot.getBoundingClientRect();
+                if (clientX >= slotRect.left && clientX <= slotRect.right &&
+                    clientY >= slotRect.top && clientY <= slotRect.bottom &&
+                    !slot.classList.contains('filled')) {
+                    targetSlot = slot;
+                }
+            });
+            
+            if (targetSlot) {
+                if (isQuestion) {
+                    placeQuestionInSlot(currentDragElement, targetSlot);
+                } else {
+                    placeAbstractionInSlot(currentDragElement, targetSlot);
+                }
+            } else {
+                resetElementPosition(currentDragElement);
+            }
+            
+            // Limpar estados
+            currentDragElement.classList.remove('dragging');
+            currentDragElement.style.zIndex = '';
+            currentDragElement.style.position = '';
+            currentDragElement.style.pointerEvents = '';
+            currentDragElement.style.left = '';
+            currentDragElement.style.top = '';
+            
+            validSlots.forEach(slot => slot.classList.remove('highlight'));
+            
+            isDragging = false;
+            currentDragElement = null;
+        }
+
+        function placeQuestionInSlot(question, slot) {
+            slot.classList.add('filled');
+            slot.textContent = question.textContent;
+            slot.style.fontSize = '9px';
+            
+            question.classList.add('placed');
+            handleRootQuestionPlacement();
+        }
+
+        function placeAbstractionInSlot(abstraction, slot) {
+            const abstractionType = abstraction.dataset.abstraction;
+            
+            slot.classList.add('filled');
+            slot.textContent = abstraction.textContent;
+            slot.style.fontSize = '10px';
+            
+            abstraction.classList.add('placed');
+            handleTrunkAbstractionPlacement(abstractionType);
+        }
+
+        function resetElementPosition(element) {
+            // Elemento volta para posição original automaticamente
+        }
+
+        function highlightSlot(e) {
+            if (isDragging && !e.target.classList.contains('filled') && !e.target.classList.contains('disabled')) {
+                // Verificar se o tipo está correto
+                const isQuestion = currentDragElement?.classList.contains('question-bubble');
+                const isRootSlot = e.target.classList.contains('root-slot');
+                const isTrunkSlot = e.target.classList.contains('trunk-slot');
+                
+                if ((isQuestion && isRootSlot) || (!isQuestion && isTrunkSlot)) {
+                    e.target.classList.add('highlight');
+                }
+            }
+        }
+
+        function unhighlightSlot(e) {
+            e.target.classList.remove('highlight');
+        }
+
+        function toggleSeason() {
+            if (currentStage < 3) return;
+            
+            isWinter = !isWinter;
+            const toggle = document.getElementById('seasonToggle');
+            const rootElements = document.querySelectorAll('.roots-svg');
+            
+            if (isWinter) {
+                toggle.textContent = '❄️ Inverno → 🍃 Verão';
+                toggle.classList.add('winter');
+                rootElements.forEach(el => el.classList.add('winter'));
+                document.querySelectorAll('.leaf-topic').forEach((el, i) => {
+                    setTimeout(() => el.classList.remove('visible'), i * 8);
+                });
+                document.querySelectorAll('.leaves-group ellipse').forEach((el, i) => {
+                    setTimeout(() => el.classList.add('winter'), i * 8);
+                });
+            } else {
+                toggle.textContent = '🍃 Verão → ❄️ Inverno';
+                toggle.classList.remove('winter');
+                rootElements.forEach(el => el.classList.remove('winter'));
+                document.querySelectorAll('.leaf-topic').forEach((el, i) => {
+                    setTimeout(() => el.classList.add('visible'), i * 8);
+                });
+                document.querySelectorAll('.leaves-group ellipse').forEach((el, i) => {
+                    setTimeout(() => el.classList.remove('winter'), i * 8);
+                });
+            }
+        }
+
+        // Inicialização
+        window.addEventListener('load', () => {
+            createLeafTopics();
+            initializeDragAndDrop();
+            updateProgress();
+            
+            // Adicionar efeito de fade-in inicial
+            setTimeout(() => {
+                document.body.style.opacity = '1';
+            }, 100);
+        });
+
+        // Prevenir navegação acidental durante drag
+        document.addEventListener('dragstart', (e) => {
+            e.preventDefault();
+        });
+
+        // Adicionar estilo inicial para fade-in
+        document.body.style.opacity = '0';
+        document.body.style.transition = 'opacity 0.5s ease';
+    </script>
 </body>
 </html>

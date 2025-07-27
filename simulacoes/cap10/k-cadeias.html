@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>K-Cadeias e Cancelamento de Bordos</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(52, 152, 219, 0.1);
+            border-radius: 15px;
+            border: 2px solid rgba(52, 152, 219, 0.3);
+        }
+        
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .control-section {
+            grid-column: 1 / -1;
+            border-bottom: 2px solid rgba(52, 152, 219, 0.2);
+            padding-bottom: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .control-section h4 {
+            margin: 0 0 10px 0;
+            color: #2c3e50;
+            font-size: 1.1em;
+        }
+        
+        label {
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 0.85em;
+        }
+        
+        input[type="range"] {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: #ddd;
+            outline: none;
+            -webkit-appearance: none;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #3498db;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+        
+        select, button {
+            padding: 8px;
+            border: 2px solid #3498db;
+            border-radius: 8px;
+            background: white;
+            font-size: 0.9em;
+            cursor: pointer;
+        }
+        
+        button {
+            background: #3498db;
+            color: white;
+            font-weight: bold;
+        }
+        
+        button:hover {
+            background: #2980b9;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #3498db;
+        }
+        
+        .visualization {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .canvas-container {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border: 2px solid rgba(52, 152, 219, 0.2);
+        }
+        
+        canvas {
+            width: 100%;
+            height: 450px;
+            border-radius: 10px;
+            background: #f8f9fa;
+        }
+        
+        .cancellation-info {
+            background: linear-gradient(135deg, #ff7675, #d63031);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 15px 0;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .chain-info {
+            background: linear-gradient(135deg, #74b9ff, #0984e3);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-top: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .formula {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 1.1em;
+            backdrop-filter: blur(5px);
+        }
+        
+        .edge-pair {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px;
+            border-radius: 8px;
+            margin: 8px 0;
+            border-left: 4px solid;
+        }
+        
+        .edge-pair.cancelled { border-left-color: #00b894; }
+        .edge-pair.active { border-left-color: #fdcb6e; }
+        .edge-pair.waiting { border-left-color: #636e72; }
+        
+        .edge-notation {
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+        }
+        
+        .arrow {
+            font-size: 1.5em;
+            color: #00b894;
+        }
+        
+        @media (max-width: 768px) {
+            .visualization {
+                grid-template-columns: 1fr;
+            }
+            .controls {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Cancelamento de Bordos em K-Cadeias</h1>
+        
+        <div class="controls">
+            <div class="control-section">
+                <h4>Configuração da K-Cadeia</h4>
+            </div>
+            
+            <div class="control-group">
+                <label for="gridSize">Configuração:</label>
+                <select id="gridSize">
+                    <option value="2x1">2×1 (2 superfícies)</option>
+                    <option value="2x2" selected>2×2 (4 superfícies)</option>
+                    <option value="3x1">3×1 (3 superfícies)</option>
+                    <option value="3x2">3×2 (6 superfícies)</option>
+                </select>
+            </div>
+            
+            <div class="control-group">
+                <label for="showArrows">Mostrar orientações:</label>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="showArrows" checked>
+                </div>
+            </div>
+            
+            <div class="control-group">
+                <label for="highlightActive">Destacar bordos ativos:</label>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="highlightActive" checked>
+                </div>
+            </div>
+            
+            <div class="control-section">
+                <h4>Processo de Cancelamento</h4>
+            </div>
+            
+            <div class="control-group">
+                <label for="cancelationStep">Passo do cancelamento:</label>
+                <input type="range" id="cancelationStep" min="0" max="100" step="10" value="0">
+                <span id="cancelationStepValue">0%</span>
+            </div>
+            
+            <div class="control-group">
+                <button id="animateCancelation">Animar Cancelamento</button>
+            </div>
+            
+            <div class="control-group">
+                <button id="resetView">Resetar Visualização</button>
+            </div>
+        </div>
+        
+        <div class="visualization">
+            <div class="canvas-container">
+                <h3 style="text-align: center; color: #2c3e50; margin-bottom: 15px;">Bordos Individuais (Antes do Cancelamento)</h3>
+                <canvas id="individualCanvas"></canvas>
+                <div id="individualBordersInfo" style="margin-top: 15px; font-size: 0.9em; color: #666;">
+                    Cada superfície contribui com seus 4 bordos orientados para a soma ∂C = Σᵢ ∂σᵢ
+                </div>
+            </div>
+            
+            <div class="canvas-container">
+                <h3 style="text-align: center; color: #2c3e50; margin-bottom: 15px;">Resultado Final (Após Cancelamento)</h3>
+                <canvas id="resultCanvas"></canvas>
+                <div id="resultBordersInfo" style="margin-top: 15px; font-size: 0.9em; color: #666;">
+                    Apenas bordos externos permanecem após o cancelamento de bordos internos opostos
+                </div>
+            </div>
+        </div>
+        
+        <div class="cancellation-info" id="cancellationInfo">
+            <h3 style="margin-top: 0;">Cancelamentos Ativos</h3>
+            <div id="cancellationList">
+                <!-- Preenchido dinamicamente -->
+            </div>
+        </div>
+        
+        <div class="chain-info">
+            <h3 style="margin-top: 0;">K-Cadeias e Operador Bordo</h3>
+            
+            <div class="formula">
+                C = σ₁ + σ₂ + σ₃ + σ₄    (2-cadeia como soma de superfícies orientadas)
+            </div>
+            
+            <p><strong>Operador Bordo:</strong> O bordo de uma k-cadeia é a soma dos bordos individuais:</p>
+            
+            <div class="formula">
+                ∂C = ∂σ₁ + ∂σ₂ + ∂σ₃ + ∂σ₄
+            </div>
+            
+            <p><strong>Cancelamento:</strong> Quando duas superfícies adjacentes compartilham uma aresta, seus bordos contribuem com orientações opostas nessa aresta:</p>
+            
+            <div class="formula">
+                ∂σᵢ = +e₁₂ + e₂₃ - e₃₄ - e₄₁    (exemplo de orientação)
+                ∂σⱼ = -e₁₂ + e₂₅ + e₅₆ - e₆₁    (aresta compartilhada com sinal oposto)
+            </div>
+            
+            <p><strong>Resultado:</strong> Na soma ∂C, arestas internas se cancelam: (+e₁₂) + (-e₁₂) = 0</p>
+            
+            <div class="formula">
+                ∂²C = 0    (O bordo do bordo é sempre zero)
+            </div>
+            
+            <p><strong>Interpretação Geométrica:</strong> O cancelamento de bordos internos é a razão matemática pela qual superfícies coladas formam uma única superfície com bordo contínuo.</p>
+        </div>
+    </div>
+
+    <script>
+        // Configuração dos canvas
+        const individualCanvas = document.getElementById('individualCanvas');
+        const resultCanvas = document.getElementById('resultCanvas');
+        const individualCtx = individualCanvas.getContext('2d');
+        const resultCtx = resultCanvas.getContext('2d');
+        
+        // Configurações dos grids disponíveis
+        const gridConfigs = {
+            '2x1': { rows: 1, cols: 2, surfaces: 2 },
+            '2x2': { rows: 2, cols: 2, surfaces: 4 },
+            '3x1': { rows: 1, cols: 3, surfaces: 3 },
+            '3x2': { rows: 2, cols: 3, surfaces: 6 }
+        };
+        
+        // Parâmetros da simulação
+        let params = {
+            gridConfig: '2x2',
+            showArrows: true,
+            highlightActive: true,
+            cancelationStep: 0
+        };
+        
+        let animationId = null;
+        let currentCancellations = [];
+        
+        // Configurar tamanho dos canvas
+        function resizeCanvas() {
+            const rect = individualCanvas.parentElement.getBoundingClientRect();
+            individualCanvas.width = rect.width;
+            individualCanvas.height = 450;
+            
+            const resultRect = resultCanvas.parentElement.getBoundingClientRect();
+            resultCanvas.width = resultRect.width;
+            resultCanvas.height = 450;
+            
+            draw();
+        }
+        
+        window.addEventListener('resize', resizeCanvas);
+        
+        // Controles
+        const controls = {
+            gridSize: document.getElementById('gridSize'),
+            showArrows: document.getElementById('showArrows'),
+            highlightActive: document.getElementById('highlightActive'),
+            cancelationStep: document.getElementById('cancelationStep'),
+            animateCancelation: document.getElementById('animateCancelation'),
+            resetView: document.getElementById('resetView')
+        };
+        
+        const values = {
+            cancelationStep: document.getElementById('cancelationStepValue')
+        };
+        
+        // Event listeners
+        controls.gridSize.addEventListener('change', (e) => {
+            params.gridConfig = e.target.value;
+            params.cancelationStep = 0;
+            controls.cancelationStep.value = 0;
+            values.cancelationStep.textContent = '0%';
+            generateCancellations();
+            draw();
+        });
+        
+        controls.showArrows.addEventListener('change', (e) => {
+            params.showArrows = e.target.checked;
+            draw();
+        });
+        
+        controls.highlightActive.addEventListener('change', (e) => {
+            params.highlightActive = e.target.checked;
+            draw();
+        });
+        
+        controls.cancelationStep.addEventListener('input', (e) => {
+            params.cancelationStep = parseFloat(e.target.value);
+            values.cancelationStep.textContent = `${params.cancelationStep}%`;
+            updateCancellationDisplay();
+            draw();
+        });
+        
+        controls.animateCancelation.addEventListener('click', animateCancellation);
+        controls.resetView.addEventListener('click', resetView);
+        
+        // Função para gerar as superfícies e suas arestas
+        function generateSurfaces() {
+            const config = gridConfigs[params.gridConfig];
+            const surfaces = [];
+            
+            const cellWidth = 120;
+            const cellHeight = 100;
+            const startX = -config.cols * cellWidth / 2;
+            const startY = -config.rows * cellHeight / 2;
+            
+            for (let row = 0; row < config.rows; row++) {
+                for (let col = 0; col < config.cols; col++) {
+                    const id = row * config.cols + col;
+                    const x = startX + col * cellWidth;
+                    const y = startY + row * cellHeight;
+                    
+                    // Definir os vértices da superfície (retângulo)
+                    const vertices = [
+                        { x: x, y: y },                           // top-left
+                        { x: x + cellWidth, y: y },               // top-right
+                        { x: x + cellWidth, y: y + cellHeight },  // bottom-right
+                        { x: x, y: y + cellHeight }               // bottom-left
+                    ];
+                    
+                    // Definir as arestas com orientação consistente (sentido anti-horário)
+                    const edges = [
+                        { 
+                            id: `${id}_top`, 
+                            from: vertices[0], 
+                            to: vertices[1], 
+                            surface: id,
+                            side: 'top',
+                            orientation: 1  // esquerda para direita
+                        },
+                        { 
+                            id: `${id}_right`, 
+                            from: vertices[1], 
+                            to: vertices[2], 
+                            surface: id,
+                            side: 'right',
+                            orientation: 1  // cima para baixo
+                        },
+                        { 
+                            id: `${id}_bottom`, 
+                            from: vertices[2], 
+                            to: vertices[3], 
+                            surface: id,
+                            side: 'bottom',
+                            orientation: -1  // direita para esquerda
+                        },
+                        { 
+                            id: `${id}_left`, 
+                            from: vertices[3], 
+                            to: vertices[0], 
+                            surface: id,
+                            side: 'left',
+                            orientation: -1  // baixo para cima
+                        }
+                    ];
+                    
+                    surfaces.push({
+                        id,
+                        row,
+                        col,
+                        vertices,
+                        edges,
+                        center: { x: x + cellWidth/2, y: y + cellHeight/2 }
+                    });
+                }
+            }
+            
+            return surfaces;
+        }
+        
+        // Função para encontrar cancelamentos
+        function generateCancellations() {
+            const surfaces = generateSurfaces();
+            const config = gridConfigs[params.gridConfig];
+            currentCancellations = [];
+            
+            // Verificar cancelamentos horizontais
+            for (let row = 0; row < config.rows; row++) {
+                for (let col = 0; col < config.cols - 1; col++) {
+                    const leftSurface = surfaces[row * config.cols + col];
+                    const rightSurface = surfaces[row * config.cols + col + 1];
+                    
+                    const leftEdge = leftSurface.edges.find(e => e.side === 'right');
+                    const rightEdge = rightSurface.edges.find(e => e.side === 'left');
+                    
+                    currentCancellations.push({
+                        type: 'horizontal',
+                        edge1: leftEdge,
+                        edge2: rightEdge,
+                        description: `Aresta direita de σ${leftSurface.id + 1} cancela com aresta esquerda de σ${rightSurface.id + 1}`,
+                        surfaces: [leftSurface.id + 1, rightSurface.id + 1]
+                    });
+                }
+            }
+            
+            // Verificar cancelamentos verticais
+            for (let row = 0; row < config.rows - 1; row++) {
+                for (let col = 0; col < config.cols; col++) {
+                    const topSurface = surfaces[row * config.cols + col];
+                    const bottomSurface = surfaces[(row + 1) * config.cols + col];
+                    
+                    const topEdge = topSurface.edges.find(e => e.side === 'bottom');
+                    const bottomEdge = bottomSurface.edges.find(e => e.side === 'top');
+                    
+                    currentCancellations.push({
+                        type: 'vertical',
+                        edge1: topEdge,
+                        edge2: bottomEdge,
+                        description: `Aresta inferior de σ${topSurface.id + 1} cancela com aresta superior de σ${bottomSurface.id + 1}`,
+                        surfaces: [topSurface.id + 1, bottomSurface.id + 1]
+                    });
+                }
+            }
+            
+            updateCancellationDisplay();
+        }
+        
+        // Atualizar display de cancelamentos
+        function updateCancellationDisplay() {
+            const cancellationList = document.getElementById('cancellationList');
+            const activeCancellations = Math.floor(currentCancellations.length * params.cancelationStep / 100);
+            
+            let html = '';
+            
+            if (activeCancellations === 0) {
+                html = '<p><strong>Nenhum cancelamento ativo.</strong> Todos os bordos individuais estão presentes.</p>';
+            } else {
+                for (let i = 0; i < currentCancellations.length; i++) {
+                    const cancellation = currentCancellations[i];
+                    const isActive = i < activeCancellations;
+                    const status = isActive ? 'cancelled' : (i === activeCancellations ? 'active' : 'waiting');
+                    
+                    html += `
+                        <div class="edge-pair ${status}">
+                            <div>
+                                <div class="edge-notation">
+                                    +e${cancellation.edge1.surface + 1}${cancellation.edge1.side[0]} 
+                                    <span class="arrow">${isActive ? '✗' : '+'}</span> 
+                                    -e${cancellation.edge2.surface + 1}${cancellation.edge2.side[0]}
+                                </div>
+                                <small>${cancellation.description}</small>
+                            </div>
+                            <div style="text-align: right;">
+                                <strong>${isActive ? 'CANCELADO' : (i === activeCancellations ? 'ATIVO' : 'AGUARDANDO')}</strong>
+                            </div>
+                        </div>
+                    `;
+                }
+            }
+            
+            cancellationList.innerHTML = html;
+        }
+        
+        // Desenhar bordos individuais
+        function drawIndividualBorders() {
+            const ctx = individualCtx;
+            const canvas = individualCanvas;
+            
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            const surfaces = generateSurfaces();
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const scale = 0.8;
+            
+            // Desenhar cada superfície
+            surfaces.forEach(surface => {
+                // Desenhar retângulo da superfície
+                ctx.fillStyle = 'rgba(52, 152, 219, 0.1)';
+                ctx.strokeStyle = 'rgba(52, 152, 219, 0.3)';
+                ctx.lineWidth = 1;
+                
+                ctx.beginPath();
+                ctx.moveTo(centerX + surface.vertices[0].x * scale, centerY + surface.vertices[0].y * scale);
+                for (let i = 1; i < surface.vertices.length; i++) {
+                    ctx.lineTo(centerX + surface.vertices[i].x * scale, centerY + surface.vertices[i].y * scale);
+                }
+                ctx.closePath();
+                ctx.fill();
+                ctx.stroke();
+                
+                // Label da superfície
+                ctx.fillStyle = '#2c3e50';
+                ctx.font = '16px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText(`σ${surface.id + 1}`, 
+                    centerX + surface.center.x * scale, 
+                    centerY + surface.center.y * scale + 5);
+                
+                // Desenhar bordos individuais
+                surface.edges.forEach((edge, edgeIndex) => {
+                    const activeCancellations = Math.floor(currentCancellations.length * params.cancelationStep / 100);
+                    
+                    // Verificar se esta aresta será cancelada
+                    let willBeCancelled = false;
+                    let isCurrentlyActive = false;
+                    
+                    for (let i = 0; i < currentCancellations.length; i++) {
+                        const cancellation = currentCancellations[i];
+                        if (cancellation.edge1.id === edge.id || cancellation.edge2.id === edge.id) {
+                            if (i < activeCancellations) {
+                                willBeCancelled = true;
+                            } else if (i === activeCancellations && params.highlightActive) {
+                                isCurrentlyActive = true;
+                            }
+                            break;
+                        }
+                    }
+                    
+                    // Definir cor da aresta
+                    let edgeColor = '#e74c3c';  // vermelho para bordos ativos
+                    let lineWidth = 3;
+                    let lineDash = [];
+                    
+                    if (willBeCancelled) {
+                        edgeColor = 'rgba(231, 76, 60, 0.3)';  // vermelho transparente para canceladas
+                        lineWidth = 2;
+                        lineDash = [5, 5];
+                    } else if (isCurrentlyActive) {
+                        edgeColor = '#f39c12';  // laranja para aresta sendo cancelada
+                        lineWidth = 4;
+                    }
+                    
+                    ctx.strokeStyle = edgeColor;
+                    ctx.lineWidth = lineWidth;
+                    ctx.setLineDash(lineDash);
+                    
+                    ctx.beginPath();
+                    ctx.moveTo(centerX + edge.from.x * scale, centerY + edge.from.y * scale);
+                    ctx.lineTo(centerX + edge.to.x * scale, centerY + edge.to.y * scale);
+                    ctx.stroke();
+                    
+                    ctx.setLineDash([]);
+                    
+                    // Desenhar seta de orientação
+                    if (params.showArrows && !willBeCancelled) {
+                        const midX = centerX + (edge.from.x + edge.to.x) / 2 * scale;
+                        const midY = centerY + (edge.from.y + edge.to.y) / 2 * scale;
+                        
+                        const dx = edge.to.x - edge.from.x;
+                        const dy = edge.to.y - edge.from.y;
+                        const length = Math.sqrt(dx * dx + dy * dy);
+                        const ux = dx / length;
+                        const uy = dy / length;
+                        
+                        ctx.fillStyle = edgeColor;
+                        ctx.beginPath();
+                        ctx.moveTo(midX, midY);
+                        ctx.lineTo(midX - ux * 8 + uy * 4, midY - uy * 8 - ux * 4);
+                        ctx.lineTo(midX - ux * 8 - uy * 4, midY - uy * 8 + ux * 4);
+                        ctx.closePath();
+                        ctx.fill();
+                    }
+                });
+            });
+        }
+        
+        // Desenhar resultado final
+        function drawResult() {
+            const ctx = resultCtx;
+            const canvas = resultCanvas;
+            
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            const surfaces = generateSurfaces();
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const scale = 0.8;
+            const activeCancellations = Math.floor(currentCancellations.length * params.cancelationStep / 100);
+            
+            // Desenhar superfícies coladas
+            surfaces.forEach(surface => {
+                ctx.fillStyle = 'rgba(52, 152, 219, 0.15)';
+                ctx.strokeStyle = 'rgba(52, 152, 219, 0.2)';
+                ctx.lineWidth = 1;
+                
+                ctx.beginPath();
+                ctx.moveTo(centerX + surface.vertices[0].x * scale, centerY + surface.vertices[0].y * scale);
+                for (let i = 1; i < surface.vertices.length; i++) {
+                    ctx.lineTo(centerX + surface.vertices[i].x * scale, centerY + surface.vertices[i].y * scale);
+                }
+                ctx.closePath();
+                ctx.fill();
+                ctx.stroke();
+            });
+            
+            // Desenhar apenas bordos não cancelados
+            surfaces.forEach(surface => {
+                surface.edges.forEach(edge => {
+                    // Verificar se esta aresta foi cancelada
+                    let isCancelled = false;
+                    
+                    for (let i = 0; i < activeCancellations; i++) {
+                        const cancellation = currentCancellations[i];
+                        if (cancellation.edge1.id === edge.id || cancellation.edge2.id === edge.id) {
+                            isCancelled = true;
+                            break;
+                        }
+                    }
+                    
+                    if (!isCancelled) {
+                        ctx.strokeStyle = '#27ae60';  // verde para bordos externos restantes
+                        ctx.lineWidth = 4;
+                        
+                        ctx.beginPath();
+                        ctx.moveTo(centerX + edge.from.x * scale, centerY + edge.from.y * scale);
+                        ctx.lineTo(centerX + edge.to.x * scale, centerY + edge.to.y * scale);
+                        ctx.stroke();
+                        
+                        // Seta de orientação para bordos restantes
+                        if (params.showArrows) {
+                            const midX = centerX + (edge.from.x + edge.to.x) / 2 * scale;
+                            const midY = centerY + (edge.from.y + edge.to.y) / 2 * scale;
+                            
+                            const dx = edge.to.x - edge.from.x;
+                            const dy = edge.to.y - edge.from.y;
+                            const length = Math.sqrt(dx * dx + dy * dy);
+                            const ux = dx / length;
+                            const uy = dy / length;
+                            
+                            ctx.fillStyle = '#27ae60';
+                            ctx.beginPath();
+                            ctx.moveTo(midX, midY);
+                            ctx.lineTo(midX - ux * 8 + uy * 4, midY - uy * 8 - ux * 4);
+                            ctx.lineTo(midX - ux * 8 - uy * 4, midY - uy * 8 + ux * 4);
+                            ctx.closePath();
+                            ctx.fill();
+                        }
+                    }
+                });
+            });
+            
+            // Desenhar linha conectando as superfícies para mostrar colagem
+            if (activeCancellations > 0) {
+                ctx.strokeStyle = 'rgba(52, 152, 219, 0.4)';
+                ctx.lineWidth = 2;
+                ctx.setLineDash([10, 5]);
+                
+                for (let i = 0; i < activeCancellations; i++) {
+                    const cancellation = currentCancellations[i];
+                    const edge1 = cancellation.edge1;
+                    const edge2 = cancellation.edge2;
+                    
+                    const mid1X = centerX + (edge1.from.x + edge1.to.x) / 2 * scale;
+                    const mid1Y = centerY + (edge1.from.y + edge1.to.y) / 2 * scale;
+                    const mid2X = centerX + (edge2.from.x + edge2.to.x) / 2 * scale;
+                    const mid2Y = centerY + (edge2.from.y + edge2.to.y) / 2 * scale;
+                    
+                    ctx.beginPath();
+                    ctx.moveTo(mid1X, mid1Y);
+                    ctx.lineTo(mid2X, mid2Y);
+                    ctx.stroke();
+                }
+                
+                ctx.setLineDash([]);
+            }
+        }
+        
+        // Animação do cancelamento
+        function animateCancellation() {
+            if (animationId) {
+                cancelAnimationFrame(animationId);
+                animationId = null;
+                controls.animateCancelation.textContent = 'Animar Cancelamento';
+                return;
+            }
+            
+            controls.animateCancelation.textContent = 'Parar Animação';
+            
+            let startTime = Date.now();
+            const duration = 5000; // 5 segundos
+            
+            function animate() {
+                const elapsed = Date.now() - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                
+                // Função de easing suave
+                const easedProgress = 1 - Math.pow(1 - progress, 2);
+                
+                params.cancelationStep = easedProgress * 100;
+                controls.cancelationStep.value = params.cancelationStep;
+                values.cancelationStep.textContent = `${Math.round(params.cancelationStep)}%`;
+                
+                updateCancellationDisplay();
+                draw();
+                
+                if (progress < 1) {
+                    animationId = requestAnimationFrame(animate);
+                } else {
+                    animationId = null;
+                    controls.animateCancelation.textContent = 'Animar Cancelamento';
+                }
+            }
+            
+            animationId = requestAnimationFrame(animate);
+        }
+        
+        // Resetar visualização
+        function resetView() {
+            if (animationId) {
+                cancelAnimationFrame(animationId);
+                animationId = null;
+                controls.animateCancelation.textContent = 'Animar Cancelamento';
+            }
+            
+            params.cancelationStep = 0;
+            controls.cancelationStep.value = 0;
+            values.cancelationStep.textContent = '0%';
+            
+            updateCancellationDisplay();
+            draw();
+        }
+        
+        // Função principal de desenho
+        function draw() {
+            if (!individualCanvas || !resultCanvas) return;
+            drawIndividualBorders();
+            drawResult();
+        }
+        
+        // Inicialização
+        generateCancellations();
+        resizeCanvas();
+
+    </script>
+</body>
+</html>

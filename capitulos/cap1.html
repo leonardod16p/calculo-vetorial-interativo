@@ -3,53 +3,64 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Prefácio — Formas diferenciais, topologia e física</title>
-
-  <!-- KaTeX -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"
-    onload="renderMathInElement(document.body, {
-      delimiters: [
-        { left: '$$', right: '$$', display: true },
-        { left: '\\[', right: '\\]', display: true },
-        { left: '\\(', right: '\\)', display: false }
-      ]
-    });"
-  ></script>
-
-  <style>
-    body {
-      font-family: sans-serif;
-      line-height: 1.6;
-      margin: 1rem 2rem;
-      background: #fff;
-      color: #222;
-    }
-    a {
-      color: #2b6cb0;
-      text-decoration: none;
-    }
-    a:hover {
-      text-decoration: underline;
-    }
-    nav {
-      margin-bottom: 2rem;
-    }
-  </style>
+  <title>Capítulo 1 — Prefácio</title>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+  
+  <!-- Main stylesheet -->
+  <link rel="stylesheet" href="../assets/css/main.css">
+  
+  <!-- KaTeX for math rendering -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+          onload="renderMathInElement(document.body, {
+            delimiters: [
+              {left: '$$', right: '$$', display: true},
+              {left: '$', right: '$', display: false},
+              {left: '\\[', right: '\\]', display: true},
+              {left: '\\(', right: '\\)', display: false}
+            ]
+          });"></script>
 </head>
 <body>
+  <button id="toggleMenuBtn" aria-label="Toggle navigation menu">☰</button>
 
-  <nav>
-    <a href="index.html">&larr; Voltar ao Sumário</a>
-  </nav>
+  <div class="container" id="container">
+    <div id="sidebar-placeholder"></div>
+    
+    <main class="content">
+      <h1>Capítulo 1: Prefácio</h1>
+      
+      <section>
+        <p>Bem-vindo a esta jornada através das formas diferenciais e topologia. Este livro foi concebido para tornar conceitos matemáticos complexos acessíveis através de visualizações interativas e explicações intuitivas.</p>
+        
+        <h2>O que você vai aprender</h2>
+        <p>Ao longo deste livro, você irá:</p>
+        <ul>
+          <li>Compreender os fundamentos das formas diferenciais</li>
+          <li>Explorar conexões entre topologia e física</li>
+          <li>Visualizar conceitos abstratos de forma concreta</li>
+          <li>Aplicar o conhecimento em problemas práticos</li>
+        </ul>
+        
+        <h2>Exemplo de matemática</h2>
+        <p>Aqui está um exemplo de como a matemática é renderizada:</p>
+        <p>A equação de Euler: $e^{i\pi} + 1 = 0$</p>
+        <p>E uma equação em destaque:</p>
+        $$\int_{-\infty}^{\infty} e^{-x^2} dx = \sqrt{\pi}$$
+      </section>
+      
+      <nav class="chapter-nav">
+        <a href="../index.html" class="nav-prev">← Início</a>
+        <a href="cap2.html" class="nav-next">Próximo Capítulo →</a>
+      </nav>
+    </main>
+  </div>
 
-  <h1>1. Prefácio</h1>
-
- <script src="../scripts.js"></script>
-
-  <div id="sidebar-placeholder"></div>
-
-
+  <script src="../assets//js/main.js"></script>
 </body>
 </html>

@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visualização Interativa de Integrais</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        
+        h1 {
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .section {
+            margin-bottom: 40px;
+            padding: 25px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .section h2 {
+            color: #ffd700;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+        
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 20px;
+            align-items: center;
+        }
+        
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        label {
+            font-weight: bold;
+            color: #e0e0e0;
+        }
+        
+        input[type="range"] {
+            width: 150px;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            outline: none;
+            border-radius: 5px;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: #ffd700;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+        }
+        
+        canvas {
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            display: block;
+            margin: 0 auto;
+        }
+        
+        .canvas-container {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        
+        .info-panel {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .formula {
+            text-align: center;
+            font-size: 1.2em;
+            color: #ffd700;
+            margin: 10px 0;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📚 Visualização Interativa de Integrais</h1>
+        
+        <!-- Seção 1: Área como função da altura -->
+        <div class="section">
+            <h2>🔍 1. Área como Função da Altura</h2>
+            <div class="formula">S(h) = ∫₀ʰ L(t) dt</div>
+            <div class="controls">
+                <div class="control-group">
+                    <label>Altura (h):</label>
+                    <input type="range" id="height-slider" min="0" max="100" value="50">
+                    <span id="height-value">50</span>
+                </div>
+                <div class="control-group">
+                    <label>Forma:</label>
+                    <select id="shape-select" style="padding: 5px; border-radius: 5px;">
+                        <option value="sin">Senoidal</option>
+                        <option value="parabola">Parábola</option>
+                        <option value="exponential">Exponencial</option>
+                    </select>
+                </div>
+            </div>
+            <div class="canvas-container">
+                <canvas id="area-canvas" width="600" height="400"></canvas>
+            </div>
+            <div class="info-panel">
+                <div>Área acumulada: <span id="area-value">0</span></div>
+                <div>Largura atual: <span id="width-value">0</span></div>
+            </div>
+        </div>
+        
+        <!-- Seção 2: Integral iterada -->
+        <div class="section">
+            <h2>🥞 2. Integral Iterada - Empilhamento de Fatias</h2>
+            <div class="formula">∫∫ f(x,y) dx dy = ∫ [∫ f(x,y) dy] dx</div>
+            <div class="controls">
+                <div class="control-group">
+                    <label>Posição X:</label>
+                    <input type="range" id="x-position" min="0" max="100" value="50">
+                    <span id="x-pos-value">50</span>
+                </div>
+                <div class="control-group">
+                    <label>Animação:</label>
+                    <button id="animate-btn" style="padding: 5px 15px; border-radius: 5px; border: none; background: #ffd700; color: #333;">Animar</button>
+                </div>
+            </div>
+            <div class="grid">
+                <div class="canvas-container">
+                    <canvas id="slice-canvas" width="400" height="300"></canvas>
+                </div>
+                <div class="canvas-container">
+                    <canvas id="volume-canvas" width="400" height="300"></canvas>
+                </div>
+            </div>
+            <div class="info-panel">
+                <div>Área da fatia: <span id="slice-area">0</span></div>
+                <div>Volume acumulado: <span id="volume-value">0</span></div>
+            </div>
+        </div>
+        
+        <!-- Seção 3: Transformação de coordenadas -->
+        <div class="section">
+            <h2>🔄 3. Transformação Cartesianas ↔ Polares</h2>
+            <div class="formula">x = r cos θ, y = r sin θ | dx dy = r dr dθ</div>
+            <div class="controls">
+                <div class="control-group">
+                    <label>Raio (r):</label>
+                    <input type="range" id="radius-slider" min="0" max="100" value="50">
+                    <span id="radius-value">50</span>
+                </div>
+                <div class="control-group">
+                    <label>Ângulo (θ):</label>
+                    <input type="range" id="angle-slider" min="0" max="360" value="45">
+                    <span id="angle-value">45°</span>
+                </div>
+                <div class="control-group">
+                    <label>Mostrar Grade:</label>
+                    <input type="checkbox" id="show-grid" checked>
+                </div>
+            </div>
+            <div class="grid">
+                <div class="canvas-container">
+                    <canvas id="cartesian-canvas" width="350" height="350"></canvas>
+                </div>
+                <div class="canvas-container">
+                    <canvas id="polar-canvas" width="350" height="350"></canvas>
+                </div>
+            </div>
+            <div class="info-panel">
+                <div>Coordenadas Cartesianas: (<span id="cart-x">0</span>, <span id="cart-y">0</span>)</div>
+                <div>Coordenadas Polares: (r=<span id="polar-r">0</span>, θ=<span id="polar-theta">0</span>°)</div>
+                <div>Jacobiano: r = <span id="jacobian">0</span></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Seção 1: Área como função da altura
+        class AreaVisualization {
+            constructor() {
+                this.canvas = document.getElementById('area-canvas');
+                this.ctx = this.canvas.getContext('2d');
+                this.heightSlider = document.getElementById('height-slider');
+                this.shapeSelect = document.getElementById('shape-select');
+                this.heightValue = document.getElementById('height-value');
+                this.areaValue = document.getElementById('area-value');
+                this.widthValue = document.getElementById('width-value');
+                
+                this.heightSlider.addEventListener('input', () => this.draw());
+                this.shapeSelect.addEventListener('change', () => this.draw());
+                
+                this.draw();
+            }
+            
+            getWidth(t, shape) {
+                const normalizedT = t / 100;
+                switch(shape) {
+                    case 'sin':
+                        return 50 + 40 * Math.sin(normalizedT * 4 * Math.PI);
+                    case 'parabola':
+                        return 30 + 60 * (1 - Math.pow(normalizedT - 0.5, 2) * 4);
+                    case 'exponential':
+                        return 20 + 70 * Math.exp(-normalizedT * 2);
+                    default:
+                        return 50;
+                }
+            }
+            
+            draw() {
+                const h = parseInt(this.heightSlider.value);
+                const shape = this.shapeSelect.value;
+                
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                
+                // Desenhar eixos
+                this.ctx.strokeStyle = '#333';
+                this.ctx.lineWidth = 2;
+                this.ctx.beginPath();
+                this.ctx.moveTo(50, 50);
+                this.ctx.lineTo(50, 350);
+                this.ctx.lineTo(550, 350);
+                this.ctx.stroke();
+                
+                // Desenhar função L(t)
+                this.ctx.strokeStyle = '#2196F3';
+                this.ctx.lineWidth = 3;
+                this.ctx.beginPath();
+                for(let t = 0; t <= 100; t++) {
+                    const x = 50 + this.getWidth(t, shape) * 4;
+                    const y = 350 - t * 3;
+                    if(t === 0) this.ctx.moveTo(x, y);
+                    else this.ctx.lineTo(x, y);
+                }
+                this.ctx.stroke();
+                
+                // Preencher área até altura h
+                this.ctx.fillStyle = 'rgba(76, 175, 80, 0.5)';
+                this.ctx.beginPath();
+                this.ctx.moveTo(50, 350);
+                for(let t = 0; t <= h; t++) {
+                    const x = 50 + this.getWidth(t, shape) * 4;
+                    const y = 350 - t * 3;
+                    this.ctx.lineTo(x, y);
+                }
+                this.ctx.lineTo(50, 350 - h * 3);
+                this.ctx.closePath();
+                this.ctx.fill();
+                
+                // Linha da altura atual
+                this.ctx.strokeStyle = '#FF5722';
+                this.ctx.lineWidth = 2;
+                this.ctx.setLineDash([5, 5]);
+                this.ctx.beginPath();
+                this.ctx.moveTo(50, 350 - h * 3);
+                const currentWidth = this.getWidth(h, shape);
+                this.ctx.lineTo(50 + currentWidth * 4, 350 - h * 3);
+                this.ctx.stroke();
+                this.ctx.setLineDash([]);
+                
+                // Calcular área aproximada
+                let area = 0;
+                for(let t = 0; t <= h; t++) {
+                    area += this.getWidth(t, shape);
+                }
+                area = area / 100; // Normalizar
+                
+                // Atualizar valores
+                this.heightValue.textContent = h;
+                this.areaValue.textContent = area.toFixed(2);
+                this.widthValue.textContent = currentWidth.toFixed(2);
+                
+                // Labels
+                this.ctx.fillStyle = '#333';
+                this.ctx.font = '14px Arial';
+                this.ctx.fillText('L(t)', 300, 30);
+                this.ctx.fillText('h', 30, 180);
+                this.ctx.fillText('S(h)', 400, 200);
+            }
+        }
+        
+        // Seção 2: Integral iterada
+        class IteratedIntegral {
+            constructor() {
+                this.sliceCanvas = document.getElementById('slice-canvas');
+                this.volumeCanvas = document.getElementById('volume-canvas');
+                this.sliceCtx = this.sliceCanvas.getContext('2d');
+                this.volumeCtx = this.volumeCanvas.getContext('2d');
+                this.xPosition = document.getElementById('x-position');
+                this.animateBtn = document.getElementById('animate-btn');
+                this.sliceArea = document.getElementById('slice-area');
+                this.volumeValue = document.getElementById('volume-value');
+                this.xPosValue = document.getElementById('x-pos-value');
+                
+                this.animating = false;
+                this.slices = [];
+                
+                this.xPosition.addEventListener('input', () => this.draw());
+                this.animateBtn.addEventListener('click', () => this.animate());
+                
+                this.draw();
+            }
+            
+            f(x, y) {
+                const nx = (x - 50) / 50;
+                const ny = (y - 50) / 50;
+                return Math.exp(-(nx*nx + ny*ny)) * 50;
+            }
+            
+            draw() {
+                const x = parseInt(this.xPosition.value);
+                this.xPosValue.textContent = x;
+                
+                // Desenhar fatia
+                this.sliceCtx.clearRect(0, 0, this.sliceCanvas.width, this.sliceCanvas.height);
+                this.sliceCtx.strokeStyle = '#333';
+                this.sliceCtx.lineWidth = 2;
+                this.sliceCtx.beginPath();
+                this.sliceCtx.moveTo(50, 250);
+                this.sliceCtx.lineTo(350, 250);
+                this.sliceCtx.moveTo(50, 50);
+                this.sliceCtx.lineTo(50, 250);
+                this.sliceCtx.stroke();
+                
+                // Desenhar curva f(x,y) para x fixo
+                this.sliceCtx.strokeStyle = '#2196F3';
+                this.sliceCtx.lineWidth = 3;
+                this.sliceCtx.beginPath();
+                let area = 0;
+                for(let y = 0; y <= 100; y++) {
+                    const height = this.f(x, y);
+                    const canvasX = 50 + y * 3;
+                    const canvasY = 250 - height * 2;
+                    if(y === 0) this.sliceCtx.moveTo(canvasX, canvasY);
+                    else this.sliceCtx.lineTo(canvasX, canvasY);
+                    area += height;
+                }
+                this.sliceCtx.stroke();
+                
+                // Preencher área sob a curva
+                this.sliceCtx.fillStyle = 'rgba(76, 175, 80, 0.5)';
+                this.sliceCtx.beginPath();
+                this.sliceCtx.moveTo(50, 250);
+                for(let y = 0; y <= 100; y++) {
+                    const height = this.f(x, y);
+                    const canvasX = 50 + y * 3;
+                    const canvasY = 250 - height * 2;
+                    this.sliceCtx.lineTo(canvasX, canvasY);
+                }
+                this.sliceCtx.lineTo(350, 250);
+                this.sliceCtx.closePath();
+                this.sliceCtx.fill();
+                
+                // Desenhar volume acumulado
+                this.volumeCtx.clearRect(0, 0, this.volumeCanvas.width, this.volumeCanvas.height);
+                this.volumeCtx.strokeStyle = '#333';
+                this.volumeCtx.lineWidth = 2;
+                this.volumeCtx.beginPath();
+                this.volumeCtx.moveTo(50, 250);
+                this.volumeCtx.lineTo(350, 250);
+                this.volumeCtx.moveTo(50, 50);
+                this.volumeCtx.lineTo(50, 250);
+                this.volumeCtx.stroke();
+                
+                // Desenhar todas as fatias até x
+                let volume = 0;
+                for(let xi = 0; xi <= x; xi += 2) {
+                    let sliceArea = 0;
+                    for(let y = 0; y <= 100; y += 2) {
+                        sliceArea += this.f(xi, y);
+                    }
+                    volume += sliceArea;
+                    
+                    const canvasX = 50 + xi * 3;
+                    const canvasY = 250 - sliceArea * 0.02;
+                    
+                    this.volumeCtx.fillStyle = `rgba(76, 175, 80, ${0.3 + 0.2 * Math.sin(xi * 0.1)})`;
+                    this.volumeCtx.fillRect(canvasX, canvasY, 6, 250 - canvasY);
+                }
+                
+                // Linha atual
+                this.volumeCtx.strokeStyle = '#FF5722';
+                this.volumeCtx.lineWidth = 3;
+                this.volumeCtx.beginPath();
+                this.volumeCtx.moveTo(50 + x * 3, 50);
+                this.volumeCtx.lineTo(50 + x * 3, 250);
+                this.volumeCtx.stroke();
+                
+                this.sliceArea.textContent = (area / 100).toFixed(2);
+                this.volumeValue.textContent = (volume / 10000).toFixed(2);
+            }
+            
+            animate() {
+                if(this.animating) return;
+                this.animating = true;
+                this.animateBtn.textContent = 'Animando...';
+                
+                let x = 0;
+                const animateStep = () => {
+                    this.xPosition.value = x;
+                    this.draw();
+                    x += 2;
+                    if(x <= 100) {
+                        setTimeout(animateStep, 50);
+                    } else {
+                        this.animating = false;
+                        this.animateBtn.textContent = 'Animar';
+                    }
+                };
+                animateStep();
+            }
+        }
+        
+        // Seção 3: Transformação de coordenadas
+        class CoordinateTransformation {
+            constructor() {
+                this.cartesianCanvas = document.getElementById('cartesian-canvas');
+                this.polarCanvas = document.getElementById('polar-canvas');
+                this.cartCtx = this.cartesianCanvas.getContext('2d');
+                this.polarCtx = this.polarCanvas.getContext('2d');
+                
+                this.radiusSlider = document.getElementById('radius-slider');
+                this.angleSlider = document.getElementById('angle-slider');
+                this.showGrid = document.getElementById('show-grid');
+                
+                this.radiusValue = document.getElementById('radius-value');
+                this.angleValue = document.getElementById('angle-value');
+                this.cartX = document.getElementById('cart-x');
+                this.cartY = document.getElementById('cart-y');
+                this.polarR = document.getElementById('polar-r');
+                this.polarTheta = document.getElementById('polar-theta');
+                this.jacobian = document.getElementById('jacobian');
+                
+                this.radiusSlider.addEventListener('input', () => this.draw());
+                this.angleSlider.addEventListener('input', () => this.draw());
+                this.showGrid.addEventListener('change', () => this.draw());
+                
+                this.draw();
+            }
+            
+            drawGrid(ctx, width, height, type) {
+                if(!this.showGrid.checked) return;
+                
+                ctx.strokeStyle = 'rgba(200, 200, 200, 0.5)';
+                ctx.lineWidth = 1;
+                
+                if(type === 'cartesian') {
+                    for(let i = 0; i <= width; i += 35) {
+                        ctx.beginPath();
+                        ctx.moveTo(i, 0);
+                        ctx.lineTo(i, height);
+                        ctx.stroke();
+                    }
+                    for(let i = 0; i <= height; i += 35) {
+                        ctx.beginPath();
+                        ctx.moveTo(0, i);
+                        ctx.lineTo(width, i);
+                        ctx.stroke();
+                    }
+                } else if(type === 'polar') {
+                    const centerX = width / 2;
+                    const centerY = height / 2;
+                    
+                    // Círculos concêntricos
+                    for(let r = 35; r <= 150; r += 35) {
+                        ctx.beginPath();
+                        ctx.arc(centerX, centerY, r, 0, 2 * Math.PI);
+                        ctx.stroke();
+                    }
+                    
+                    // Linhas radiais
+                    for(let angle = 0; angle < 360; angle += 30) {
+                        const rad = angle * Math.PI / 180;
+                        ctx.beginPath();
+                        ctx.moveTo(centerX, centerY);
+                        ctx.lineTo(centerX + 150 * Math.cos(rad), centerY + 150 * Math.sin(rad));
+                        ctx.stroke();
+                    }
+                }
+            }
+            
+            draw() {
+                const r = parseInt(this.radiusSlider.value);
+                const theta = parseInt(this.angleSlider.value);
+                const rad = theta * Math.PI / 180;
+                
+                // Calcular coordenadas cartesianas
+                const x = r * Math.cos(rad);
+                const y = r * Math.sin(rad);
+                
+                // Limpar canvas
+                this.cartCtx.clearRect(0, 0, this.cartesianCanvas.width, this.cartesianCanvas.height);
+                this.polarCtx.clearRect(0, 0, this.polarCanvas.width, this.polarCanvas.height);
+                
+                // Desenhar grades
+                this.drawGrid(this.cartCtx, this.cartesianCanvas.width, this.cartesianCanvas.height, 'cartesian');
+                this.drawGrid(this.polarCtx, this.polarCanvas.width, this.polarCanvas.height, 'polar');
+                
+                // Coordenadas cartesianas
+                const centerX = this.cartesianCanvas.width / 2;
+                const centerY = this.cartesianCanvas.height / 2;
+                
+                // Eixos cartesianos
+                this.cartCtx.strokeStyle = '#333';
+                this.cartCtx.lineWidth = 2;
+                this.cartCtx.beginPath();
+                this.cartCtx.moveTo(0, centerY);
+                this.cartCtx.lineTo(this.cartesianCanvas.width, centerY);
+                this.cartCtx.moveTo(centerX, 0);
+                this.cartCtx.lineTo(centerX, this.cartesianCanvas.height);
+                this.cartCtx.stroke();
+                
+                // Ponto em coordenadas cartesianas
+                const cartX = centerX + x;
+                const cartY = centerY - y;
+                
+                this.cartCtx.fillStyle = '#FF5722';
+                this.cartCtx.beginPath();
+                this.cartCtx.arc(cartX, cartY, 8, 0, 2 * Math.PI);
+                this.cartCtx.fill();
+                
+                // Linhas auxiliares cartesianas
+                this.cartCtx.strokeStyle = '#2196F3';
+                this.cartCtx.lineWidth = 2;
+                this.cartCtx.setLineDash([5, 5]);
+                this.cartCtx.beginPath();
+                this.cartCtx.moveTo(centerX, cartY);
+                this.cartCtx.lineTo(cartX, cartY);
+                this.cartCtx.moveTo(cartX, centerY);
+                this.cartCtx.lineTo(cartX, cartY);
+                this.cartCtx.stroke();
+                this.cartCtx.setLineDash([]);
+                
+                // Coordenadas polares
+                const polarCenterX = this.polarCanvas.width / 2;
+                const polarCenterY = this.polarCanvas.height / 2;
+                
+                // Eixos polares
+                this.polarCtx.strokeStyle = '#333';
+                this.polarCtx.lineWidth = 2;
+                this.polarCtx.beginPath();
+                this.polarCtx.moveTo(0, polarCenterY);
+                this.polarCtx.lineTo(this.polarCanvas.width, polarCenterY);
+                this.polarCtx.moveTo(polarCenterX, 0);
+                this.polarCtx.lineTo(polarCenterX, this.polarCanvas.height);
+                this.polarCtx.stroke();
+                
+                // Ponto em coordenadas polares
+                const polarX = polarCenterX + x;
+                const polarY = polarCenterY - y;
+                
+                this.polarCtx.fillStyle = '#FF5722';
+                this.polarCtx.beginPath();
+                this.polarCtx.arc(polarX, polarY, 8, 0, 2 * Math.PI);
+                this.polarCtx.fill();
+                
+                // Linha do raio
+                this.polarCtx.strokeStyle = '#2196F3';
+                this.polarCtx.lineWidth = 3;
+                this.polarCtx.beginPath();
+                this.polarCtx.moveTo(polarCenterX, polarCenterY);
+                this.polarCtx.lineTo(polarX, polarY);
+                this.polarCtx.stroke();
+                
+                // Arco do ângulo
+                this.polarCtx.strokeStyle = '#4CAF50';
+                this.polarCtx.lineWidth = 2;
+                this.polarCtx.beginPath();
+                this.polarCtx.arc(polarCenterX, polarCenterY, 30, 0, -rad, true);
+                this.polarCtx.stroke();
+                
+                // Atualizar valores
+                this.radiusValue.textContent = r;
+                this.angleValue.textContent = theta + '°';
+                this.cartX.textContent = x.toFixed(2);
+                this.cartY.textContent = y.toFixed(2);
+                this.polarR.textContent = r;
+                this.polarTheta.textContent = theta;
+                this.jacobian.textContent = r;
+                
+                // Labels
+                this.cartCtx.fillStyle = '#333';
+                this.cartCtx.font = '14px Arial';
+                this.cartCtx.fillText('Cartesianas', 10, 20);
+                this.cartCtx.fillText('x', this.cartesianCanvas.width - 20, centerY - 10);
+                this.cartCtx.fillText('y', centerX + 10, 20);
+                
+                this.polarCtx.fillStyle = '#333';
+                this.polarCtx.font = '14px Arial';
+                this.polarCtx.fillText('Polares', 10, 20);
+                this.polarCtx.fillText('r', polarX + 10, polarY - 10);
+                this.polarCtx.fillText('θ', polarCenterX + 35, polarCenterY - 35);
+            }
+        }
+        
+        // Inicializar visualizações
+        document.addEventListener('DOMContentLoaded', () => {
+            new AreaVisualization();
+            new IteratedIntegral();
+            new CoordinateTransformation();
+        });
+    </script>
+</body>
+</html>

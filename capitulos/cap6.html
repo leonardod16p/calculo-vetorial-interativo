@@ -3,171 +3,146 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Capítulo 6 — Campos e Fluxos</title>
+  <title>Capítulo 6 — Variação de Ângulo e Integral de Linha</title>
 
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"
-    onload="renderMathInElement(document.body, {
-      delimiters: [
-        { left: '$$', right: '$$', display: true },
-        { left: '\\[', right: '\\]', display: true },
-        { left: '\\(', right: '\\)', display: false }
-      ]
-    });"></script>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
 
-  <style>
-    body {
-      font-family: sans-serif;
-      margin: 2rem;
-    }
-    canvas {
-      border: 1px solid #ccc;
-      margin-top: 1rem;
-      background-color: #f9f9f9;
-    }
-  </style>
+  <!-- Main stylesheet -->
+  <link rel="stylesheet" href="../assets/css/main.css">
+
+  <!-- KaTeX for math rendering -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+          onload="renderMathInElement(document.body, {
+            delimiters: [
+              {left: '$$', right: '$$', display: true},
+              {left: '$', right: '$', display: false},
+              {left: '\\[', right: '\\]', display: true},
+              {left: '\\(', right: '\\)', display: false}
+            ]
+          });"></script>
 </head>
 <body>
+  <button id="toggleMenuBtn" aria-label="Toggle navigation menu">☰</button>
 
-  <nav>
-    <a href="../index.html">&larr; Voltar ao Sumário</a>
-  </nav>
+  <div class="container" id="container">
+    <div id="sidebar-placeholder"></div>
 
-  <h1>Capítulo 6 — Campos e Fluxos</h1>
+    <main class="content">
+      <div class="reading-container">
+      <h1>Campos - Fluxos</h1>
+<p>Até agora, o único exemplo concreto de um campo vetorial que vimos foi o campo gravitacional.</p>
+<p>O campo gravitacional é relativamente simples. O campo gravitacional nada mais é que os pontos no espaço onde atua a força da gravidade. Por nossos interesses, essa força é aproximadamente constante em toda a superfície da Terra.</p>
+<p>Este é um exemplo relativamente simples de campo vetorial. Campos vetoriais aparecem por toda a física. No exemplo que eu dei, esses vetores eram forças gravitacionais em todo o espaço.</p>
+<p>Porém, eu posso me interessar por outra classe de campos vetoriais. Em mecânica dos fluidos, é comum a descrição de campos vetoriais a partir de campos de velocidade. Os nossos vetores dependem do tempo e da posição, e têm um significado físico de velocidade.</p>
+<p>O exemplo clássico é o de uma correnteza em um rio. Uma bolinha flutuando no rio estará sob a ação desse campo de velocidade.</p>
+<p>Agora, considere um campo de velocidades \( \mathbf{v}(t, x) \).</p>
+<p>Considere um sólido sob a ação desse campo de velocidade, que se desloca em uma região \( B \). O sólido tem densidade de massa</p>
+\[
+\rho(t, x) = \text{densidade de massa}.
+\]
+<p>A densidade é definida por</p>
+\[
+\rho(x) = \lim_{\Delta V \to 0} \frac{\Delta m}{\Delta V}.
+\]
+<p>A função \( \rho(t, x) \) tem dimensão de massa por comprimento ao cubo. A velocidade \( \mathbf{v}(t, x) \) tem dimensão de comprimento por tempo. E, como estamos integrando numa região do espaço, \( dx \) terá dimensão de comprimento ao cubo.</p>
+<p>Quando multiplicamos essas três grandezas físicas, temos:</p>
+\[
+\left[\frac{\text{M}}{\text{L}^3}\right] \cdot \left[\frac{\text{L}}{\text{T}}\right] \cdot \left[\text{L}^3\right] = \frac{\text{M} \cdot \text{L}}{\text{T}}.
+\]
+<p>Isso é igual à massa vezes comprimento sobre tempo.</p>
+<p>Nossa análise dimensional nos revela que essa quantidade é o <strong>momento linear</strong>.</p>
+<p>Da mesma forma, se quiséssemos a energia cinética, poderíamos considerar a quantidade</p>
+\[
+\int_B \frac{1}{2} \rho(t, x)\, \|\mathbf{v}(t, x)\|^2 \, dx.
+\]
+<p>Se fizermos a análise dimensional, percebemos que \( \rho \cdot \|\mathbf{v}\|^2 \cdot dx \) é igual a:</p>
+\[
+\left[\frac{\text{M}}{L^3}\right] \cdot \left[\frac{L^2}{T^2}\right] \cdot \left[L^3\right] = \frac{\text{M} \cdot L^2}{T^2}.
+\]
+<p>Isso tem dimensão de energia, ou seja, Joule.</p>
+<h2>Motivação para o conceito de fluxo (via volume)</h2>
+<p>Queremos entender o que atravessa um volume. Pode ser qualquer coisa: massa, energia, impulso, partículas. O importante é que <em>há algo fluindo</em> através do volume.</p>
+<p>Mas por que estudar isso? Porque em diversas situações físicas, é exatamente isso que está em jogo: algo <em>passando por dentro de uma região</em> do espaço.</p>
+<p>Podemos imaginar, por exemplo, um fluido se movendo e atravessando uma pedra. Ou um gás entrando em uma câmara. Ou ainda: vento soprando sobre uma turbina. Em todos esses casos, algo está passando — e essa quantidade que passa pode ser estimada ou medida.</p>
+<p>Queremos capturar esse efeito. Para isso, começamos com um volume \( V \), imerso em um campo de velocidades \(\vec{v}(\mathbf{x}, t)\), e tentamos entender o que entra e sai. No limite, a taxa de variação da quantidade dentro do volume depende do que atravessa sua <em>fronteira</em>.</p>
+<p>Esse é o ponto de partida para o conceito de <strong>fluxo</strong>: medir o que passa por uma superfície que delimita um volume. E, mais adiante, chegaremos à ideia de que esse fluxo pode ser expresso por uma <em>integral de superfície</em> da componente do campo na direção normal.</p>
+<p>Agora, considere um campo de velocidades \(\vec{v}\) atravessando uma superfície \(S\). Podemos ver na figura que temos a superfície \(S_1\), um deslocamento paralelo dessa superfície que gera a superfície \(S_2\), e em pontos de \(S_1\) temos um vetor \(\vec{v}\), referente ao campo de velocidade que atravessa a superfície, e um vetor normal \(\vec{n}\).</p>
+<p>Agora, imagine que passou um tempo \(\mathrm{d}t\). O vetor \(\vec{v} \, \mathrm{d}t\) nos dá o deslocamento infinitesimal na direção de \(\vec{v}\), isto é, na direção do campo de velocidade.</p>
+<p>Considere um elemento de área infinitesimal da superfície \(S_1\), denotado por \(\mathrm{d}S\). O deslocamento paralelo da superfície \(S_1\) até \(S_2\) é dado por \(\vec{v} \, \mathrm{d}t\).</p>
+<p>Considere também a existência de um vetor normal \(\vec{n}\) à superfície.</p>
+<p>A altura \(h\) do paralelepípedo infinitesimal construído é dada pelo produto escalar entre o deslocamento \(\vec{v} \, \mathrm{d}t\) e o vetor normal \(\vec{n}\):</p>
+\[
+h = (\vec{v} \cdot \vec{n}) \, \mathrm{d}t.
+\]
+<p>Assim, obtemos o elemento de volume infinitesimal \(\mathrm{d}V\), dado por</p>
+\[
+dV = (\vec{v} \cdot \vec{n}) \, dS \, dt
+\]
+<p>Quando falamos em fluxo, estamos interessados em medir a quantidade de volume que passa através de uma superfície por unidade de tempo.</p>
+<p>Após essas considerações, podemos definir o fluxo como a soma de todos os elementos de volume por segundo que passam em uma determinada superfície, ou seja,</p>
+$$
+Fluxo = \int_S \frac{dV}{dt} = \int_S \frac{(\vec{v} \cdot \vec{n}) \, dS \, dt}{dt} = \int_S \vec{v} \cdot \vec{n} \, dS
+$$
+<p>onde \( \vec{v} \) é o campo de velocidade, \( \vec{n} \) o vetor normal à superfície \(S\) e \( \mathrm{d}S \) o elemento infinitesimal de área.</p>
+<p>Nossa definição de fluxo depende da noção que temos de superfície. Precisamos lembrar que uma superfície, para nós, é um objeto parametrizado.</p>
+<p>O elemento de área \(\mathrm{d}S\) e o vetor normal \(\vec{n}\) podem ser definidos a partir dos vetores tangentes \(\vec{u}\) e \(\vec{v}\) da seguinte forma:</p>
+$$
+du\frac{\partial\phi}{\partial u} \otimes dv\frac{\partial\phi}{\partial v} = d\vec{S}
+$$
+<p>Onde v é o campo de velocidades. A trajetória de uma partícula no campo é descrita pela equação diferencial ordinária:</p>
+$$ \dot{x}(t) = v(t, x(t)) $$
+<p>A densidade de massa é \( \rho(t, x) \). A quantidade de momento linear em uma região B é:</p>
+$$\int_B \rho(t, x)v(t,x) dx$$
+<p>A definição de densidade é:</p>
+$$\rho(x) = \lim_{dV \to 0} \frac{dm}{dV}$$
+<h3>FLUXO</h3>
+<figure>
+  <figcaption>[Figura: Ilustração de uma superfície S1, deslocada para uma superfície S2 por um campo de velocidade v. Mostra um vetor normal n e um vetor de velocidade v em um ponto da superfície S1.]</figcaption>
+</figure>
+<figure>
+  <figcaption>[Figura: Ilustração de uma esfera com vetores de campo de velocidade atravessando-a.]</figcaption>
+</figure>
+<p>A energia cinética pode ser expressa como:</p>
+$$
+\frac{1}{2} \int_B \rho(t, x) |v(t,x)|^2 dx 
+$$
+<p>A definição do elemento vetorial de superfície \( d\vec{S} \) é dada pelo produto vetorial dos vetores tangentes à superfície parametrizada:</p>
+$$
+du\frac{\partial\phi}{\partial u} \times dv\frac{\partial\phi}{\partial v} = d\vec{S}
+$$
+<p>A parametrização é dada por um mapa \(\phi: B \to \Omega\), onde \(B = [a_1, b_1] \times [a_2, b_2]\).</p>
+<p>A conservação da massa em uma região B, relacionando a variação da massa total com o fluxo através da fronteira \( \partial B \), é dada por:</p>
+$$m(t) = \int_B \rho(t,x)dV$$
+$$\frac{d}{dt}\int_B \rho dV = - \int_{\partial B} \rho \vec{v} \cdot d\vec{S}$$
+<p>O fluxo de massa é a integral de superfície da densidade vezes a velocidade:</p>
+$$ \text{Fluxo de Massa} = \int_{\partial B} \rho (t, x) v(t, x) \cdot d\vec{S} = \text{Saída} - \text{Entrada} $$
+     
+<div class="simulation-link-container">
+  <h3 class="simulation-title">Simulações Interativas</h3>
+  
+  <a href="simulacoes/cap2/mecanicav2.html" class="simulation-link" target="_blank">
+    <span class="simulation-icon">⎈</span>
+    <span class="simulation-text">Ver Simulação: Teorema de Stokes</span>
+    <span class="simulation-arrow">→</span>
+  </a>
+  
+</div>
+     
 
-  <p>
-    O campo vetorial considerado é:
-    \[
-      \vec{F}(x, y) = (-y, x)
-    \]
-    Esse campo é o exemplo mais simples de um campo com rotacional constante.
-  </p>
+      <nav class="chapter-nav">
+        <a href="cap5.html" class="nav-prev">← Capítulo anterior</a>
+        <a href="cap7.html" class="nav-next">Próximo Capítulo →</a>
+      </nav>
+  </div>
+    </main>
 
-  <p>
-    Três partículas se movem no plano sob a ação desse campo. Todas seguem trajetórias circulares:
-  </p>
+  </div>
 
-  <canvas id="field" width="400" height="400"></canvas>
-
-  <h2>Exemplos de expressões LaTeX complexas</h2>
-
-  <ul>
-    <li>Produto exterior:
-      \[
-        dx \wedge dy = - dy \wedge dx
-      \]
-    </li>
-    <li>Forma diferencial:
-      \[
-        \omega = f_1(x, y, z) \, dx + f_2(x, y, z) \, dy + f_3(x, y, z) \, dz
-      \]
-    </li>
-    <li>Integral de linha:
-      \[
-        \int_\gamma \vec{F} \cdot d\vec{r} = \int_a^b \vec{F}(\vec{r}(t)) \cdot \vec{r}'(t)\,dt
-      \]
-    </li>
-    <li>Rotacional como determinante:
-      \[
-        \nabla \times \vec{F} = 
-        \begin{vmatrix}
-          \hat{i} & \hat{j} & \hat{k} \\
-          \partial_x & \partial_y & \partial_z \\
-          F_1 & F_2 & F_3
-        \end{vmatrix}
-      \]
-    </li>
-    <li>Pullback:
-      \[
-        \phi^*(\omega) = \omega(\phi(t)) \cdot D\phi(t)
-      \]
-    </li>
-  </ul>
-
-  <script>
-    const canvas = document.getElementById('field');
-    const ctx = canvas.getContext('2d');
-    const width = canvas.width;
-    const height = canvas.height;
-    const step = 40;
-
-    const particles = [
-      { x: 100, y: 0, color: "red" },
-      { x: 0, y: 100, color: "green" },
-      { x: -100, y: 0, color: "blue" }
-    ];
-
-    function field(x, y) {
-      return { x: -y, y: x };
-    }
-
-    function drawArrow(x, y, dx, dy, color = "black") {
-      const len = Math.sqrt(dx * dx + dy * dy);
-      if (len === 0) return;
-      dx /= len;
-      dy /= len;
-
-      const size = 10;
-      ctx.beginPath();
-      ctx.moveTo(x, y);
-      ctx.lineTo(x + dx * size, y + dy * size);
-      ctx.strokeStyle = color;
-      ctx.lineWidth = 1;
-      ctx.stroke();
-
-      const angle = Math.atan2(dy, dx);
-      ctx.beginPath();
-      ctx.moveTo(x + dx * size, y + dy * size);
-      ctx.lineTo(x + dx * size - 4 * Math.cos(angle - Math.PI / 6), y + dy * size - 4 * Math.sin(angle - Math.PI / 6));
-      ctx.lineTo(x + dx * size - 4 * Math.cos(angle + Math.PI / 6), y + dy * size - 4 * Math.sin(angle + Math.PI / 6));
-      ctx.closePath();
-      ctx.fillStyle = color;
-      ctx.fill();
-    }
-
-    function drawField() {
-      ctx.save();
-      ctx.translate(width / 2, height / 2);
-      for (let x = -width/2; x < width/2; x += step) {
-        for (let y = -height/2; y < height/2; y += step) {
-          const f = field(x, y);
-          drawArrow(x, y, f.x * 0.1, f.y * 0.1, "#aaa");
-        }
-      }
-      ctx.restore();
-    }
-
-    function drawParticles() {
-      ctx.save();
-      ctx.translate(width / 2, height / 2);
-      for (const p of particles) {
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, 4, 0, 2 * Math.PI);
-        ctx.fillStyle = p.color;
-        ctx.fill();
-      }
-      ctx.restore();
-    }
-
-    function updateParticles(dt = 0.05) {
-      for (const p of particles) {
-        const f = field(p.x, p.y);
-        p.x += f.x * dt;
-        p.y += f.y * dt;
-      }
-    }
-
-    function animate() {
-      ctx.clearRect(0, 0, width, height);
-      drawField();
-      drawParticles();
-      updateParticles();
-      requestAnimationFrame(animate);
-    }
-
-    animate();
-  </script>
-
+  <script src="../assets/js/main.js"></script>
 </body>
 </html>

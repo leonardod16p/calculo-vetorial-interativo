@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bordo e Orientação - Simulação Interativa</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(52, 152, 219, 0.1);
+            border-radius: 15px;
+            border: 2px solid rgba(52, 152, 219, 0.3);
+        }
+        
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .control-section {
+            grid-column: 1 / -1;
+            border-bottom: 2px solid rgba(52, 152, 219, 0.2);
+            padding-bottom: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .control-section h4 {
+            margin: 0 0 10px 0;
+            color: #2c3e50;
+            font-size: 1.1em;
+        }
+        
+        label {
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 0.85em;
+        }
+        
+        input[type="range"] {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: #ddd;
+            outline: none;
+            -webkit-appearance: none;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #3498db;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+        
+        input[type="range"]::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #3498db;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+        
+        select {
+            padding: 8px;
+            border: 2px solid #3498db;
+            border-radius: 8px;
+            background: white;
+            font-size: 0.9em;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #3498db;
+        }
+        
+        .visualization {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .canvas-container {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border: 2px solid rgba(52, 152, 219, 0.2);
+        }
+        
+        canvas {
+            width: 100%;
+            height: 450px;
+            border-radius: 10px;
+            background: #f8f9fa;
+        }
+        
+        .info-panel {
+            background: linear-gradient(135deg, #74b9ff, #0984e3);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-top: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .formula {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 1.1em;
+            backdrop-filter: blur(5px);
+        }
+        
+        .orientation-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .orientation-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            backdrop-filter: blur(5px);
+        }
+        
+        .curve-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .curve-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid;
+        }
+        
+        .curve-card.positive { border-left-color: #00b894; }
+        .curve-card.negative { border-left-color: #e17055; }
+        
+        @media (max-width: 768px) {
+            .visualization {
+                grid-template-columns: 1fr;
+            }
+            .controls {
+                grid-template-columns: 1fr;
+            }
+            .orientation-info {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Simulação: Bordo, Orientação e Vetores Normais</h1>
+        
+        <div class="controls">
+            <div class="control-section">
+                <h4>Tipo de Superfície</h4>
+            </div>
+            
+            <div class="control-group">
+                <label for="surfaceType">Função base:</label>
+                <select id="surfaceType">
+                    <option value="wave">Ondas senoidais</option>
+                    <option value="paraboloid">Paraboloide</option>
+                    <option value="saddle">Ponto de sela</option>
+                    <option value="cylinder">Cilindro</option>
+                    <option value="custom">Personalizada</option>
+                </select>
+            </div>
+            
+            <div class="control-group">
+                <label for="reverseOrientation">Inverter orientação:</label>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="reverseOrientation">
+                    <span>Trocar N → -N</span>
+                </div>
+            </div>
+            
+            <div class="control-section">
+                <h4>Parâmetros da Superfície</h4>
+            </div>
+            
+            <div class="control-group">
+                <label for="amplitude">Amplitude:</label>
+                <input type="range" id="amplitude" min="0.2" max="3" step="0.1" value="1.0">
+                <span id="amplitudeValue">1.0</span>
+            </div>
+            
+            <div class="control-group">
+                <label for="frequency">Frequência:</label>
+                <input type="range" id="frequency" min="0.5" max="4" step="0.1" value="1.5">
+                <span id="frequencyValue">1.5</span>
+            </div>
+            
+            <div class="control-group">
+                <label for="stretch">Estiramento X:</label>
+                <input type="range" id="stretch" min="0.5" max="2" step="0.1" value="1.0">
+                <span id="stretchValue">1.0</span>
+            </div>
+            
+            <div class="control-group">
+                <label for="skew">Inclinação Y:</label>
+                <input type="range" id="skew" min="0.5" max="2" step="0.1" value="1.0">
+                <span id="skewValue">1.0</span>
+            </div>
+            
+            <div class="control-section">
+                <h4>Visualização</h4>
+            </div>
+            
+            <div class="control-group">
+                <label for="rotation">Rotação:</label>
+                <input type="range" id="rotation" min="0" max="360" step="5" value="30">
+                <span id="rotationValue">30°</span>
+            </div>
+            
+            <div class="control-group">
+                <label for="showNormals">Vetores normais:</label>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="showNormals" checked>
+                </div>
+            </div>
+            
+            <div class="control-group">
+                <label for="showGrid">Grade:</label>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="showGrid" checked>
+                </div>
+            </div>
+            
+            <div class="control-group">
+                <label for="normalDensity">Densidade normais:</label>
+                <input type="range" id="normalDensity" min="3" max="10" step="1" value="6">
+                <span id="normalDensityValue">6</span>
+            </div>
+        </div>
+        
+        <div class="visualization">
+            <div class="canvas-container">
+                <h3 style="text-align: center; color: #2c3e50; margin-bottom: 15px;">Superfície com Vetores Normais</h3>
+                <canvas id="surfaceCanvas"></canvas>
+            </div>
+            
+            <div class="canvas-container">
+                <h3 style="text-align: center; color: #2c3e50; margin-bottom: 15px;">Domínio e Orientação do Bordo</h3>
+                <canvas id="domainCanvas"></canvas>
+            </div>
+        </div>
+        
+        <div class="info-panel">
+            <h3 style="margin-top: 0;">Relação entre Orientação da Superfície e do Bordo</h3>
+            
+            <div class="orientation-info">
+                <div class="orientation-card">
+                    <h4>Regra da Mão Direita</h4>
+                    <p>O vetor normal <strong>N</strong> determina como percorrer o bordo. Com N apontando para você, o bordo é percorrido no <strong>sentido anti-horário</strong>.</p>
+                </div>
+                
+                <div class="orientation-card">
+                    <h4>Inversão de Orientação</h4>
+                    <p>Ao inverter N → -N, o sentido de percurso do bordo também inverte. As setas mostram a direção de integração ao longo de ∂C.</p>
+                </div>
+            </div>
+            
+            <div class="formula" id="formulaDisplay">
+                ∂C percorrido no sentido anti-horário
+            </div>
+            
+            <p><strong>Vetores Normais:</strong> Calculados como N = ∂C/∂u × ∂C/∂v. As setas azuis no bordo mostram o sentido de percurso determinado por N.</p>
+            
+            <div class="curve-info">
+                <div class="curve-card">
+                    <strong>Fórmula Matemática do Bordo</strong><br>
+                    ∂C = C₂₀ + C₁₁ - C₂₁ - C₁₀<br>
+                    <small>Onde cada Cᵢⱼ representa um segmento do bordo com orientação específica</small>
+                </div>
+                
+                <div class="curve-card">
+                    <strong>Regra da Mão Direita</strong><br>
+                    Com o polegar na direção de N, os dedos indicam o sentido de percurso do bordo ∂C
+                </div>
+            </div>
+            
+            <p style="margin-top: 20px;"><strong>Experimente:</strong> Mude o tipo de superfície e observe como os vetores normais se comportam. Inverta a orientação para ver como isso afeta o sentido de percurso do bordo! A fórmula ∂C = C₂₀ + C₁₁ - C₂₁ - C₁₀ permanece válida, mas quando N → -N, todo o bordo inverte: ∂C → -∂C.</p>
+        </div>
+    </div>
+
+    <script>
+        // Configuração dos canvas
+        const surfaceCanvas = document.getElementById('surfaceCanvas');
+        const domainCanvas = document.getElementById('domainCanvas');
+        const surfaceCtx = surfaceCanvas.getContext('2d');
+        const domainCtx = domainCanvas.getContext('2d');
+        
+        // Configurar tamanho dos canvas
+        function resizeCanvas() {
+            const rect = surfaceCanvas.parentElement.getBoundingClientRect();
+            surfaceCanvas.width = rect.width;
+            surfaceCanvas.height = rect.width * (450 / rect.width);
+            
+            const domainRect = domainCanvas.parentElement.getBoundingClientRect();
+            domainCanvas.width = domainRect.width;
+            domainCanvas.height = domainRect.width * (450 / rect.width);
+            
+            draw();
+        }
+        
+        window.addEventListener('resize', resizeCanvas);
+        
+        // Parâmetros da simulação
+        let params = {
+            surfaceType: 'wave',
+            amplitude: 1.0,
+            frequency: 1.5,
+            stretch: 1.0,
+            skew: 1.0,
+            rotation: 30,
+            showNormals: true,
+            showGrid: true,
+            normalDensity: 6,
+            reverseOrientation: false
+        };
+        
+        // Controles
+        const controls = {
+            surfaceType: document.getElementById('surfaceType'),
+            amplitude: document.getElementById('amplitude'),
+            frequency: document.getElementById('frequency'),
+            stretch: document.getElementById('stretch'),
+            skew: document.getElementById('skew'),
+            rotation: document.getElementById('rotation'),
+            showNormals: document.getElementById('showNormals'),
+            showGrid: document.getElementById('showGrid'),
+            normalDensity: document.getElementById('normalDensity'),
+            reverseOrientation: document.getElementById('reverseOrientation')
+        };
+        
+        const values = {
+            amplitude: document.getElementById('amplitudeValue'),
+            frequency: document.getElementById('frequencyValue'),
+            stretch: document.getElementById('stretchValue'),
+            skew: document.getElementById('skewValue'),
+            rotation: document.getElementById('rotationValue'),
+            normalDensity: document.getElementById('normalDensityValue')
+        };
+        
+        // Event listeners para controles
+        Object.keys(controls).forEach(key => {
+            if (key === 'showNormals' || key === 'showGrid' || key === 'reverseOrientation') {
+                controls[key].addEventListener('change', (e) => {
+                    params[key] = e.target.checked;
+                    updateFormulaDisplay();
+                    draw();
+                });
+            } else if (key === 'surfaceType') {
+                controls[key].addEventListener('change', (e) => {
+                    params[key] = e.target.value;
+                    draw();
+                });
+            } else {
+                controls[key].addEventListener('input', (e) => {
+                    params[key] = parseFloat(e.target.value);
+                    if (values[key]) {
+                        values[key].textContent = key === 'rotation' ? `${params[key]}°` : params[key];
+                    }
+                    draw();
+                });
+            }
+        });
+        
+        // Atualizar exibição da fórmula e descrições
+        function updateFormulaDisplay() {
+            const formulaDisplay = document.getElementById('formulaDisplay');
+            
+            if (params.reverseOrientation) {
+                formulaDisplay.innerHTML = '∂C percorrido no <strong>sentido horário</strong>';
+            } else {
+                formulaDisplay.innerHTML = '∂C percorrido no <strong>sentido anti-horário</strong>';
+            }
+        }
+        
+        // Funções das superfícies
+        function surfaceFunction(u, v) {
+            let x, y, z;
+            
+            switch (params.surfaceType) {
+                case 'wave':
+                    x = u * params.stretch + 0.2 * Math.sin(params.frequency * v) * params.amplitude;
+                    y = v * params.skew + 0.2 * Math.cos(params.frequency * u) * params.amplitude;
+                    z = 0.3 * Math.sin(params.frequency * u) * Math.cos(params.frequency * v) * params.amplitude;
+                    break;
+                    
+                case 'paraboloid':
+                    x = u * params.stretch;
+                    y = v * params.skew;
+                    z = params.amplitude * (u * u + v * v) * 0.5;
+                    break;
+                    
+                case 'saddle':
+                    x = u * params.stretch;
+                    y = v * params.skew;
+                    z = params.amplitude * (u * u - v * v) * 0.5;
+                    break;
+                    
+                case 'cylinder':
+                    const r = 1 + params.amplitude * 0.3;
+                    x = r * Math.cos(params.frequency * u) * params.stretch;
+                    y = v * params.skew;
+                    z = r * Math.sin(params.frequency * u) * params.amplitude;
+                    break;
+                    
+                case 'custom':
+                    x = u * params.stretch + 0.1 * Math.sin(params.frequency * u * v) * params.amplitude;
+                    y = v * params.skew + 0.1 * Math.cos(params.frequency * u * v) * params.amplitude;
+                    z = 0.2 * Math.sin(params.frequency * u) * Math.sin(params.frequency * v) * params.amplitude;
+                    break;
+                    
+                default:
+                    x = u; y = v; z = 0;
+            }
+            
+            return [x, y, z];
+        }
+        
+        // Calcular derivadas parciais numericamente
+        function partialDerivatives(u, v) {
+            const h = 0.001;
+            
+            const [x, y, z] = surfaceFunction(u, v);
+            const [xu1, yu1, zu1] = surfaceFunction(u + h, v);
+            const [xu2, yu2, zu2] = surfaceFunction(u, v + h);
+            
+            const du = [(xu1 - x) / h, (yu1 - y) / h, (zu1 - z) / h];
+            const dv = [(xu2 - x) / h, (yu2 - y) / h, (zu2 - z) / h];
+            
+            return [du, dv];
+        }
+        
+        // Produto vetorial
+        function crossProduct(a, b) {
+            return [
+                a[1] * b[2] - a[2] * b[1],
+                a[2] * b[0] - a[0] * b[2],
+                a[0] * b[1] - a[1] * b[0]
+            ];
+        }
+        
+        // Normalizar vetor
+        function normalize(v) {
+            const length = Math.sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]);
+            if (length === 0) return [0, 0, 1];
+            return [v[0] / length, v[1] / length, v[2] / length];
+        }
+        
+        // Calcular vetor normal
+        function normalVector(u, v) {
+            const [du, dv] = partialDerivatives(u, v);
+            let normal = crossProduct(du, dv);
+            normal = normalize(normal);
+            
+            if (params.reverseOrientation) {
+                normal = [-normal[0], -normal[1], -normal[2]];
+            }
+            
+            return normal;
+        }
+        
+        // Projeção 3D para 2D
+        function project3D(x, y, z, canvas) {
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const scale = Math.min(canvas.width, canvas.height) * 0.25;
+            
+            const rad = params.rotation * Math.PI / 180;
+            const cos = Math.cos(rad);
+            const sin = Math.sin(rad);
+            
+            // Rotação em Y e X para melhor visualização
+            const rotY_x = x * cos - z * sin;
+            const rotY_z = x * sin + z * cos;
+            
+            const pitch = 30 * Math.PI / 180;
+            const cosP = Math.cos(pitch);
+            const sinP = Math.sin(pitch);
+
+            const finalX = rotY_x;
+            const finalY = y * cosP - rotY_z * sinP;
+            const finalZ = y * sinP + rotY_z * cosP;
+
+            const perspective = 1 + finalZ * 0.1;
+            
+            return [
+                centerX + finalX * scale * perspective,
+                centerY - finalY * scale * perspective
+            ];
+        }
+        
+        // Desenhar superfície
+        function drawSurface() {
+            const ctx = surfaceCtx;
+            const canvas = surfaceCanvas;
+            
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            const resolution = 25;
+            const uMin = -1.2, uMax = 1.2;
+            const vMin = -1.2, vMax = 1.2;
+            
+            // Desenhar grade da superfície
+            if (params.showGrid) {
+                ctx.strokeStyle = 'rgba(52, 152, 219, 0.4)';
+                ctx.lineWidth = 1;
+                
+                // Linhas u constante
+                for (let i = 0; i <= resolution; i++) {
+                    const u = uMin + (uMax - uMin) * i / resolution;
+                    ctx.beginPath();
+                    
+                    for (let j = 0; j <= resolution; j++) {
+                        const v = vMin + (vMax - vMin) * j / resolution;
+                        const [x, y, z] = surfaceFunction(u, v);
+                        const [px, py] = project3D(x, y, z, canvas);
+                        
+                        if (j === 0) ctx.moveTo(px, py);
+                        else ctx.lineTo(px, py);
+                    }
+                    ctx.stroke();
+                }
+                
+                // Linhas v constante
+                for (let j = 0; j <= resolution; j++) {
+                    const v = vMin + (vMax - vMin) * j / resolution;
+                    ctx.beginPath();
+                    
+                    for (let i = 0; i <= resolution; i++) {
+                        const u = uMin + (uMax - uMin) * i / resolution;
+                        const [x, y, z] = surfaceFunction(u, v);
+                        const [px, py] = project3D(x, y, z, canvas);
+                        
+                        if (i === 0) ctx.moveTo(px, py);
+                        else ctx.lineTo(px, py);
+                    }
+                    ctx.stroke();
+                }
+            }
+            
+            // Destacar curvas de bordo com cor única e setas direcionais
+            const borderColor = '#2980b9'; // Azul para todas as bordas
+            const curves = [
+                { v: vMin, uRange: [uMin, uMax], direction: params.reverseOrientation ? -1 : 1 }, // Inferior
+                { u: uMax, vRange: [vMin, vMax], direction: params.reverseOrientation ? -1 : 1 }, // Direita  
+                { v: vMax, uRange: [uMax, uMin], direction: params.reverseOrientation ? -1 : 1 }, // Superior (invertida)
+                { u: uMin, vRange: [vMax, vMin], direction: params.reverseOrientation ? -1 : 1 }  // Esquerda (invertida)
+            ];
+            
+            curves.forEach(curve => {
+                ctx.strokeStyle = borderColor;
+                ctx.fillStyle = borderColor;
+                ctx.lineWidth = 4;
+                
+                ctx.beginPath();
+                
+                let points = [];
+                if ('u' in curve) {
+                    // Curva com u fixo (bordas esquerda e direita)
+                    const [vStart, vEnd] = curve.vRange;
+                    for (let i = 0; i <= 50; i++) {
+                        const v = vStart + (vEnd - vStart) * i / 50;
+                        const [x, y, z] = surfaceFunction(curve.u, v);
+                        const [px, py] = project3D(x, y, z, canvas);
+                        points.push([px, py]);
+                        
+                        if (i === 0) ctx.moveTo(px, py);
+                        else ctx.lineTo(px, py);
+                    }
+                } else {
+                    // Curva com v fixo (bordas inferior e superior)
+                    const [uStart, uEnd] = curve.uRange;
+                    for (let i = 0; i <= 50; i++) {
+                        const v = curve.v;
+                        const u = uStart + (uEnd - uStart) * i / 50;
+                        const [x, y, z] = surfaceFunction(u, v);
+                        const [px, py] = project3D(x, y, z, canvas);
+                        points.push([px, py]);
+                        
+                        if (i === 0) ctx.moveTo(px, py);
+                        else ctx.lineTo(px, py);
+                    }
+                }
+                ctx.stroke();
+                
+                // Desenhar setas direcionais ao longo da curva
+                const numArrows = 4;
+                for (let i = 1; i <= numArrows; i++) {
+                    const idx = Math.floor((points.length - 1) * i / (numArrows + 1));
+                    if (idx < points.length - 1) {
+                        const [x1, y1] = points[idx];
+                        const [x2, y2] = points[idx + 1];
+                        
+                        let dx = x2 - x1;
+                        let dy = y2 - y1;
+                        
+                        // Inverter direção se necessário
+                        if (curve.direction < 0) {
+                            dx = -dx;
+                            dy = -dy;
+                        }
+                        
+                        const length = Math.sqrt(dx * dx + dy * dy);
+                        if (length > 1) {
+                            const ux = dx / length;
+                            const uy = dy / length;
+                            const arrowSize = 8;
+                            
+                            ctx.beginPath();
+                            ctx.moveTo(x1, y1);
+                            ctx.lineTo(x1 - ux * arrowSize + uy * arrowSize * 0.5, y1 - uy * arrowSize - ux * arrowSize * 0.5);
+                            ctx.lineTo(x1 - ux * arrowSize - uy * arrowSize * 0.5, y1 - uy * arrowSize + ux * arrowSize * 0.5);
+                            ctx.closePath();
+                            ctx.fill();
+                        }
+                    }
+                }
+            });
+            
+            // Desenhar vetores normais
+            if (params.showNormals) {
+                const normalRes = params.normalDensity;
+                ctx.strokeStyle = '#9b59b6';
+                ctx.lineWidth = 2;
+                
+                for (let i = 1; i < normalRes; i++) {
+                    for (let j = 1; j < normalRes; j++) {
+                        const u = uMin + (uMax - uMin) * i / normalRes;
+                        const v = vMin + (vMax - vMin) * j / normalRes;
+                        
+                        const [x, y, z] = surfaceFunction(u, v);
+                        const [nx, ny, nz] = normalVector(u, v);
+                        
+                        const [px1, py1] = project3D(x, y, z, canvas);
+                        const [px2, py2] = project3D(x + nx * 0.3, y + ny * 0.3, z + nz * 0.3, canvas);
+                        
+                        // Vetor normal
+                        ctx.beginPath();
+                        ctx.moveTo(px1, py1);
+                        ctx.lineTo(px2, py2);
+                        ctx.stroke();
+                        
+                        // Ponta da seta
+                        const dx = px2 - px1;
+                        const dy = py2 - py1;
+                        const length = Math.sqrt(dx * dx + dy * dy);
+                        
+                        if (length > 5) {
+                            const ux = dx / length;
+                            const uy = dy / length;
+                            const arrowSize = 6;
+                            
+                            ctx.fillStyle = '#9b59b6';
+                            ctx.beginPath();
+                            ctx.moveTo(px2, py2);
+                            ctx.lineTo(px2 - ux * arrowSize + uy * arrowSize * 0.5, py2 - uy * arrowSize - ux * arrowSize * 0.5);
+                            ctx.lineTo(px2 - ux * arrowSize - uy * arrowSize * 0.5, py2 - uy * arrowSize + ux * arrowSize * 0.5);
+                            ctx.closePath();
+                            ctx.fill();
+                        }
+                    }
+                }
+            }
+        }
+        
+        // Desenhar domínio e curvas
+        function drawDomain() {
+            const ctx = domainCtx;
+            const canvas = domainCanvas;
+            
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            const margin = 60;
+            const width = canvas.width - 2 * margin;
+            const height = canvas.height - 2 * margin;
+            const arrowSize = 10;
+            
+            // Desenhar eixos
+            ctx.strokeStyle = '#34495e';
+            ctx.fillStyle = '#34495e';
+            ctx.lineWidth = 2;
+            ctx.font = 'bold 14px Segoe UI';
+            
+            // Eixo u
+            ctx.beginPath();
+            ctx.moveTo(margin - 20, margin + height);
+            ctx.lineTo(margin + width + 20, margin + height);
+            ctx.stroke();
+            ctx.fillText('u', margin + width + 25, margin + height + 5);
+            
+            // Seta do eixo u
+            ctx.beginPath();
+            ctx.moveTo(margin + width + 20, margin + height);
+            ctx.lineTo(margin + width + 10, margin + height - 5);
+            ctx.lineTo(margin + width + 10, margin + height + 5);
+            ctx.closePath();
+            ctx.fill();
+            
+            // Eixo v
+            ctx.beginPath();
+            ctx.moveTo(margin, margin + height + 20);
+            ctx.lineTo(margin, margin - 20);
+            ctx.stroke();
+            ctx.fillText('v', margin - 5, margin - 25);
+            
+            // Seta do eixo v
+            ctx.beginPath();
+            ctx.moveTo(margin, margin - 20);
+            ctx.lineTo(margin - 5, margin - 10);
+            ctx.lineTo(margin + 5, margin - 10);
+            ctx.closePath();
+            ctx.fill();
+            
+            // Grade do domínio
+            if (params.showGrid) {
+                ctx.strokeStyle = 'rgba(52, 73, 94, 0.2)';
+                ctx.lineWidth = 1;
+                const gridLines = 8;
+                for (let i = 1; i < gridLines; i++) {
+                    const x = margin + width * i / gridLines;
+                    const y = margin + height * i / gridLines;
+                    
+                    ctx.beginPath();
+                    ctx.moveTo(x, margin);
+                    ctx.lineTo(x, margin + height);
+                    ctx.stroke();
+                    
+                    ctx.beginPath();
+                    ctx.moveTo(margin, y);
+                    ctx.lineTo(margin + width, y);
+                    ctx.stroke();
+                }
+            }
+            
+            // Definir pontos do retângulo (domínio)
+            const p1 = [margin, margin];           // Canto superior esquerdo
+            const p2 = [margin + width, margin];   // Canto superior direito
+            const p3 = [margin + width, margin + height]; // Canto inferior direito
+            const p4 = [margin, margin + height];  // Canto inferior esquerdo
+
+            // Definir o caminho do bordo baseado na orientação
+            const borderPath = params.reverseOrientation ? 
+                [p4, p1, p2, p3, p4] :  // Sentido horário
+                [p4, p3, p2, p1, p4];   // Sentido anti-horário
+            
+            // Desenhar o bordo completo
+            ctx.strokeStyle = '#2980b9';
+            ctx.fillStyle = '#2980b9';
+            ctx.lineWidth = 4;
+            
+            // Linha do bordo
+            ctx.beginPath();
+            ctx.moveTo(borderPath[0][0], borderPath[0][1]);
+            for (let i = 1; i < borderPath.length; i++) {
+                ctx.lineTo(borderPath[i][0], borderPath[i][1]);
+            }
+            ctx.stroke();
+            
+            // Desenhar setas ao longo do bordo
+            const totalSegments = borderPath.length - 1;
+            const arrowsPerSegment = 3;
+            
+            for (let segment = 0; segment < totalSegments; segment++) {
+                const start = borderPath[segment];
+                const end = borderPath[segment + 1];
+                
+                for (let arrow = 1; arrow <= arrowsPerSegment; arrow++) {
+                    const t = arrow / (arrowsPerSegment + 1);
+                    const arrowX = start[0] + t * (end[0] - start[0]);
+                    const arrowY = start[1] + t * (end[1] - start[1]);
+                    const dx = end[0] - start[0];
+                    const dy = end[1] - start[1];
+                    const angle = Math.atan2(dy, dx);
+                    
+                    ctx.beginPath();
+                    ctx.moveTo(arrowX, arrowY);
+                    ctx.lineTo(arrowX - arrowSize * Math.cos(angle - Math.PI / 6), arrowY - arrowSize * Math.sin(angle - Math.PI / 6));
+                    ctx.lineTo(arrowX - arrowSize * Math.cos(angle + Math.PI / 6), arrowY - arrowSize * Math.sin(angle + Math.PI / 6));
+                    ctx.closePath();
+                    ctx.fill();
+                }
+            }
+            
+            // Desenhar indicador de orientação no centro
+            const centerX = margin + width / 2;
+            const centerY = margin + height / 2;
+            
+            ctx.font = 'bold 14px Segoe UI';
+            ctx.fillStyle = '#2980b9';
+            ctx.textAlign = 'center';
+            
+            const orientationText = params.reverseOrientation ? 
+                'Sentido Horário\n(N invertido)' : 
+                'Sentido Anti-horário\n(N normal)';
+            
+            const lines = orientationText.split('\n');
+            ctx.fillText(lines[0], centerX, centerY - 5);
+            ctx.fillText(lines[1], centerX, centerY + 15);
+            
+            // Desenhar seta circular indicando direção
+            ctx.strokeStyle = '#2980b9';
+            ctx.lineWidth = 2;
+            const radius = 25;
+            const startAngle = params.reverseOrientation ? 0 : Math.PI;
+            const endAngle = params.reverseOrientation ? -Math.PI * 1.5 : Math.PI * 0.5;
+            
+            ctx.beginPath();
+            ctx.arc(centerX, centerY + 30, radius, startAngle, endAngle, params.reverseOrientation);
+            ctx.stroke();
+            
+            // Seta na extremidade do arco
+            const arrowAngle = endAngle;
+            const arrowX = centerX + radius * Math.cos(arrowAngle);
+            const arrowY = centerY + 30 + radius * Math.sin(arrowAngle);
+            const direction = params.reverseOrientation ? -1 : 1;
+            
+            ctx.fillStyle = '#2980b9';
+            ctx.beginPath();
+            ctx.moveTo(arrowX, arrowY);
+            ctx.lineTo(arrowX - 6 * Math.cos(arrowAngle - direction * Math.PI / 6), 
+                      arrowY - 6 * Math.sin(arrowAngle - direction * Math.PI / 6));
+            ctx.lineTo(arrowX - 6 * Math.cos(arrowAngle + direction * Math.PI / 6), 
+                      arrowY - 6 * Math.sin(arrowAngle + direction * Math.PI / 6));
+            ctx.closePath();
+            ctx.fill();
+        }
+        
+        // Função principal que chama as rotinas de desenho
+        function draw() {
+            if (!surfaceCanvas || !domainCanvas) return;
+            drawSurface();
+            drawDomain();
+        }
+        
+        // Inicialização
+        updateFormulaDisplay();
+        resizeCanvas();
+
+    </script>
+</body>
+</html>

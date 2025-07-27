@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Derivada como Densidade de Variação</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            color: white;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .controls {
+            background: rgba(0,0,0,0.3);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .control-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .control-item {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        label {
+            font-size: 14px;
+            font-weight: 500;
+            color: #e2e8f0;
+        }
+        
+        select, input[type="range"] {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.15);
+            color: white;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        select option {
+            background: #2a5298;
+            color: white;
+        }
+        
+        input[type="range"] {
+            width: 150px;
+            height: 6px;
+            background: rgba(255,255,255,0.2);
+            outline: none;
+            border-radius: 3px;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb {
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            background: #60a5fa;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+        }
+        
+        .value-display {
+            font-size: 12px;
+            color: #cbd5e1;
+            background: rgba(0,0,0,0.2);
+            padding: 4px 8px;
+            border-radius: 4px;
+            min-width: 60px;
+            text-align: center;
+        }
+        
+        .info-panel {
+            background: rgba(0,0,0,0.3);
+            padding: 20px;
+            border-radius: 15px;
+            margin-top: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .formula {
+            background: rgba(0,0,0,0.2);
+            padding: 15px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 16px;
+            margin: 10px 0;
+            border-left: 4px solid #60a5fa;
+        }
+        
+        .explanation {
+            font-size: 14px;
+            line-height: 1.6;
+            margin-top: 15px;
+        }
+        
+        #canvas-container {
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+        
+        .legend-color {
+            width: 20px;
+            height: 4px;
+            border-radius: 2px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌊 Derivada como Densidade de Variação</h1>
+            <p>Visualização interativa do conceito de derivada através da analogia do fluxo em um tubo</p>
+        </div>
+        
+        <div class="controls">
+            <div class="control-group">
+                <div class="control-item">
+                    <label for="function-select">Função:</label>
+                    <select id="function-select">
+                        <option value="quadratic">f(x) = x²/4</option>
+                        <option value="cubic">f(x) = x³/12</option>
+                        <option value="sine">f(x) = 2sin(x/2)</option>
+                        <option value="exponential">f(x) = e^(x/3)</option>
+                    </select>
+                </div>
+                
+                <div class="control-item">
+                    <label for="interval-size">Tamanho do Intervalo (β - α):</label>
+                    <input type="range" id="interval-size" min="0.1" max="3" step="0.1" value="1">
+                    <div class="value-display" id="interval-display">1.0</div>
+                </div>
+                
+                <div class="control-item">
+                    <label for="point-x">Ponto x:</label>
+                    <input type="range" id="point-x" min="-2" max="6" step="0.1" value="2">
+                    <div class="value-display" id="point-display">2.0</div>
+                </div>
+                
+                <div class="control-item">
+                    <label for="show-particles">Mostrar Partículas:</label>
+                    <input type="checkbox" id="show-particles" checked>
+                </div>
+            </div>
+        </div>
+        
+        <div id="canvas-container"></div>
+        
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color" style="background: #60a5fa;"></div>
+                <span>Função f(x)</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #ef4444;"></div>
+                <span>Intervalo [α, β]</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #10b981;"></div>
+                <span>Densidade Média</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #f59e0b;"></div>
+                <span>Taxa Instantânea (Derivada)</span>
+            </div>
+        </div>
+        
+        <div class="info-panel">
+            <h3>📊 Interpretação Física</h3>
+            <div class="formula" id="calculation-display">
+                Saldo Líquido: f(β) - f(α) = ?<br>
+                Densidade Média: [f(β) - f(α)] / (β - α) = ?<br>
+                Taxa Instantânea: f'(x) = ?
+            </div>
+            
+            <div class="explanation">
+                <strong>Analogia do Tubo:</strong> Imagine um tubo onde algo (massa, energia, carga) está fluindo. 
+                O <strong>saldo líquido</strong> representa o quanto foi acumulado no intervalo [α, β]. 
+                A <strong>densidade média</strong> é esse saldo dividido pelo comprimento do intervalo. 
+                Quando o intervalo se torna infinitesimalmente pequeno, obtemos a <strong>taxa instantânea</strong> 
+                de geração no ponto x, que é exatamente a derivada f'(x).
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let functions = {
+            quadratic: {
+                name: 'f(x) = x²/4',
+                f: x => x * x / 4,
+                derivative: x => x / 2,
+                color: [96, 165, 250]
+            },
+            cubic: {
+                name: 'f(x) = x³/12',
+                f: x => x * x * x / 12,
+                derivative: x => x * x / 4,
+                color: [239, 68, 68]
+            },
+            sine: {
+                name: 'f(x) = 2sin(x/2)',
+                f: x => 2 * Math.sin(x / 2),
+                derivative: x => Math.cos(x / 2),
+                color: [16, 185, 129]
+            },
+            exponential: {
+                name: 'f(x) = e^(x/3)',
+                f: x => Math.exp(x / 3),
+                derivative: x => Math.exp(x / 3) / 3,
+                color: [245, 158, 11]
+            }
+        };
+        
+        let currentFunction = 'quadratic';
+        let intervalSize = 1.0;
+        let pointX = 2.0;
+        let showParticles = true;
+        let particles = [];
+        let time = 0;
+        
+        function setup() {
+            let canvas = createCanvas(800, 600);
+            canvas.parent('canvas-container');
+            
+            // Initialize particles
+            for (let i = 0; i < 60; i++) {
+                particles.push({
+                    x: random(width),
+                    y: height/2 + random(-30, 30),
+                    baseY: height/2,
+                    speed: random(0.5, 2),
+                    phase: random(TWO_PI),
+                    size: random(2, 5),
+                    color: random(['#60a5fa', '#ef4444', '#10b981', '#f59e0b'])
+                });
+            }
+            
+            setupControls();
+        }
+        
+        function draw() {
+            // Dark gradient background
+            for (let i = 0; i <= height; i++) {
+                let inter = map(i, 0, height, 0, 1);
+                let c = lerpColor(color(30, 60, 114), color(42, 82, 152), inter);
+                stroke(c);
+                line(0, i, width, i);
+            }
+            
+            time += 0.02;
+            
+            drawCoordinateSystem();
+            drawFunction();
+            drawInterval();
+            
+            if (showParticles) {
+                drawParticles();
+            }
+            
+            drawInfoBox();
+            updateCalculations();
+        }
+        
+        function drawCoordinateSystem() {
+            stroke(255, 255, 255, 100);
+            strokeWeight(1);
+            
+            // Grid lines
+            for (let x = 0; x <= width; x += 40) {
+                line(x, 0, x, height);
+            }
+            for (let y = 0; y <= height; y += 40) {
+                line(0, y, width, y);
+            }
+            
+            // Main axes
+            stroke(255, 255, 255, 200);
+            strokeWeight(2);
+            line(0, height/2, width, height/2); // x-axis
+            line(width/2, 0, width/2, height); // y-axis
+            
+            // Axis labels
+            fill(255, 255, 255, 180);
+            noStroke();
+            textAlign(CENTER);
+            textSize(12);
+            
+            for (let i = -4; i <= 4; i++) {
+                if (i !== 0) {
+                    let x = map(i, -4, 4, 0, width);
+                    text(i, x, height/2 + 20);
+                }
+            }
+            
+            for (let i = -3; i <= 3; i++) {
+                if (i !== 0) {
+                    let y = map(i, -3, 3, height - 50, 50);
+                    text(i, width/2 + 20, y);
+                }
+            }
+        }
+        
+        function drawFunction() {
+            let func = functions[currentFunction];
+            stroke(func.color[0], func.color[1], func.color[2]);
+            strokeWeight(3);
+            noFill();
+            
+            beginShape();
+            for (let px = 0; px <= width; px += 2) {
+                let x = map(px, 0, width, -4, 4);
+                let y = func.f(x);
+                let py = map(y, -3, 3, height - 50, 50);
+                
+                if (py >= 0 && py <= height) {
+                    vertex(px, py);
+                }
+            }
+            endShape();
+            
+            // Function label
+            fill(func.color[0], func.color[1], func.color[2]);
+            noStroke();
+            textAlign(LEFT);
+            textSize(16);
+            text(func.name, 20, 30);
+        }
+        
+        function drawInterval() {
+            let func = functions[currentFunction];
+            
+            // Calculate α and β
+            let alpha = pointX - intervalSize / 2;
+            let beta = pointX + intervalSize / 2;
+            
+            // Convert to pixel coordinates
+            let alphaX = map(alpha, -4, 4, 0, width);
+            let betaX = map(beta, -4, 4, 0, width);
+            let pointPX = map(pointX, -4, 4, 0, width);
+            
+            let alphaY = map(func.f(alpha), -3, 3, height - 50, 50);
+            let betaY = map(func.f(beta), -3, 3, height - 50, 50);
+            let pointY = map(func.f(pointX), -3, 3, height - 50, 50);
+            
+            // Draw interval on x-axis
+            stroke(239, 68, 68, 200);
+            strokeWeight(6);
+            line(alphaX, height/2 - 10, betaX, height/2 - 10);
+            
+            // Draw vertical lines
+            stroke(239, 68, 68, 150);
+            strokeWeight(2);
+            strokeDasharray([5, 5]);
+            line(alphaX, height/2 - 10, alphaX, alphaY);
+            line(betaX, height/2 - 10, betaX, betaY);
+            line(pointPX, height/2 - 10, pointPX, pointY);
+            strokeDasharray([]);
+            
+            // Draw points
+            fill(239, 68, 68);
+            noStroke();
+            ellipse(alphaX, alphaY, 8);
+            ellipse(betaX, betaY, 8);
+            
+            fill(245, 158, 11);
+            ellipse(pointPX, pointY, 10);
+            
+            // Draw average rate line
+            stroke(16, 185, 129, 180);
+            strokeWeight(2);
+            line(alphaX, alphaY, betaX, betaY);
+            
+            // Draw instantaneous rate (tangent line)
+            let derivative = func.derivative(pointX);
+            let tangentLength = 100;
+            let tangentX1 = pointPX - tangentLength/2;
+            let tangentX2 = pointPX + tangentLength/2;
+            let tangentY1 = pointY - derivative * tangentLength/2 * (width/8); // Scale factor
+            let tangentY2 = pointY + derivative * tangentLength/2 * (width/8);
+            
+            stroke(245, 158, 11, 200);
+            strokeWeight(3);
+            line(tangentX1, tangentY1, tangentX2, tangentY2);
+            
+            // Labels
+            fill(255);
+            noStroke();
+            textAlign(CENTER);
+            textSize(14);
+            text('α', alphaX, height/2 + 35);
+            text('β', betaX, height/2 + 35);
+            text('x', pointPX, height/2 + 35);
+        }
+        
+        function drawParticles() {
+            let func = functions[currentFunction];
+            
+            for (let particle of particles) {
+                // Move particles
+                particle.x += particle.speed;
+                if (particle.x > width + 10) {
+                    particle.x = -10;
+                }
+                
+                // Oscillate based on derivative at current position
+                let worldX = map(particle.x, 0, width, -4, 4);
+                let oscillation = Math.sin(time + particle.phase) * 15;
+                let derivativeEffect = func.derivative(worldX) * 10;
+                particle.y = particle.baseY + oscillation + derivativeEffect;
+                
+                // Draw particle
+                fill(particle.color + '80'); // Add transparency
+                noStroke();
+                ellipse(particle.x, particle.y, particle.size);
+                
+                // Trail effect
+                fill(particle.color + '40');
+                ellipse(particle.x - particle.speed * 2, particle.y, particle.size * 0.7);
+                ellipse(particle.x - particle.speed * 4, particle.y, particle.size * 0.4);
+            }
+        }
+        
+        function drawInfoBox() {
+            // Semi-transparent background
+            fill(0, 0, 0, 100);
+            noStroke();
+            rect(width - 280, 10, 270, 120, 10);
+            
+            fill(255);
+            textAlign(LEFT);
+            textSize(12);
+            text('Interpretação Física:', width - 270, 30);
+            text('• Azul: Função f(x)', width - 270, 50);
+            text('• Vermelho: Intervalo [α, β]', width - 270, 70);
+            text('• Verde: Densidade média', width - 270, 90);
+            text('• Amarelo: Taxa instantânea (derivada)', width - 270, 110);
+        }
+        
+        function updateCalculations() {
+            let func = functions[currentFunction];
+            let alpha = pointX - intervalSize / 2;
+            let beta = pointX + intervalSize / 2;
+            
+            let fAlpha = func.f(alpha);
+            let fBeta = func.f(beta);
+            let netFlow = fBeta - fAlpha;
+            let avgDensity = netFlow / intervalSize;
+            let instantRate = func.derivative(pointX);
+            
+            let calcDisplay = document.getElementById('calculation-display');
+            calcDisplay.innerHTML = `
+                Saldo Líquido: f(${beta.toFixed(2)}) - f(${alpha.toFixed(2)}) = ${netFlow.toFixed(3)}<br>
+                Densidade Média: ${netFlow.toFixed(3)} / ${intervalSize.toFixed(2)} = ${avgDensity.toFixed(3)}<br>
+                Taxa Instantânea: f'(${pointX.toFixed(1)}) = ${instantRate.toFixed(3)}
+            `;
+        }
+        
+        function setupControls() {
+            document.getElementById('function-select').addEventListener('change', (e) => {
+                currentFunction = e.target.value;
+            });
+            
+            document.getElementById('interval-size').addEventListener('input', (e) => {
+                intervalSize = parseFloat(e.target.value);
+                document.getElementById('interval-display').textContent = intervalSize.toFixed(1);
+            });
+            
+            document.getElementById('point-x').addEventListener('input', (e) => {
+                pointX = parseFloat(e.target.value);
+                document.getElementById('point-display').textContent = pointX.toFixed(1);
+            });
+            
+            document.getElementById('show-particles').addEventListener('change', (e) => {
+                showParticles = e.target.checked;
+            });
+        }
+        
+        // Helper function for dashed lines (p5.js doesn't have built-in support)
+        function strokeDasharray(pattern) {
+            // This is a simplified implementation
+            // In practice, you might need a more sophisticated dashing function
+        }
+    </script>
+</body>
+</html>
