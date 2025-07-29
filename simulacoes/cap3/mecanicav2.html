@@ -5,346 +5,660 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Simulador de Mecânica Newtoniana</title>
     <style>
+        /* Aproveitando as variáveis CSS do seu sistema */
+        :root {
+          /* Cores do tema Árvore */
+          --primary-dark: #1a2b4c;
+          --primary-medium: #2c4a78;
+          --primary-light: #4a6741;
+          --primary-extra-light: #3a4b3d;
+          --accent-blue: #4fc3f7;
+          --accent-green: #81c784;
+          --accent-orange: #ffb74d;
+          --wood-dark: #6d4c41;
+          --wood-light: #8d6e63;
+          --leaf-green: #4caf50;
+          
+          /* Cores para simulações */
+          --simulation-panel-bg: rgba(15, 23, 42, 0.92);
+          --simulation-border: rgba(79, 195, 247, 0.3);
+          --simulation-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+          --transition-smooth: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+          
+          /* Cores gerais */
+          --sidebar-bg: #1e3a8a;
+          --content-bg: #f9fafb;
+          --text-dark: #0f172a;
+          --text-medium: #1e293b;
+          --text-light: #f9fafb;
+          --text-muted: #e0e0e0;
+        }
+
+        /* Reset básico aproveitando do seu CSS */
+        * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+        }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background: linear-gradient(135deg, #1e3c72, #2a5298);
-            color: white;
-            min-height: 100vh;
+          font-family: 'EB Garamond', serif;
+          color: var(--text-light);
+          min-height: 100vh;
+          background: linear-gradient(to bottom, 
+            var(--primary-dark) 0%, 
+            var(--primary-medium) 30%, 
+            var(--primary-light) 70%, 
+            var(--primary-extra-light) 100%);
         }
-        
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            padding: 30px;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+
+        /* Container principal usando o estilo do livro */
+        .simulation-main-container {
+          max-width: 1600px;
+          margin: 0 auto;
+          padding: 2rem;
+          min-height: 100vh;
         }
-        
-        h1 {
-            text-align: center;
-            margin-bottom: 30px;
-            font-size: 2.2em;
-            color: #ffffff;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+
+        /* Cabeçalho da simulação */
+        .simulation-header {
+          background: var(--simulation-panel-bg);
+          backdrop-filter: blur(12px);
+          border-radius: 20px;
+          padding: 2.5rem;
+          margin-bottom: 2rem;
+          border: 1px solid var(--simulation-border);
+          box-shadow: var(--simulation-shadow);
+          text-align: center;
         }
-        
+
+        .simulation-title {
+          font-size: 3rem;
+          color: var(--accent-blue);
+          margin-bottom: 1rem;
+          text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .simulation-subtitle {
+          font-size: 1.3rem;
+          color: var(--text-muted);
+          opacity: 0.9;
+        }
+
+        /* Seletor de modo */
+        .simulation-mode-selector {
+          text-align: center;
+          margin-bottom: 2rem;
+          display: flex;
+          justify-content: center;
+          gap: 1rem;
+          flex-wrap: wrap;
+        }
+
+        .simulation-mode-btn {
+          background: linear-gradient(45deg, var(--accent-blue), var(--primary-medium));
+          color: white;
+          border: none;
+          border-radius: 15px;
+          padding: 1rem 2rem;
+          font-size: 1.1rem;
+          font-weight: 600;
+          cursor: pointer;
+          transition: var(--transition-smooth);
+          box-shadow: 0 4px 15px rgba(79, 195, 247, 0.3);
+          position: relative;
+          overflow: hidden;
+        }
+
+        .simulation-mode-btn:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 8px 25px rgba(79, 195, 247, 0.4);
+        }
+
+        .simulation-mode-btn.active {
+          background: linear-gradient(45deg, var(--accent-orange), var(--wood-light));
+          box-shadow: 0 0 0 3px rgba(255, 183, 77, 0.5);
+        }
+
+        /* Layout principal da simulação */
         .simulation-area {
-            display: flex;
-            gap: 20px;
-            margin-bottom: 30px;
+          display: grid;
+          grid-template-columns: 2fr 1fr;
+          gap: 2rem;
+          margin-bottom: 2rem;
         }
-        
-        .canvas-container {
-            flex: 2;
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 15px;
-            padding: 20px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+
+        /* Container do canvas */
+        .simulation-canvas-container {
+          background: var(--simulation-panel-bg);
+          backdrop-filter: blur(12px);
+          border-radius: 20px;
+          padding: 2rem;
+          border: 1px solid var(--simulation-border);
+          box-shadow: var(--simulation-shadow);
+          position: relative;
+          transition: var(--transition-smooth);
+        }
+
+        .simulation-canvas-container:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .simulation-canvas {
+          border: 2px solid var(--simulation-border);
+          border-radius: 12px;
+          background: rgba(255, 255, 255, 0.98);
+          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+          display: block;
+          margin: 0 auto;
+          cursor: crosshair;
+          transition: var(--transition-smooth);
+        }
+
+        .simulation-canvas:hover {
+          box-shadow: 0 12px 40px rgba(79, 195, 247, 0.3);
+        }
+
+        /* Painel de controles */
+        .simulation-controls-panel {
+          background: var(--simulation-panel-bg);
+          backdrop-filter: blur(12px);
+          border-radius: 20px;
+          padding: 2rem;
+          border: 1px solid var(--simulation-border);
+          box-shadow: var(--simulation-shadow);
+          height: fit-content;
+        }
+
+        /* Grupos de controles */
+        .simulation-control-group {
+          margin-bottom: 2rem;
+          padding: 1.5rem;
+          background: rgba(79, 195, 247, 0.1);
+          border-radius: 15px;
+          border-left: 4px solid var(--accent-green);
+          transition: var(--transition-smooth);
+        }
+
+        .simulation-control-group:hover {
+          background: rgba(79, 195, 247, 0.15);
+          border-left-color: var(--accent-orange);
+        }
+
+        .simulation-control-group-title {
+          font-size: 1.4rem;
+          color: var(--accent-blue);
+          margin-bottom: 1.5rem;
+          font-weight: 600;
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+        }
+
+        /* Labels */
+        .simulation-control-label {
+          display: block;
+          margin-bottom: 0.8rem;
+          font-weight: 600;
+          color: var(--text-muted);
+          font-size: 1.1rem;
+        }
+
+        /* Sliders estilizados */
+        .simulation-slider {
+          width: 100%;
+          height: 8px;
+          background: rgba(79, 195, 247, 0.2);
+          outline: none;
+          border-radius: 8px;
+          appearance: none;
+          cursor: pointer;
+          transition: var(--transition-smooth);
+          margin-bottom: 1rem;
+        }
+
+        .simulation-slider::-webkit-slider-thumb {
+          appearance: none;
+          width: 24px;
+          height: 24px;
+          background: linear-gradient(45deg, var(--accent-orange), var(--accent-green));
+          border-radius: 50%;
+          cursor: pointer;
+          box-shadow: 0 4px 12px rgba(255, 183, 77, 0.4);
+          transition: var(--transition-smooth);
+        }
+
+        .simulation-slider::-webkit-slider-thumb:hover {
+          transform: scale(1.2);
+          box-shadow: 0 6px 16px rgba(255, 183, 77, 0.6);
+        }
+
+        /* Displays de valores */
+        .simulation-value-display {
+          background: rgba(79, 195, 247, 0.1);
+          padding: 0.5rem 1rem;
+          border-radius: 8px;
+          border: 1px solid var(--simulation-border);
+          color: var(--accent-blue);
+          font-weight: bold;
+          text-align: center;
+          display: inline-block;
+          min-width: 70px;
+          font-family: 'Courier New', monospace;
+        }
+
+        /* Inputs numéricos */
+        .simulation-number-input {
+          background: rgba(15, 23, 42, 0.8);
+          color: var(--text-light);
+          border: 1px solid var(--simulation-border);
+          border-radius: 8px;
+          padding: 0.6rem;
+          font-size: 1rem;
+          width: 100px;
+          text-align: center;
+          transition: var(--transition-smooth);
+        }
+
+        .simulation-number-input:focus {
+          border-color: var(--accent-blue);
+          box-shadow: 0 0 0 2px rgba(79, 195, 247, 0.3);
+          outline: none;
+        }
+
+        /* Botões de ação */
+        .simulation-action-btn {
+          background: linear-gradient(45deg, var(--accent-blue), var(--accent-green));
+          color: white;
+          border: none;
+          border-radius: 12px;
+          padding: 1rem 1.5rem;
+          font-size: 1rem;
+          font-weight: 600;
+          cursor: pointer;
+          transition: var(--transition-smooth);
+          box-shadow: 0 4px 15px rgba(79, 195, 247, 0.3);
+          margin: 0.3rem;
+          position: relative;
+          overflow: hidden;
+        }
+
+        .simulation-action-btn:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 8px 25px rgba(79, 195, 247, 0.4);
+        }
+
+        .simulation-action-btn:active {
+          transform: translateY(0);
+        }
+
+        /* Botões de tipo de força */
+        .simulation-force-type-btn {
+          background: linear-gradient(45deg, var(--wood-dark), var(--wood-light));
+          margin: 0.3rem;
+          padding: 0.8rem 1.2rem;
+          font-size: 0.9rem;
+          flex: 1;
+          min-width: 100px;
+        }
+
+        .simulation-force-type-btn.active {
+          background: linear-gradient(45deg, var(--accent-orange), var(--wood-light));
+          box-shadow: 0 0 0 2px rgba(255, 183, 77, 0.7);
+        }
+
+        /* Container para botões de força */
+        .simulation-force-controls {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 0.5rem;
+          margin-bottom: 1rem;
+        }
+
+        /* Diagrama de forças */
+        .simulation-force-diagram {
+          position: absolute;
+          top: 2rem;
+          right: 2rem;
+          background: rgba(255, 255, 255, 0.95);
+          border-radius: 15px;
+          padding: 1.5rem;
+          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+          z-index: 10;
+          width: 220px;
+          border: 1px solid var(--simulation-border);
+          backdrop-filter: blur(8px);
+        }
+
+        .simulation-force-diagram h4 {
+          margin-top: 0;
+          color: var(--text-dark);
+          text-align: center;
+          border-bottom: 2px solid var(--accent-blue);
+          padding-bottom: 0.5rem;
+          margin-bottom: 1rem;
+          font-size: 1.2rem;
+        }
+
+        .simulation-force-legend {
+          display: flex;
+          align-items: center;
+          margin-bottom: 0.8rem;
+          transition: var(--transition-smooth);
+        }
+
+        .simulation-force-legend:hover {
+          transform: translateX(3px);
+        }
+
+        .simulation-force-color {
+          width: 18px;
+          height: 18px;
+          border-radius: 50%;
+          margin-right: 12px;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .simulation-force-label {
+          color: var(--text-dark);
+          font-size: 0.95rem;
+          font-weight: 500;
+        }
+
+        /* Painel de informações físicas */
+        .simulation-info-panel {
+          background: var(--simulation-panel-bg);
+          backdrop-filter: blur(12px);
+          border-radius: 20px;
+          padding: 2rem;
+          margin-top: 2rem;
+          border: 1px solid var(--simulation-border);
+          box-shadow: var(--simulation-shadow);
+        }
+
+        .simulation-info-title {
+          font-size: 1.8rem;
+          color: var(--accent-blue);
+          margin-bottom: 1.5rem;
+          text-align: center;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 0.5rem;
+        }
+
+        .simulation-physics-display {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+          gap: 1.5rem;
+          margin-bottom: 2rem;
+        }
+
+        .simulation-physics-item {
+          background: rgba(79, 195, 247, 0.1);
+          padding: 1.2rem;
+          border-radius: 12px;
+          text-align: center;
+          border: 1px solid rgba(79, 195, 247, 0.2);
+          transition: var(--transition-smooth);
+        }
+
+        .simulation-physics-item:hover {
+          background: rgba(79, 195, 247, 0.15);
+          transform: translateY(-2px);
+        }
+
+        .simulation-physics-item strong {
+          color: var(--accent-green);
+          font-size: 1.2rem;
+          display: block;
+          margin-bottom: 0.5rem;
+        }
+
+        .simulation-physics-value {
+          font-family: 'Courier New', monospace;
+          font-size: 1.1rem;
+          color: var(--text-muted);
+        }
+
+        /* Explicação */
+        .simulation-explanation {
+          background: rgba(129, 199, 132, 0.1);
+          padding: 1.5rem;
+          border-radius: 12px;
+          border-left: 4px solid var(--accent-green);
+          font-size: 1.1rem;
+          line-height: 1.6;
+        }
+
+        /* Estados especiais dos botões */
+        .simulation-btn-gravity {
+          background: linear-gradient(45deg, var(--leaf-green), var(--accent-green));
+        }
+
+        .simulation-btn-gravity.active {
+          background: linear-gradient(45deg, var(--accent-orange), var(--wood-light));
+          box-shadow: 0 0 15px rgba(255, 183, 77, 0.6);
+        }
+
+        /* Responsividade */
+        @media (max-width: 1200px) {
+          .simulation-area {
+            grid-template-columns: 1fr;
+          }
+          
+          .simulation-force-diagram {
             position: relative;
-        }
-        
-        canvas {
-            border: 2px solid #ddd;
-            border-radius: 10px;
-            cursor: crosshair;
-            display: block;
-            margin: 0 auto;
-        }
-        
-        .controls {
-            flex: 1;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-            padding: 20px;
-            backdrop-filter: blur(5px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        
-        .control-group {
-            margin-bottom: 25px;
-            padding: 15px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            border-left: 4px solid #4CAF50;
-        }
-        
-        .control-group h3 {
-            margin: 0 0 15px 0;
-            color: #ffffff;
-            font-size: 1.1em;
-        }
-        
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-            color: #f0f0f0;
-        }
-        
-        input[type="range"] {
+            top: 0;
+            right: 0;
             width: 100%;
-            margin-bottom: 10px;
-            accent-color: #4CAF50;
+            margin-bottom: 1rem;
+          }
         }
-        
-        input[type="number"] {
-            width: 80px;
-            padding: 5px;
-            border: none;
-            border-radius: 5px;
-            background: rgba(255, 255, 255, 0.9);
-            color: #333;
-        }
-        
-        button {
-            background: linear-gradient(45deg, #4CAF50, #45a049);
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
-            margin: 5px;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-        }
-        
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0,0,0,0.4);
-        }
-        
-        .info-panel {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-            padding: 20px;
-            margin-top: 20px;
-            backdrop-filter: blur(5px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        
-        .physics-display {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-top: 15px;
-        }
-        
-        .physics-item {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 10px;
-            border-radius: 8px;
-            text-align: center;
-        }
-        
-        .physics-item strong {
-            color: #4CAF50;
-            font-size: 1.1em;
-        }
-        
-        .mode-selector {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        
-        .mode-btn {
-            margin: 0 10px;
-            background: linear-gradient(45deg, #2196F3, #1976D2);
-        }
-        
-        .mode-btn.active {
-            background: linear-gradient(45deg, #FF9800, #F57C00);
-        }
-        
-        .explanation {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 15px;
-            border-radius: 10px;
-            margin-top: 15px;
-            border-left: 4px solid #2196F3;
-        }
-        
-        .force-diagram {
-            position: absolute;
-            top: 30px;
-            right: 30px;
-            background: rgba(255, 255, 255, 0.9);
-            border-radius: 10px;
-            padding: 15px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-            z-index: 10;
-            width: 200px;
-        }
-        
-        .force-diagram h4 {
-            margin-top: 0;
-            color: #333;
-            text-align: center;
-            border-bottom: 1px solid #ddd;
-            padding-bottom: 8px;
-        }
-        
-        .force-legend {
-            display: flex;
+
+        @media (max-width: 768px) {
+          .simulation-main-container {
+            padding: 1rem;
+          }
+          
+          .simulation-header,
+          .simulation-canvas-container,
+          .simulation-controls-panel,
+          .simulation-info-panel {
+            padding: 1.5rem;
+          }
+          
+          .simulation-title {
+            font-size: 2.5rem;
+          }
+          
+          .simulation-mode-selector {
+            flex-direction: column;
             align-items: center;
-            margin-bottom: 8px;
+          }
+          
+          .simulation-mode-btn {
+            width: 100%;
+            max-width: 300px;
+          }
+          
+          .simulation-physics-display {
+            grid-template-columns: 1fr;
+          }
+          
+          .simulation-force-controls {
+            flex-direction: column;
+          }
+          
+          .simulation-force-type-btn {
+            flex: none;
+            width: 100%;
+          }
         }
-        
-        .force-color {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            margin-right: 10px;
+
+        /* Animações personalizadas */
+        @keyframes simulation-pulse {
+          0% { box-shadow: 0 0 0 0 rgba(79, 195, 247, 0.7); }
+          70% { box-shadow: 0 0 0 10px rgba(79, 195, 247, 0); }
+          100% { box-shadow: 0 0 0 0 rgba(79, 195, 247, 0); }
         }
-        
-        .force-label {
-            color: #333;
-            font-size: 0.9em;
+
+        .simulation-pulse-effect {
+          animation: simulation-pulse 2s infinite;
         }
-        
-        .force-controls {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-bottom: 15px;
+
+        /* Estados de loading */
+        .simulation-loading {
+          position: relative;
+          overflow: hidden;
         }
-        
-        .force-btn {
-            flex: 1;
-            min-width: 120px;
-            padding: 8px;
-            font-size: 14px;
+
+        .simulation-loading::after {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: -100%;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(90deg, transparent, rgba(79, 195, 247, 0.2), transparent);
+          animation: loading-sweep 1.5s infinite;
         }
-        
-        .force-type-btn {
-            background: linear-gradient(45deg, #9C27B0, #7B1FA2);
-        }
-        
-        .force-type-btn.active {
-            background: linear-gradient(45deg, #FF9800, #F57C00);
-            box-shadow: 0 0 0 2px white;
+
+        @keyframes loading-sweep {
+          0% { left: -100%; }
+          100% { left: 100%; }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>🔬 Simulador Interativo de Mecânica Newtoniana</h1>
-        
-        <div class="mode-selector">
-            <button class="mode-btn active" onclick="setMode('forces')">Forças e Trajetórias</button>
-            <button class="mode-btn" onclick="setMode('circular')">Movimento Circular</button>
-            <button class="mode-btn" onclick="setMode('work')">Trabalho e Energia</button>
+    <div class="simulation-main-container">
+        <!-- Cabeçalho -->
+        <div class="simulation-header">
+            <h1 class="simulation-title">🔬 Simulador Interativo de Mecânica Newtoniana</h1>
+            <p class="simulation-subtitle">Explore as leis de Newton através de simulações visuais interativas</p>
         </div>
-        
+
+        <!-- Seletor de Modo -->
+        <div class="simulation-mode-selector">
+            <button class="simulation-mode-btn active" onclick="setMode('forces')">⚡ Forças e Trajetórias</button>
+            <button class="simulation-mode-btn" onclick="setMode('circular')">🔄 Movimento Circular</button>
+            <button class="simulation-mode-btn" onclick="setMode('work')">⚙️ Trabalho e Energia</button>
+        </div>
+
+        <!-- Área principal da simulação -->
         <div class="simulation-area">
-            <div class="canvas-container">
-                <div class="force-diagram">
+            <!-- Container do Canvas -->
+            <div class="simulation-canvas-container">
+                <div class="simulation-force-diagram">
                     <h4>Diagrama de Forças</h4>
-                    <div class="force-legend">
-                        <div class="force-color" style="background: #2196F3;"></div>
-                        <div class="force-label">Partícula</div>
+                    <div class="simulation-force-legend">
+                        <div class="simulation-force-color" style="background: #2196F3;"></div>
+                        <div class="simulation-force-label">Partícula</div>
                     </div>
-                    <div class="force-legend">
-                        <div class="force-color" style="background: #4CAF50;"></div>
-                        <div class="force-label">Velocidade</div>
+                    <div class="simulation-force-legend">
+                        <div class="simulation-force-color" style="background: #4CAF50;"></div>
+                        <div class="simulation-force-label">Velocidade</div>
                     </div>
-                    <div class="force-legend">
-                        <div class="force-color" style="background: #FF5722;"></div>
-                        <div class="force-label">Força</div>
+                    <div class="simulation-force-legend">
+                        <div class="simulation-force-color" style="background: #FF5722;"></div>
+                        <div class="simulation-force-label">Força</div>
                     </div>
-                    <div class="force-legend">
-                        <div class="force-color" style="background: #9C27B0;"></div>
-                        <div class="force-label">Força Central</div>
+                    <div class="simulation-force-legend">
+                        <div class="simulation-force-color" style="background: #9C27B0;"></div>
+                        <div class="simulation-force-label">Força Central</div>
                     </div>
-                    <div class="force-legend">
-                        <div class="force-color" style="background: #FF9800;"></div>
-                        <div class="force-label">Resultante</div>
+                    <div class="simulation-force-legend">
+                        <div class="simulation-force-color" style="background: #FF9800;"></div>
+                        <div class="simulation-force-label">Resultante</div>
                     </div>
                 </div>
-                <canvas id="canvas" width="800" height="600"></canvas>
+                <canvas class="simulation-canvas" id="canvas" width="800" height="600"></canvas>
             </div>
-            
-            <div class="controls">
-                <div class="control-group">
-                    <h3>⚙️ Controles de Simulação</h3>
-                    <button onclick="startSimulation()">▶️ Iniciar</button>
-                    <button onclick="pauseSimulation()">⏸️ Pausar</button>
-                    <button onclick="resetSimulation()">🔄 Reset</button>
-                    <button onclick="toggleTrail()">✨ Rastro</button>
-                    <button onclick="toggleForceVectors()">↗️ Vetores de Força</button>
+
+            <!-- Painel de Controles -->
+            <div class="simulation-controls-panel">
+                <!-- Controles de Simulação -->
+                <div class="simulation-control-group">
+                    <h3 class="simulation-control-group-title">⚙️ Controles de Simulação</h3>
+                    <button class="simulation-action-btn" onclick="startSimulation()">▶️ Iniciar</button>
+                    <button class="simulation-action-btn" onclick="pauseSimulation()">⏸️ Pausar</button>
+                    <button class="simulation-action-btn" onclick="resetSimulation()">🔄 Reset</button>
+                    <button class="simulation-action-btn" onclick="toggleTrail()">✨ Rastro</button>
+                    <button class="simulation-action-btn" onclick="toggleForceVectors()">↗️ Vetores</button>
                 </div>
-                
-                <div class="control-group">
-                    <h3>🎯 Propriedades da Partícula</h3>
-                    <label>Massa (kg): <span id="massValue">1.0</span></label>
-                    <input type="range" id="mass" min="0.5" max="5" step="0.1" value="1.0" oninput="updateMass()">
+
+                <!-- Propriedades da Partícula -->
+                <div class="simulation-control-group">
+                    <h3 class="simulation-control-group-title">🎯 Propriedades da Partícula</h3>
+                    <label class="simulation-control-label">Massa (kg): <span class="simulation-value-display" id="massValue">1.0</span></label>
+                    <input type="range" class="simulation-slider" id="mass" min="0.5" max="5" step="0.1" value="1.0" oninput="updateMass()">
                     
-                    <label>Velocidade Inicial (m/s): <span id="velocityValue">50</span></label>
-                    <input type="range" id="initialVelocity" min="10" max="100" step="5" value="50" oninput="updateVelocity()">
+                    <label class="simulation-control-label">Velocidade Inicial (m/s): <span class="simulation-value-display" id="velocityValue">50</span></label>
+                    <input type="range" class="simulation-slider" id="initialVelocity" min="10" max="100" step="5" value="50" oninput="updateVelocity()">
                 </div>
-                
-                <div class="control-group" id="forceControls">
-                    <h3>⚡ Campo de Forças</h3>
-                    <div class="force-controls">
-                        <button class="force-type-btn" onclick="setForceType('point')" id="pointForceBtn">Ponto</button>
-                        <button class="force-type-btn" onclick="setForceType('radial')" id="radialForceBtn">Radial</button>
-                        <button class="force-type-btn" onclick="setForceType('uniform')" id="uniformForceBtn">Uniforme</button>
+
+                <!-- Controles de Força -->
+                <div class="simulation-control-group" id="forceControls">
+                    <h3 class="simulation-control-group-title">⚡ Campo de Forças</h3>
+                    <div class="simulation-force-controls">
+                        <button class="simulation-force-type-btn active" onclick="setForceType('point')" id="pointForceBtn">📍 Ponto</button>
+                        <button class="simulation-force-type-btn" onclick="setForceType('radial')" id="radialForceBtn">🌟 Radial</button>
+                        <button class="simulation-force-type-btn" onclick="setForceType('uniform')" id="uniformForceBtn">➡️ Uniforme</button>
                     </div>
                     
-                    <label>Intensidade: <span id="forceValue">20</span></label>
-                    <input type="range" id="forceStrength" min="-100" max="100" step="5" value="20" oninput="updateForce()">
+                    <label class="simulation-control-label">Intensidade: <span class="simulation-value-display" id="forceValue">20</span></label>
+                    <input type="range" class="simulation-slider" id="forceStrength" min="-100" max="100" step="5" value="20" oninput="updateForce()">
                     
-                    <div class="force-controls">
-                        <button onclick="toggleGravity()">🌍 Gravidade</button>
-                        <button onclick="clearForces()">🧹 Limpar Forças</button>
+                    <div class="simulation-force-controls">
+                        <button class="simulation-action-btn simulation-btn-gravity" onclick="toggleGravity()">🌍 Gravidade</button>
+                        <button class="simulation-action-btn" onclick="clearForces()">🧹 Limpar</button>
                     </div>
                 </div>
-                
-                <div class="control-group" id="circularControls" style="display:none;">
-                    <h3>🔄 Movimento Circular</h3>
-                    <label>Raio (m): <span id="radiusValue">150</span></label>
-                    <input type="range" id="radius" min="50" max="250" step="10" value="150" oninput="updateRadius()">
+
+                <!-- Controles de Movimento Circular -->
+                <div class="simulation-control-group" id="circularControls" style="display:none;">
+                    <h3 class="simulation-control-group-title">🔄 Movimento Circular</h3>
+                    <label class="simulation-control-label">Raio (m): <span class="simulation-value-display" id="radiusValue">150</span></label>
+                    <input type="range" class="simulation-slider" id="radius" min="50" max="250" step="10" value="150" oninput="updateRadius()">
                     
-                    <label>Velocidade Angular (rad/s): <span id="angularVelValue">1.0</span></label>
-                    <input type="range" id="angularVel" min="0.1" max="3.0" step="0.1" value="1.0" oninput="updateAngularVel()">
+                    <label class="simulation-control-label">Velocidade Angular (rad/s): <span class="simulation-value-display" id="angularVelValue">1.0</span></label>
+                    <input type="range" class="simulation-slider" id="angularVel" min="0.1" max="3.0" step="0.1" value="1.0" oninput="updateAngularVel()">
                 </div>
             </div>
         </div>
-        
-        <div class="info-panel">
-            <h3>📊 Informações Físicas em Tempo Real</h3>
-            <div class="physics-display">
-                <div class="physics-item">
-                    <strong>Posição (m)</strong><br>
-                    <span id="position">x: 0, y: 0</span>
+
+        <!-- Painel de Informações Físicas -->
+        <div class="simulation-info-panel">
+            <h3 class="simulation-info-title">📊 Informações Físicas em Tempo Real</h3>
+            <div class="simulation-physics-display">
+                <div class="simulation-physics-item">
+                    <strong>Posição (m)</strong>
+                    <div class="simulation-physics-value" id="position">x: 0, y: 0</div>
                 </div>
-                <div class="physics-item">
-                    <strong>Velocidade (m/s)</strong><br>
-                    <span id="velocity">vₓ: 0, vᵧ: 0</span>
+                <div class="simulation-physics-item">
+                    <strong>Velocidade (m/s)</strong>
+                    <div class="simulation-physics-value" id="velocity">vₓ: 0, vᵧ: 0</div>
                 </div>
-                <div class="physics-item">
-                    <strong>Aceleração (m/s²)</strong><br>
-                    <span id="acceleration">aₓ: 0, aᵧ: 0</span>
+                <div class="simulation-physics-item">
+                    <strong>Aceleração (m/s²)</strong>
+                    <div class="simulation-physics-value" id="acceleration">aₓ: 0, aᵧ: 0</div>
                 </div>
-                <div class="physics-item">
-                    <strong>Força Resultante (N)</strong><br>
-                    <span id="force">Fₓ: 0, Fᵧ: 0</span>
+                <div class="simulation-physics-item">
+                    <strong>Força Resultante (N)</strong>
+                    <div class="simulation-physics-value" id="force">Fₓ: 0, Fᵧ: 0</div>
                 </div>
-                <div class="physics-item">
-                    <strong>Energia Cinética (J)</strong><br>
-                    <span id="kineticEnergy">0</span>
+                <div class="simulation-physics-item">
+                    <strong>Energia Cinética (J)</strong>
+                    <div class="simulation-physics-value" id="kineticEnergy">0</div>
                 </div>
-                <div class="physics-item">
-                    <strong>Momento Angular (kg⋅m²/s)</strong><br>
-                    <span id="angularMomentum">0</span>
+                <div class="simulation-physics-item">
+                    <strong>Momento Angular (kg⋅m²/s)</strong>
+                    <div class="simulation-physics-value" id="angularMomentum">0</div>
                 </div>
             </div>
             
-            <div class="explanation" id="explanation">
+            <div class="simulation-explanation" id="explanation">
                 <strong>💡 Dica:</strong> Clique no canvas para adicionar forças pontuais! Observe como as forças alteram a trajetória e experimente com diferentes massas e velocidades iniciais.
             </div>
         </div>
@@ -398,7 +712,7 @@
             currentMode = mode;
             
             // Atualizar botões
-            document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.simulation-mode-btn').forEach(btn => btn.classList.remove('active'));
             event.target.classList.add('active');
             
             // Mostrar/ocultar controles
@@ -415,16 +729,12 @@
             currentForceType = type;
             
             // Atualizar botões
-            document.querySelectorAll('.force-type-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.simulation-force-type-btn').forEach(btn => btn.classList.remove('active'));
             event.target.classList.add('active');
             
             // Limpar forças existentes do tipo que não está mais selecionado
             if (type !== 'radial') centralForce = null;
             if (type !== 'uniform') uniformForce = null;
-            
-            // Atualizar botões de força
-            document.querySelector('button[onclick="addRadialForce()"]').style.backgroundColor = 
-                type === 'radial' ? '#9C27B0' : '';
         }
         
         function updateExplanation() {
@@ -683,13 +993,15 @@
                         const y = j * spacing + spacing/2;
                         
                         const magnitude = Math.sqrt(uniformForce.fx * uniformForce.fx + uniformForce.fy * uniformForce.fy);
-                        const arrowDx = (uniformForce.fx / magnitude) * arrowLength;
-                        const arrowDy = (uniformForce.fy / magnitude) * arrowLength;
-                        
-                        ctx.beginPath();
-                        ctx.moveTo(x, y);
-                        ctx.lineTo(x + arrowDx, y + arrowDy);
-                        ctx.stroke();
+                        if (magnitude > 0) {
+                            const arrowDx = (uniformForce.fx / magnitude) * arrowLength;
+                            const arrowDy = (uniformForce.fy / magnitude) * arrowLength;
+                            
+                            ctx.beginPath();
+                            ctx.moveTo(x, y);
+                            ctx.lineTo(x + arrowDx, y + arrowDy);
+                            ctx.stroke();
+                        }
                     }
                 }
                 ctx.globalAlpha = 1.0;
@@ -858,7 +1170,12 @@
         
         function toggleGravity() {
             hasGravity = !hasGravity;
-            event.target.style.backgroundColor = hasGravity ? '#4CAF50' : '';
+            const btn = event.target;
+            if (hasGravity) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
         }
         
         function clearForces() {
@@ -866,7 +1183,7 @@
             centralForce = null;
             uniformForce = null;
             hasGravity = false;
-            document.querySelector('button[onclick="toggleGravity()"]').style.backgroundColor = '';
+            document.querySelector('.simulation-btn-gravity').classList.remove('active');
         }
         
         // Inicialização

@@ -86,4 +86,4 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
-// Adicione isto ao seu CSS para complementar:
+// Adicione isto ao seu CSS para complementar

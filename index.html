@@ -34,7 +34,7 @@
         }
 
         .title {
-            font-size: 2rem;
+            font-size: 2.2rem;
             font-weight: bold;
             background: linear-gradient(45deg, #4fc3f7, #81c784, #ffb74d);
             background-clip: text;
@@ -45,7 +45,7 @@
         }
 
         .subtitle {
-            font-size: 1rem;
+            font-size: 1.2rem;
             color: #e0e0e0;
             font-style: italic;
             margin-bottom: 10px;
@@ -77,7 +77,7 @@
         }
 
         .season-toggle {
-            background: linear-gradient(45deg, #4fc3f7, #81c784);
+            background: linear-gradient(45deg, #f44336, #e57373);
             border: none;
             color: white;
             padding: 12px 24px;
@@ -98,11 +98,11 @@
 
         .season-toggle:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(79, 195, 247, 0.4);
+            box-shadow: 0 6px 20px rgba(244, 67, 54, 0.4);
         }
 
-        .season-toggle.winter {
-            background: linear-gradient(45deg, #607d8b, #90a4ae);
+        .season-toggle.cutting {
+            background: linear-gradient(45deg, #795548, #8d6e63);
         }
 
         /* Raízes e Tronco SVG */
@@ -118,6 +118,19 @@
         .root-path, .trunk-svg, .trunk-line, .branch-path {
             transition: all 0.8s ease;
             filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+        }
+
+        .root-path.withering {
+            stroke: #8d6e63;
+            opacity: 0.6;
+            filter: drop-shadow(0 0 5px rgba(139, 69, 19, 0.5));
+            animation: wither 2s ease-in-out;
+        }
+
+        @keyframes wither {
+            0% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.3; transform: scale(0.95); }
+            100% { opacity: 0.6; transform: scale(0.9); }
         }
 
         /* Slots do Tronco - Segmentos delimitados */
@@ -163,6 +176,13 @@
             font-size: 11px;
         }
 
+        .trunk-slot.unavailable {
+            opacity: 0.5;
+            border-color: rgba(255, 255, 255, 0.3);
+            color: rgba(255, 255, 255, 0.4);
+            cursor: not-allowed;
+        }
+
         /* Posicionamento dos slots do tronco */
         .trunk-slot.intuition-slot { bottom: 380px; }
         .trunk-slot.geometry-slot { bottom: 530px; }
@@ -197,9 +217,10 @@
             transform: scale(1);
         }
 
-        .leaves-group ellipse.winter {
-            opacity: 0;
-            transform: scale(0.3) translateY(40px) rotate(180deg);
+        .leaves-group ellipse.withering {
+            opacity: 0.4;
+            transform: scale(0.8) translateY(20px);
+            filter: sepia(0.8) hue-rotate(30deg);
         }
 
         /* Perguntas e Nomes das Abstrações Arrastáveis */
@@ -252,12 +273,19 @@
             color: rgba(255, 255, 255, 0.4);
         }
 
+        .abstraction-bubble.unavailable {
+            opacity: 0.5;
+            cursor: not-allowed;
+            border-color: rgba(255, 255, 255, 0.3);
+            color: rgba(255, 255, 255, 0.4);
+        }
+
         .question-bubble:hover, .abstraction-bubble:hover {
             background: rgba(0, 0, 0, 0.2);
             transform: translateX(2px);
         }
 
-        .abstraction-bubble.disabled:hover {
+        .abstraction-bubble.disabled:hover, .abstraction-bubble.unavailable:hover {
             background: transparent;
             transform: none;
         }
@@ -410,64 +438,22 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* Progress Indicator */
-        .progress-container {
-            position: absolute;
-            top: 50%;
-            right: 20px;
-            transform: translateY(-50%);
-            z-index: 200;
+        /* Efeito de murcha global */
+        .withering .root-path, .withering .branch-path {
+            stroke: #8d6e63;
+            filter: drop-shadow(0 0 3px rgba(139, 69, 19, 0.5));
         }
 
-        .progress-bar {
-            width: 8px;
-            height: 200px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 4px;
-            overflow: hidden;
-            margin-bottom: 10px;
+        .withering .trunk-svg {
+            fill: #8d6e63;
+        }
+        .withering .trunk-line {
+             stroke: #6d4c41;
         }
 
-        .progress-fill {
-            width: 100%;
-            background: linear-gradient(to top, #4caf50, #81c784, #a5d6a7);
-            border-radius: 4px;
-            transition: height 0.5s ease;
-            height: 0%;
-        }
-
-        .progress-text {
-            font-size: 10px;
-            color: #b0bec5;
-            text-align: center;
-            margin-bottom: 5px;
-        }
-
-        .stage-indicator {
-            font-size: 9px;
-            color: #90a4ae;
-            text-align: center;
-            background: rgba(0, 0, 0, 0.3);
-            padding: 4px;
-            border-radius: 4px;
-        }
-
-        /* Efeito de inverno global */
-        .winter .root-path, .winter .branch-path {
-            stroke: #5a4a42;
-            filter: drop-shadow(0 0 3px rgba(200, 200, 200, 0.3));
-        }
-
-        .winter .trunk-svg {
-            fill: #5a4a42;
-        }
-        .winter .trunk-line {
-             stroke: #4a3a32;
-        }
-
-        .winter .question-bubble, .winter .abstraction-bubble {
-            opacity: 0.85;
-            border-color: rgba(200, 200, 200, 0.4);
+        .withering .question-bubble, .withering .abstraction-bubble {
+            opacity: 0.7;
+            border-color: rgba(139, 69, 19, 0.4);
         }
 
         /* Tooltip para tópicos */
@@ -509,28 +495,14 @@
 <body>
     <div class="book-cover">
         <div class="header">
-            <h1 class="title">Formas Diferenciais, Topologia e Fisica</h1>
-            <p class="subtitle">Um Resgate Interativo a Intuição</p>
-            <div class="instructions">
-                <strong>🎯 Como usar:</strong><br>
-                <strong>1º:</strong> Arraste as <span style="color: #4fc3f7;">perguntas fundamentais</span> para as raízes<br>
-                <strong>2º:</strong> Arraste os <span style="color: #ffc107;">nomes das abstrações</span> para os segmentos do tronco<br>
-                <strong>3º:</strong> Clique nos tópicos das folhas para navegar!
-            </div>
+            <h1 class="title">Formas Diferenciais, Topologia e Física</h1>
+            <p class="subtitle">Um Resgate Interativo à Intuição</p>
         </div>
 
         <div class="controls">
-            <button class="season-toggle" id="seasonToggle" onclick="toggleSeason()">
-                🍃 Verão → ❄️ Inverno
+            <button class="season-toggle" id="seasonToggle" onclick="cutRoots()">
+                ✂️ Cortar Raízes
             </button>
-        </div>
-
-        <div class="progress-container">
-            <div class="progress-bar">
-                <div class="progress-fill" id="progressFill"></div>
-            </div>
-            <div class="progress-text" id="progressText">Raízes: 0/3</div>
-            <div class="stage-indicator" id="stageIndicator">Fase 1: Fundamentos</div>
         </div>
 
         <div class="tree-container" id="treeContainer">
@@ -540,18 +512,18 @@
             <div class="trunk-delimiter d3"></div>
             <div class="trunk-delimiter d4"></div>
 
-            <!-- Slots do Tronco (Camadas de Abstração) -->
-            <div class="trunk-slot intuition-slot disabled" id="trunkSlot1">
+            <!-- Slots do Tronco (Camadas de Abstração) - Ordem obrigatória -->
+            <div class="trunk-slot intuition-slot disabled" id="trunkSlot1" data-order="1" data-abstraction="intuition">
                 Complete as raízes primeiro
             </div>
-            <div class="trunk-slot geometry-slot disabled" id="trunkSlot2">
-                Complete as raízes primeiro
+            <div class="trunk-slot geometry-slot unavailable" id="trunkSlot2" data-order="2" data-abstraction="geometry">
+                Coloque "Intuição" primeiro
             </div>
-            <div class="trunk-slot analysis-slot disabled" id="trunkSlot3">
-                Complete as raízes primeiro
+            <div class="trunk-slot analysis-slot unavailable" id="trunkSlot3" data-order="3" data-abstraction="analysis">
+                Coloque "Geometria/Física" primeiro
             </div>
-            <div class="trunk-slot topology-slot disabled" id="trunkSlot4">
-                Complete as raízes primeiro
+            <div class="trunk-slot topology-slot unavailable" id="trunkSlot4" data-order="4" data-abstraction="topology">
+                Coloque "Analogias" primeiro
             </div>
 
             <!-- Slots das Raízes -->
@@ -764,7 +736,7 @@
                     <ellipse cx="1300" cy="135" rx="40" ry="28" fill="#81c784"/>
                     <ellipse cx="1315" cy="120" rx="35" ry="24" fill="#a5d6a7"/>
 
-                    <!-- PREENCHIMENTO DA PARTE SUPERIOR DO TRONCO (região 450-200) -->
+                    <!-- Preenchimento adicional para árvore densa -->
                     <ellipse cx="990" cy="430" rx="45" ry="32" fill="#4caf50"/>
                     <ellipse cx="1010" cy="420" rx="42" ry="30" fill="#66bb6a"/>
                     <ellipse cx="985" cy="400" rx="48" ry="35" fill="#81c784"/>
@@ -780,22 +752,19 @@
                     <ellipse cx="990" cy="220" rx="45" ry="32" fill="#a5d6a7"/>
                     <ellipse cx="1010" cy="210" rx="42" ry="30" fill="#66bb6a"/>
 
-                    <!-- PREENCHIMENTO DOS ESPAÇOS VAZIOS ENTRE GALHOS -->
-                    <!-- Região entre galhos principais esquerdo e direito (centro-superior) -->
+                    <!-- Mais folhas para completar espaços -->
                     <ellipse cx="970" cy="360" rx="40" ry="28" fill="#66bb6a"/>
                     <ellipse cx="1030" cy="360" rx="38" ry="26" fill="#4caf50"/>
                     <ellipse cx="950" cy="320" rx="42" ry="30" fill="#81c784"/>
                     <ellipse cx="1050" cy="320" rx="40" ry="28" fill="#a5d6a7"/>
                     <ellipse cx="980" cy="280" rx="45" ry="32" fill="#4caf50"/>
                     <ellipse cx="1020" cy="280" rx="42" ry="30" fill="#66bb6a"/>
-
-                    <!-- Região entre galhos médios -->
                     <ellipse cx="960" cy="250" rx="38" ry="26" fill="#81c784"/>
                     <ellipse cx="1040" cy="250" rx="40" ry="28" fill="#a5d6a7"/>
                     <ellipse cx="975" cy="230" rx="42" ry="30" fill="#4caf50"/>
                     <ellipse cx="1025" cy="230" rx="38" ry="26" fill="#66bb6a"/>
 
-                    <!-- Preenchimento entre ramificações esquerdas -->
+                    <!-- Folhas adicionais nas extremidades -->
                     <ellipse cx="850" cy="200" rx="35" ry="24" fill="#a5d6a7"/>
                     <ellipse cx="820" cy="180" rx="38" ry="26" fill="#66bb6a"/>
                     <ellipse cx="880" cy="160" rx="40" ry="28" fill="#4caf50"/>
@@ -805,7 +774,6 @@
                     <ellipse cx="850" cy="80" rx="35" ry="24" fill="#4caf50"/>
                     <ellipse cx="880" cy="60" rx="38" ry="26" fill="#81c784"/>
 
-                    <!-- Preenchimento entre ramificações direitas -->
                     <ellipse cx="1150" cy="200" rx="35" ry="24" fill="#a5d6a7"/>
                     <ellipse cx="1180" cy="180" rx="38" ry="26" fill="#66bb6a"/>
                     <ellipse cx="1120" cy="160" rx="40" ry="28" fill="#4caf50"/>
@@ -815,40 +783,15 @@
                     <ellipse cx="1150" cy="80" rx="35" ry="24" fill="#4caf50"/>
                     <ellipse cx="1120" cy="60" rx="38" ry="26" fill="#81c784"/>
 
-                    <!-- Preenchimento das extremidades -->
+                    <!-- Folhas finais -->
                     <ellipse cx="750" cy="120" rx="32" ry="22" fill="#66bb6a"/>
                     <ellipse cx="780" cy="100" rx="35" ry="24" fill="#4caf50"/>
                     <ellipse cx="720" cy="100" rx="38" ry="26" fill="#81c784"/>
                     <ellipse cx="760" cy="80" rx="32" ry="22" fill="#a5d6a7"/>
-
                     <ellipse cx="1250" cy="120" rx="32" ry="22" fill="#66bb6a"/>
                     <ellipse cx="1220" cy="100" rx="35" ry="24" fill="#4caf50"/>
                     <ellipse cx="1280" cy="100" rx="38" ry="26" fill="#81c784"/>
                     <ellipse cx="1240" cy="80" rx="32" ry="22" fill="#a5d6a7"/>
-
-                    <!-- Preenchimento adicional nas áreas mais esparsas -->
-                    <ellipse cx="900" cy="250" rx="35" ry="24" fill="#4caf50"/>
-                    <ellipse cx="1100" cy="250" rx="35" ry="24" fill="#4caf50"/>
-                    <ellipse cx="880" cy="220" rx="32" ry="22" fill="#66bb6a"/>
-                    <ellipse cx="1120" cy="220" rx="32" ry="22" fill="#66bb6a"/>
-                    <ellipse cx="920" cy="190" rx="38" ry="26" fill="#81c784"/>
-                    <ellipse cx="1080" cy="190" rx="38" ry="26" fill="#81c784"/>
-
-                    <!-- Folhas nas pontas dos galhos menores -->
-                    <ellipse cx="530" cy="65" rx="30" ry="20" fill="#a5d6a7"/>
-                    <ellipse cx="1470" cy="65" rx="30" ry="20" fill="#a5d6a7"/>
-                    <ellipse cx="750" cy="10" rx="28" ry="18" fill="#66bb6a"/>
-                    <ellipse cx="1250" cy="10" rx="28" ry="18" fill="#66bb6a"/>
-
-                    <!-- Preenchimento final para eliminar espaços vazios -->
-                    <ellipse cx="950" cy="180" rx="35" ry="24" fill="#a5d6a7"/>
-                    <ellipse cx="1050" cy="180" rx="35" ry="24" fill="#a5d6a7"/>
-                    <ellipse cx="970" cy="160" rx="32" ry="22" fill="#4caf50"/>
-                    <ellipse cx="1030" cy="160" rx="32" ry="22" fill="#4caf50"/>
-                    <ellipse cx="940" cy="140" rx="38" ry="26" fill="#66bb6a"/>
-                    <ellipse cx="1060" cy="140" rx="38" ry="26" fill="#66bb6a"/>
-                    <ellipse cx="960" cy="120" rx="35" ry="24" fill="#81c784"/>
-                    <ellipse cx="1040" cy="120" rx="35" ry="24" fill="#81c784"/>
                 </g>
             </svg>
         </div>
@@ -868,51 +811,51 @@
                 Intuição
             </div>
             <div class="abstraction-bubble disabled" draggable="false" data-abstraction="geometry">
-                Geometria
+                Geometria/Física
             </div>
             <div class="abstraction-bubble disabled" draggable="false" data-abstraction="analysis">
-                Análise
+                Analogias
             </div>
             <div class="abstraction-bubble disabled" draggable="false" data-abstraction="topology">
-                Topologia
+                Abstração
             </div>
         </div>
 
         <!-- Perguntas Arrastáveis -->
         <div class="draggable-questions">
             <div class="question-bubble" draggable="true" data-question="integral">
-                O que é uma integral?
+                O que é?
             </div>
             <div class="question-bubble" draggable="true" data-question="area">
-                Como medir áreas curvas?
+                Como?
             </div>
             <div class="question-bubble" draggable="true" data-question="parts">
-                Por que integrar por partes?
+                Por que?
             </div>
         </div>
     </div>
 
     <script>
-        let isWinter = false;
+        let isWithering = false;
         let rootQuestionsPlaced = 0;
         let trunkAbstractionsPlaced = 0;
         let currentStage = 1; // 1 = raízes, 2 = tronco, 3 = completo
         let draggedElement = null;
         
-        // Ordem correta das abstrações (de baixo para cima)
+        // Ordem obrigatória das abstrações (de baixo para cima)
         const abstractionOrder = ['intuition', 'geometry', 'analysis', 'topology'];
         const placedAbstractions = [];
         
         // Tópicos do livro com links e tooltips
         const topics = [
             {
-                title: "1. Prefácio",
-                link: "capitulos/prefacio.html",
+                title: "1. Introdução",
+                link: "capitulos/cap1.html",
                 tooltip: "Introdução ao cálculo integral avançado"
             },
             {
                 title: "2. Integrais sobre Elementos",
-                link: "capitulos/integrais-elementos.html",
+                link: "capitulos/cap2.html",
                 tooltip: "Integrais sobre elementos de área e volume"
             },
             {
@@ -1007,33 +950,28 @@
             }
         ];
 
-        // Posições otimizadas das folhas (sem sobreposição)
+        // Posições melhor distribuídas pela árvore, sem sobreposição
         const leafPositions = [
-            // Lado esquerdo - tópicos básicos (1-10)
-            {x: 650, y: 140},   // 1. Prefácio
-            {x: 720, y: 165},   // 2. Integrais sobre Elementos
-            {x: 780, y: 195},   // 3. Mecânica
-            {x: 810, y: 235},   // 4. Trabalho e Energia
-            {x: 840, y: 275},   // 5. Variação de Ângulo
-            {x: 870, y: 315},   // 6. Campos - Fluxos
-            {x: 900, y: 355},   // 7. Ângulo Sólido
-            {x: 930, y: 395},   // 8. Determinante
-            {x: 960, y: 435},   // 9. Voltando ao Trabalho
-            {x: 990, y: 420},   // 10. Bordo
-            
-            // Lado direito - tópicos intermediários (11-17)
-            {x: 1310, y: 140},  // 11. Trabalho: Parte 2
-            {x: 1280, y: 175},  // 12. Teorema de Stokes
-            {x: 1250, y: 210},  // 13. Teorema de Green
-            {x: 1220, y: 245},  // 14. Reinterpretando Derivada
-            {x: 1190, y: 280},  // 15. Teorema da Divergência
-            {x: 1160, y: 315},  // 16. Álgebra Exterior
-            {x: 1130, y: 350},  // 17. Pullback
-            
-            // Apêndices - nas extremidades
-            {x: 580, y: 110},   // Apêndice A
-            {x: 540, y: 85},    // Apêndice B
-            {x: 1420, y: 110}   // Apêndice C
+            {x: 565, y: 60},    // 1. Prefácio (extremidade esquerda)
+            {x: 645, y: 140},   // 2. Integrais sobre Elementos 
+            {x: 725, y: 150},   // 3. Mecânica (galho principal esquerdo)
+            {x: 790, y: 120},   // 4. Trabalho e Energia (galho médio esquerdo)
+            {x: 838, y: 50},    // 5. Variação de Ângulo (galho superior esquerdo)
+            {x: 805, y: 240},   // 6. Campos - Fluxos (ramificação esquerda)
+            {x: 925, y: 375},   // 7. Ângulo Sólido (galho principal baixo esquerdo)
+            {x: 975, y: 425},   // 8. Determinante (galho principal central)
+            {x: 985, y: 220},   // 9. Voltando ao Trabalho (centro superior)
+            {x: 1015, y: 280},  // 10. Bordo (centro médio)
+            {x: 1025, y: 425},  // 11. Trabalho: Parte 2 (galho principal central direito)
+            {x: 1075, y: 375},  // 12. Teorema de Stokes (galho principal baixo direito)
+            {x: 1195, y: 240},  // 13. Teorema de Green (ramificação direita)
+            {x: 1162, y: 50},   // 14. Reinterpretando Derivada (galho superior direito)
+            {x: 1210, y: 120},  // 15. Teorema da Divergência (galho médio direito)
+            {x: 1275, y: 150},  // 16. Álgebra Exterior (galho principal direito)
+            {x: 1355, y: 140},  // 17. Pullback (meio-direita)
+            {x: 685, y: 30},    // Apêndice A (topo esquerdo)
+            {x: 1315, y: 30},   // Apêndice B (topo direito)
+            {x: 1435, y: 60}    // Apêndice C (extremidade direita)
         ];
 
         // Função para navegar para capítulo com animação
@@ -1042,16 +980,12 @@
             const title = document.getElementById('transitionTitle');
             const subtitle = document.getElementById('transitionSubtitle');
             
-            // Configurar textos da transição
             title.textContent = topic.title;
             subtitle.textContent = topic.tooltip;
             
-            // Mostrar animação
             transition.classList.add('active');
             
-            // Simular carregamento e navegar
             setTimeout(() => {
-                // Aqui você pode modificar o link conforme sua estrutura
                 window.location.href = topic.link;
             }, 2000);
         }
@@ -1069,90 +1003,86 @@
             topicEl.className = 'leaf-topic';
             topicEl.textContent = topicData.title;
             topicEl.setAttribute('data-tooltip', topicData.tooltip);
-            topicEl.href = '#'; // Previne navegação padrão
+            topicEl.href = '#';
             
-            // Adicionar evento de clique personalizado
             topicEl.addEventListener('click', (e) => {
                 e.preventDefault();
-                if (currentStage >= 2) { // Só permite navegação após completar raízes
+                if (currentStage >= 2) {
                     navigateToChapter(topicData);
                 }
             });
             
-            // Obter as dimensões do container e do SVG
             const container = document.getElementById('treeContainer');
-            
-            // Calcular a posição em porcentagem relativa ao container
             const viewBoxWidth = 2000;
             const viewBoxHeight = 1200;
             
             const leftPercent = (x / viewBoxWidth) * 100;
             const topPercent = (y / viewBoxHeight) * 100;
             
-            // Aplicar a posição
             topicEl.style.left = `${leftPercent}%`;
             topicEl.style.top = `${topPercent}%`;
             
             container.appendChild(topicEl);
         }
 
-        function updateProgress() {
-            const progressFill = document.getElementById('progressFill');
-            const progressText = document.getElementById('progressText');
-            const stageIndicator = document.getElementById('stageIndicator');
+        function updateTrunkSlotAvailability() {
+            const slots = document.querySelectorAll('.trunk-slot');
+            const bubbles = document.querySelectorAll('.abstraction-bubble');
             
-            let totalProgress = 0;
-            let progressLabel = '';
-            let stageLabel = '';
+            // Determinar qual é o próximo slot disponível
+            const nextOrder = trunkAbstractionsPlaced + 1;
             
-            if (currentStage === 1) {
-                totalProgress = (rootQuestionsPlaced / 3) * 33.33;
-                progressLabel = `Raízes: ${rootQuestionsPlaced}/3`;
-                stageLabel = 'Fase 1: Fundamentos';
-            } else if (currentStage === 2) {
-                totalProgress = 33.33 + (trunkAbstractionsPlaced / 4) * 33.33;
-                progressLabel = `Abstrações: ${trunkAbstractionsPlaced}/4`;
-                stageLabel = 'Fase 2: Estrutura';
-            } else {
-                totalProgress = 100;
-                progressLabel = 'Completo!';
-                stageLabel = 'Fase 3: Conhecimento';
-            }
-            
-            progressFill.style.height = totalProgress + '%';
-            progressText.textContent = progressLabel;
-            stageIndicator.textContent = stageLabel;
-            
-            // Ativar botão de estação quando completar tudo
-            if (currentStage === 3) {
-                document.getElementById('seasonToggle').classList.add('active');
-            }
+            slots.forEach(slot => {
+                const slotOrder = parseInt(slot.dataset.order);
+                const slotAbstraction = slot.dataset.abstraction;
+                
+                if (slotOrder === nextOrder && !slot.classList.contains('filled')) {
+                    // Este é o próximo slot disponível
+                    slot.classList.remove('disabled', 'unavailable');
+                    slot.textContent = 'Arraste o nome da camada';
+                    
+                    // Habilitar apenas a abstração correspondente
+                    bubbles.forEach(bubble => {
+                        if (bubble.dataset.abstraction === slotAbstraction) {
+                            bubble.classList.remove('disabled', 'unavailable');
+                            bubble.draggable = true;
+                        } else if (!bubble.classList.contains('placed')) {
+                            bubble.classList.add('unavailable');
+                            bubble.draggable = false;
+                        }
+                    });
+                } else if (slotOrder > nextOrder && !slot.classList.contains('filled')) {
+                    // Slots futuros ficam indisponíveis
+                    slot.classList.add('unavailable');
+                    slot.classList.remove('disabled');
+                    
+                    const nextAbstraction = abstractionOrder[nextOrder - 1];
+                    slot.textContent = `Coloque "${getAbstractionName(nextAbstraction)}" primeiro`;
+                }
+            });
+        }
+
+        function getAbstractionName(abstraction) {
+            const names = {
+                'intuition': 'Intuição',
+                'geometry': 'Geometria/Física',
+                'analysis': 'Analogias',
+                'topology': 'Abstração'
+            };
+            return names[abstraction] || abstraction;
         }
 
         function enableTrunkSlots() {
-            const trunkSlots = document.querySelectorAll('.trunk-slot');
-            const abstractionBubbles = document.querySelectorAll('.abstraction-bubble');
-            
-            trunkSlots.forEach(slot => {
-                slot.classList.remove('disabled');
-                slot.textContent = 'Arraste o nome da camada';
-            });
-            
-            abstractionBubbles.forEach(bubble => {
-                bubble.classList.remove('disabled');
-                bubble.draggable = true;
-            });
+            // Habilitar apenas o primeiro slot (Intuição)
+            updateTrunkSlotAvailability();
         }
 
         function handleRootQuestionPlacement() {
             rootQuestionsPlaced++;
-            updateProgress();
             
             if (rootQuestionsPlaced === 3) {
                 currentStage = 2;
-                updateProgress();
                 enableTrunkSlots();
-                // Mostrar algumas folhas iniciais
                 revealLeaves(8);
             }
         }
@@ -1160,14 +1090,18 @@
         function handleTrunkAbstractionPlacement(abstractionType) {
             trunkAbstractionsPlaced++;
             placedAbstractions.push(abstractionType);
-            updateProgress();
             
             // Revelar mais folhas baseado na quantidade colocada
             revealLeaves(8 + trunkAbstractionsPlaced * 5);
             
+            // Atualizar disponibilidade dos próximos slots
+            updateTrunkSlotAvailability();
+            
             if (trunkAbstractionsPlaced === 4) {
                 currentStage = 3;
-                updateProgress();
+                // Ativar botão de cortar raízes
+                document.getElementById('seasonToggle').classList.add('active');
+                
                 // Mostrar todas as folhas
                 setTimeout(() => {
                     const allLeaves = document.querySelectorAll('.leaves-group ellipse');
@@ -1212,25 +1146,21 @@
             const rootSlots = document.querySelectorAll('.root-slot');
             const trunkSlots = document.querySelectorAll('.trunk-slot');
 
-            // Eventos para perguntas
             questions.forEach(question => {
                 question.addEventListener('mousedown', startDrag);
                 question.addEventListener('touchstart', startDrag, { passive: false });
             });
 
-            // Eventos para abstrações
             abstractions.forEach(abstraction => {
                 abstraction.addEventListener('mousedown', startDrag);
                 abstraction.addEventListener('touchstart', startDrag, { passive: false });
             });
 
-            // Eventos globais
             document.addEventListener('mousemove', drag);
             document.addEventListener('mouseup', endDrag);
             document.addEventListener('touchmove', drag, { passive: false });
             document.addEventListener('touchend', endDrag);
 
-            // Eventos dos slots
             [...rootSlots, ...trunkSlots].forEach(slot => {
                 slot.addEventListener('mouseenter', highlightSlot);
                 slot.addEventListener('mouseleave', unhighlightSlot);
@@ -1240,7 +1170,9 @@
         function startDrag(e) {
             e.preventDefault();
             
-            if (e.target.classList.contains('placed') || e.target.classList.contains('disabled')) return;
+            if (e.target.classList.contains('placed') || 
+                e.target.classList.contains('disabled') || 
+                e.target.classList.contains('unavailable')) return;
             
             isDragging = true;
             currentDragElement = e.target;
@@ -1270,11 +1202,10 @@
             
             updateDragPosition(clientX, clientY);
             
-            // Determinar tipo de slots válidos
             const isQuestion = currentDragElement.classList.contains('question-bubble');
             const validSlots = isQuestion ? 
                 document.querySelectorAll('.root-slot') : 
-                document.querySelectorAll('.trunk-slot:not(.disabled)');
+                document.querySelectorAll('.trunk-slot:not(.disabled):not(.unavailable)');
             
             let overSlot = null;
             
@@ -1286,10 +1217,18 @@
                 }
             });
             
-            // Highlight do slot correto
             validSlots.forEach(slot => {
                 if (slot === overSlot && !slot.classList.contains('filled')) {
-                    slot.classList.add('highlight');
+                    // Para abstrações, verificar se é a correta para este slot
+                    if (!isQuestion) {
+                        const slotAbstraction = slot.dataset.abstraction;
+                        const dragAbstraction = currentDragElement.dataset.abstraction;
+                        if (slotAbstraction === dragAbstraction) {
+                            slot.classList.add('highlight');
+                        }
+                    } else {
+                        slot.classList.add('highlight');
+                    }
                 } else {
                     slot.classList.remove('highlight');
                 }
@@ -1309,11 +1248,10 @@
             const clientX = e.type.includes('touch') ? e.changedTouches[0].clientX : e.clientX;
             const clientY = e.type.includes('touch') ? e.changedTouches[0].clientY : e.clientY;
             
-            // Determinar tipo de slots válidos
             const isQuestion = currentDragElement.classList.contains('question-bubble');
             const validSlots = isQuestion ? 
                 document.querySelectorAll('.root-slot') : 
-                document.querySelectorAll('.trunk-slot:not(.disabled)');
+                document.querySelectorAll('.trunk-slot:not(.disabled):not(.unavailable)');
             
             let targetSlot = null;
             
@@ -1322,7 +1260,17 @@
                 if (clientX >= slotRect.left && clientX <= slotRect.right &&
                     clientY >= slotRect.top && clientY <= slotRect.bottom &&
                     !slot.classList.contains('filled')) {
-                    targetSlot = slot;
+                    
+                    // Para abstrações, verificar se é a correta para este slot
+                    if (!isQuestion) {
+                        const slotAbstraction = slot.dataset.abstraction;
+                        const dragAbstraction = currentDragElement.dataset.abstraction;
+                        if (slotAbstraction === dragAbstraction) {
+                            targetSlot = slot;
+                        }
+                    } else {
+                        targetSlot = slot;
+                    }
                 }
             });
             
@@ -1375,13 +1323,17 @@
         }
 
         function highlightSlot(e) {
-            if (isDragging && !e.target.classList.contains('filled') && !e.target.classList.contains('disabled')) {
-                // Verificar se o tipo está correto
+            if (isDragging && !e.target.classList.contains('filled') && 
+                !e.target.classList.contains('disabled') && 
+                !e.target.classList.contains('unavailable')) {
+                
                 const isQuestion = currentDragElement?.classList.contains('question-bubble');
                 const isRootSlot = e.target.classList.contains('root-slot');
                 const isTrunkSlot = e.target.classList.contains('trunk-slot');
                 
-                if ((isQuestion && isRootSlot) || (!isQuestion && isTrunkSlot)) {
+                if ((isQuestion && isRootSlot) || 
+                    (!isQuestion && isTrunkSlot && 
+                     e.target.dataset.abstraction === currentDragElement?.dataset.abstraction)) {
                     e.target.classList.add('highlight');
                 }
             }
@@ -1391,32 +1343,50 @@
             e.target.classList.remove('highlight');
         }
 
-        function toggleSeason() {
+        function cutRoots() {
             if (currentStage < 3) return;
             
-            isWinter = !isWinter;
+            isWithering = !isWithering;
             const toggle = document.getElementById('seasonToggle');
-            const rootElements = document.querySelectorAll('.roots-svg');
+            const treeContainer = document.getElementById('treeContainer');
             
-            if (isWinter) {
-                toggle.textContent = '❄️ Inverno → 🍃 Verão';
-                toggle.classList.add('winter');
-                rootElements.forEach(el => el.classList.add('winter'));
+            if (isWithering) {
+                toggle.textContent = '🌱 Fazer Crescer';
+                toggle.classList.add('cutting');
+                treeContainer.classList.add('withering');
+                
+                // Animação das raízes murchando
+                document.querySelectorAll('.root-path').forEach((root, i) => {
+                    setTimeout(() => {
+                        root.classList.add('withering');
+                    }, i * 100);
+                });
+                
+                // Folhas murchando
                 document.querySelectorAll('.leaf-topic').forEach((el, i) => {
                     setTimeout(() => el.classList.remove('visible'), i * 8);
                 });
                 document.querySelectorAll('.leaves-group ellipse').forEach((el, i) => {
-                    setTimeout(() => el.classList.add('winter'), i * 8);
+                    setTimeout(() => el.classList.add('withering'), i * 8);
                 });
             } else {
-                toggle.textContent = '🍃 Verão → ❄️ Inverno';
-                toggle.classList.remove('winter');
-                rootElements.forEach(el => el.classList.remove('winter'));
+                toggle.textContent = '✂️ Cortar Raízes';
+                toggle.classList.remove('cutting');
+                treeContainer.classList.remove('withering');
+                
+                // Animação das raízes crescendo de volta
+                document.querySelectorAll('.root-path').forEach((root, i) => {
+                    setTimeout(() => {
+                        root.classList.remove('withering');
+                    }, i * 100);
+                });
+                
+                // Folhas voltando
                 document.querySelectorAll('.leaf-topic').forEach((el, i) => {
                     setTimeout(() => el.classList.add('visible'), i * 8);
                 });
                 document.querySelectorAll('.leaves-group ellipse').forEach((el, i) => {
-                    setTimeout(() => el.classList.remove('winter'), i * 8);
+                    setTimeout(() => el.classList.remove('withering'), i * 8);
                 });
             }
         }
@@ -1425,7 +1395,6 @@
         window.addEventListener('load', () => {
             createLeafTopics();
             initializeDragAndDrop();
-            updateProgress();
             
             // Adicionar efeito de fade-in inicial
             setTimeout(() => {

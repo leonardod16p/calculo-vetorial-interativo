@@ -33,18 +33,18 @@
 
       <section>
         <p>O Teorema de Stokes afirma que:</p>
-        <div class="equation">
+        
           $$\int_{\partial S} \omega = \int_S d\omega$$
-        </div>
+        
         <p>onde $ \omega $ é uma $ (k-1) $-forma diferenciável e $ S $ é uma variedade orientada de dimensão $ k $ com bordo $ \partial S $.</p>
 
-        <div class="equation">
+        
           $$Temos:$$
           $$\int_{\gamma} \omega \quad \text{(Integral de linha)}$$
           $$\iint_{S} \omega \quad \text{(Integral de superfície)}$$
           $$\int_{\partial S} \omega = \iint_S d\omega \quad \text{(Identidade)}$$
           <p>com $ \omega $ uma 1-forma e $ d\omega $ sua diferencial (2-forma).</p>
-        </div>
+        
 
         <p>Temos uma superfície $ S $ com bordo $ \partial S $. Dada uma 1-forma $ \omega $, podemos integrá-la ao longo do bordo: $ \int_{\partial S} \omega $. Neste contexto, $ \omega $ atua sobre vetores tangentes ao bordo de $ S $.</p>
 
@@ -53,39 +53,41 @@
         <p>Considere um campo vetorial $ \mathbf{F} = (p(x,y), q(x,y)) $ definido em uma região do plano.</p>
 
         <p>A integral de linha de $ \mathbf{F} $ ao longo do bordo de uma região retangular $ R $ é dada por:</p>
-        <div class="equation">
+        
           $$\oint_{\partial R} \mathbf{F} \cdot d\mathbf{r} = \oint_{\partial R} p(x,y)\, dx + q(x,y)\, dy$$
-        </div>
+        
 
         <p>Suponha que o retângulo $ R $ seja dado por</p>
-        <div class="equation">
+        
           $$R = \{(x,y) \mid a_{10} \le x \le a_{11},\; a_{20} \le y \le a_{21}\}$$
-        </div>
+        
 
         <p>A integral de linha ao longo do bordo de $ R $, orientado positivamente (anti-horário), pode ser decomposta como:</p>
-        <div class="equation">
+        
           $$\oint_{\partial R} \mathbf{F} \cdot d\mathbf{r} = \int_{a_{10}}^{a_{11}} p(x, a_{20})\, dx + \int_{a_{20}}^{a_{21}} q(a_{11}, y)\, dy - \int_{a_{10}}^{a_{11}} p(x, a_{21})\, dx - \int_{a_{20}}^{a_{21}} q(a_{10}, y)\, dy$$
-        </div>
+        
 
-        <div class="equation">
+        
           $$\oint_{\partial R} \mathbf{F} \cdot d\mathbf{r} = \int_{a_{10}}^{a_{11}} \left[ P(x, a_{20}) - P(x, a_{21}) \right]\, dx + \int_{a_{20}}^{a_{21}} \left[ Q(a_{11}, y) - Q(a_{10}, y) \right]\, dy$$
           $$= - \int_{a_{10}}^{a_{11}} \int_{a_{20}}^{a_{21}} \frac{\partial P}{\partial y}(x, y) \, dy\, dx + \int_{a_{20}}^{a_{21}} \int_{a_{10}}^{a_{11}} \frac{\partial Q}{\partial x}(x, y) \, dx\, dy$$
-        </div>
+        
 
-        <div class="equation">
+        
           $$\iint_{B} \left( \frac{\partial Q}{\partial x}(x, y) - \frac{\partial P}{\partial y}(x, y) \right)\, dy\, dx = \oint_{\partial B} P\,dx + Q\,dy$$
-        </div>
+        
 
         <p>Dividimos o intervalo $[a,b]$ em uma partição:</p>
-        <div class="equation">
+        
           $$a = a_0 < a_1 < a_2 < \dots < a_n = b$$
-        </div>
+        
 
         <p>Portanto, obtemos uma das versões do <strong>Teorema Fundamental do Cálculo</strong>:</p>
-        <div class="equation">
+        
           $$f(b) - f(a) = \int_{a}^{b} f'(x)\, dx$$
-        </div>
+        
       </section>
+
+
 
       <nav class="chapter-nav">
         <a href="../cap7/index.html" class="nav-prev">← Capítulo Anterior</a>

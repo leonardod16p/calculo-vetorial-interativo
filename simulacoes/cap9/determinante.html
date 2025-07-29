@@ -5,312 +5,562 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Determinantes, Áreas e Formas Diferenciais</title>
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            color: white;
+        /* ===== VARIÁVEIS DO TEMA ÁRVORE ===== */
+        :root {
+            /* Cores do tema Árvore */
+            --primary-dark: #1a2b4c;
+            --primary-medium: #2c4a78;
+            --primary-light: #4a6741;
+            --primary-extra-light: #3a4b3d;
+            --accent-blue: #4fc3f7;
+            --accent-green: #81c784;
+            --accent-orange: #ffb74d;
+            --wood-dark: #6d4c41;
+            --wood-light: #8d6e63;
+            --leaf-green: #4caf50;
+            
+            /* Cores da simulação integradas */
+            --simulation-bg: rgba(15, 23, 42, 0.92);
+            --simulation-panel-bg: rgba(30, 58, 138, 0.95);
+            --simulation-border: rgba(79, 195, 247, 0.3);
+            --simulation-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+            
+            /* Cores gerais */
+            --sidebar-bg: #1e3a8a;
+            --sidebar-active: #4f46e5;
+            --sidebar-highlight: #fbbf24;
+            --content-bg: #f9fafb;
+            --text-dark: #0f172a;
+            --text-medium: #1e293b;
+            --text-light: #f9fafb;
+            --text-muted: #e0e0e0;
+            
+            /* Transições */
+            --transition-smooth: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
-        
-        .container {
+
+        /* ===== RESET E BASE ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'EB Garamond', serif;
+            background: linear-gradient(to bottom, 
+                var(--primary-dark) 0%, 
+                var(--primary-medium) 30%, 
+                var(--primary-light) 70%, 
+                var(--primary-extra-light) 100%);
+            min-height: 100vh;
+            color: var(--text-light);
+            overflow-x: hidden;
+        }
+
+        /* ===== CONTAINER PRINCIPAL ===== */
+        .simulation-main-container {
             max-width: 1400px;
             margin: 0 auto;
-            background: rgba(255, 255, 255, 0.1);
+            padding: 2rem;
+            min-height: 100vh;
+        }
+
+        /* ===== CABEÇALHO ===== */
+        .simulation-header {
+            background: var(--simulation-panel-bg);
+            backdrop-filter: blur(12px);
             border-radius: 20px;
-            padding: 30px;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-        }
-        
-        h1 {
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            border: 1px solid var(--simulation-border);
+            box-shadow: var(--simulation-shadow);
             text-align: center;
-            font-size: 2.5em;
-            margin-bottom: 30px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-            background: linear-gradient(45deg, #ff6b6b, #ffa726);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-        
-        .main-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
-            margin-bottom: 30px;
-        }
-        
-        .canvas-container {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 15px;
-            padding: 20px;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
             position: relative;
             overflow: hidden;
         }
-        
-        .canvas-container::before {
+
+        .simulation-header::before {
             content: '';
             position: absolute;
             top: -2px;
             left: -2px;
             right: -2px;
             bottom: -2px;
-            background: linear-gradient(45deg, #ff6b6b, #ffa726, #26a69a, #42a5f5);
-            border-radius: 17px;
+            background: linear-gradient(45deg, var(--accent-blue), var(--accent-green), var(--accent-orange), var(--accent-blue));
+            border-radius: 22px;
             z-index: -1;
             animation: borderGlow 3s ease-in-out infinite alternate;
         }
-        
+
         @keyframes borderGlow {
             0% { opacity: 0.5; }
             100% { opacity: 0.8; }
         }
-        
-        canvas {
+
+        .simulation-title {
+            font-size: 2.8rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, var(--accent-blue), var(--accent-green));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: none;
+            font-weight: 600;
+        }
+
+        .simulation-subtitle {
+            font-size: 1.3rem;
+            color: var(--text-muted);
+            opacity: 0.9;
+        }
+
+        /* ===== LAYOUT PRINCIPAL ===== */
+        .simulation-content-grid {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        /* ===== ÁREA VISUAL ===== */
+        .simulation-visual-area {
+            background: var(--simulation-panel-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            border: 1px solid var(--simulation-border);
+            box-shadow: var(--simulation-shadow);
+            position: relative;
+        }
+
+        .simulation-canvas-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 1.5rem;
+            position: relative;
+            overflow: hidden;
             border: 2px solid transparent;
+            background-clip: padding-box;
+        }
+
+        .simulation-canvas-container::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, var(--accent-blue), var(--accent-green));
+            border-radius: 17px;
+            z-index: -1;
+            opacity: 0.6;
+        }
+
+        .simulation-canvas-title {
+            color: #333;
+            text-align: center;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        canvas {
             border-radius: 10px;
             cursor: crosshair;
-            transition: all 0.3s ease;
+            transition: var(--transition-smooth);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
         }
-        
+
         canvas:hover {
             transform: scale(1.02);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
         }
-        
-        .controls {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-            padding: 25px;
-            backdrop-filter: blur(5px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+
+        .simulation-canvas-hint {
+            color: #666;
+            font-size: 0.95rem;
+            text-align: center;
+            margin-top: 1rem;
+            font-style: italic;
         }
-        
-        .control-group {
-            margin-bottom: 25px;
+
+        /* ===== PAINEL DE CONTROLES ===== */
+        .simulation-controls-panel {
+            background: var(--simulation-panel-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            border: 1px solid var(--simulation-border);
+            box-shadow: var(--simulation-shadow);
+            height: fit-content;
         }
-        
-        .control-group h3 {
-            margin: 0 0 15px 0;
-            font-size: 1.1em;
-            color: #fff;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+
+        .simulation-control-group {
+            margin-bottom: 2rem;
         }
-        
-        label {
-            display: block;
-            margin-bottom: 8px;
+
+        .simulation-control-group-title {
+            color: var(--accent-blue);
+            font-size: 1.3rem;
             font-weight: 600;
-            color: #f0f0f0;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--simulation-border);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
-        
-        input[type="range"] {
+
+        .simulation-control-label {
+            display: block;
+            margin-bottom: 0.8rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        .simulation-slider {
             width: 100%;
-            margin-bottom: 15px;
             height: 8px;
-            border-radius: 5px;
-            background: rgba(255, 255, 255, 0.3);
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.2);
             outline: none;
             -webkit-appearance: none;
+            margin-bottom: 1.2rem;
+            transition: var(--transition-smooth);
         }
-        
-        input[type="range"]::-webkit-slider-thumb {
+
+        .simulation-slider::-webkit-slider-thumb {
             -webkit-appearance: none;
             appearance: none;
-            width: 20px;
-            height: 20px;
+            width: 22px;
+            height: 22px;
             border-radius: 50%;
-            background: linear-gradient(45deg, #ff6b6b, #ffa726);
+            background: linear-gradient(45deg, var(--accent-blue), var(--accent-green));
             cursor: pointer;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            transition: var(--transition-smooth);
         }
-        
-        button {
-            background: linear-gradient(45deg, #ff6b6b, #ffa726);
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 25px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: 600;
-            margin: 5px;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+
+        .simulation-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(79, 195, 247, 0.4);
         }
-        
-        button:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
-        }
-        
-        .matrix-display {
+
+        /* ===== DISPLAYS DE INFORMAÇÃO ===== */
+        .simulation-matrix-display {
             background: rgba(0, 0, 0, 0.4);
-            border-radius: 10px;
-            padding: 20px;
-            margin: 15px 0;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1.2rem 0;
             font-family: 'Courier New', monospace;
-            font-size: 1.2em;
+            font-size: 1.2rem;
             text-align: center;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-        }
-        
-        .determinant-value {
-            font-size: 1.5em;
-            font-weight: bold;
-            color: #ffa726;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
-        }
-        
-        .area-display {
-            background: rgba(42, 165, 245, 0.2);
-            border: 2px solid #42a5f5;
-            border-radius: 10px;
-            padding: 15px;
-            margin: 15px 0;
-            text-align: center;
-        }
-        
-        .differential-forms {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-            padding: 25px;
-            margin-top: 20px;
+            border: 1px solid var(--simulation-border);
             backdrop-filter: blur(5px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
         }
-        
-        .form-equation {
-            background: rgba(0, 0, 0, 0.4);
-            border-radius: 8px;
-            padding: 15px;
-            margin: 10px 0;
-            font-family: 'Courier New', monospace;
-            font-size: 1.1em;
-            border-left: 4px solid #26a69a;
+
+        .simulation-determinant-value {
+            font-size: 1.6rem;
+            font-weight: bold;
+            color: var(--accent-orange);
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            margin-top: 1rem;
         }
-        
-        .interpretation {
-            background: rgba(38, 166, 154, 0.2);
-            border: 2px solid #26a69a;
-            border-radius: 10px;
-            padding: 20px;
-            margin: 20px 0;
+
+        .simulation-area-display {
+            background: rgba(79, 195, 247, 0.15);
+            border: 2px solid var(--accent-blue);
+            border-radius: 12px;
+            padding: 1.2rem;
+            margin: 1.2rem 0;
+            text-align: center;
+            backdrop-filter: blur(5px);
         }
-        
-        .vector-info {
+
+        /* ===== BOTÕES DE AÇÃO ===== */
+        .simulation-action-controls {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin: 20px 0;
+            gap: 0.8rem;
+            margin: 1.5rem 0;
         }
-        
-        .vector-card {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            padding: 15px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+
+        .simulation-action-btn {
+            background: linear-gradient(45deg, var(--accent-blue), var(--accent-green));
+            color: white;
+            border: none;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: var(--transition-smooth);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
         }
-        
-        .animation-controls {
+
+        .simulation-action-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(79, 195, 247, 0.3);
+        }
+
+        .simulation-action-btn:active {
+            transform: translateY(-1px);
+        }
+
+        /* ===== ÁREA DE INFORMAÇÕES MATEMÁTICAS ===== */
+        .simulation-math-info {
+            background: var(--simulation-panel-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            border: 1px solid var(--simulation-border);
+            box-shadow: var(--simulation-shadow);
+            margin-top: 2rem;
+        }
+
+        .simulation-info-title {
+            color: var(--accent-green);
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
             display: flex;
-            gap: 10px;
-            margin: 20px 0;
-            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.5rem;
         }
-        
-        .highlight-area {
-            background: rgba(255, 193, 7, 0.3);
-            border: 2px solid #ffc107;
+
+        .simulation-form-equation {
+            background: rgba(0, 0, 0, 0.4);
             border-radius: 10px;
-            padding: 15px;
-            margin: 15px 0;
+            padding: 1.2rem;
+            margin: 1rem 0;
+            font-family: 'Courier New', monospace;
+            font-size: 1.1rem;
+            border-left: 4px solid var(--accent-green);
+            backdrop-filter: blur(5px);
+        }
+
+        .simulation-vector-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .simulation-vector-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 1.2rem;
+            border: 1px solid var(--simulation-border);
+            backdrop-filter: blur(5px);
+        }
+
+        .simulation-vector-card h4 {
+            color: var(--accent-blue);
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .simulation-interpretation {
+            background: rgba(129, 199, 132, 0.15);
+            border: 2px solid var(--accent-green);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            backdrop-filter: blur(5px);
+        }
+
+        .simulation-interpretation h4 {
+            color: var(--accent-green);
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+
+        .simulation-highlight-area {
+            background: rgba(255, 193, 7, 0.2);
+            border: 2px solid var(--accent-orange);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
             animation: highlightPulse 2s ease-in-out infinite alternate;
+            backdrop-filter: blur(5px);
         }
-        
+
         @keyframes highlightPulse {
-            0% { background: rgba(255, 193, 7, 0.2); }
-            100% { background: rgba(255, 193, 7, 0.4); }
+            0% { background: rgba(255, 193, 7, 0.15); }
+            100% { background: rgba(255, 193, 7, 0.25); }
         }
-        
-        .negative-area {
-            background: rgba(244, 67, 54, 0.3);
-            border: 2px solid #f44336;
+
+        .simulation-highlight-area h4 {
+            color: var(--accent-orange);
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
         }
-        
-        .positive-area {
-            background: rgba(76, 175, 80, 0.3);
-            border: 2px solid #4caf50;
+
+        /* ===== ESTADOS ESPECIAIS ===== */
+        .simulation-negative-area {
+            background: rgba(244, 67, 54, 0.2);
+            border-color: #f44336;
+        }
+
+        .simulation-positive-area {
+            background: rgba(76, 175, 80, 0.2);
+            border-color: var(--leaf-green);
+        }
+
+        /* ===== RESPONSIVIDADE ===== */
+        @media (max-width: 1024px) {
+            .simulation-content-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .simulation-controls-panel {
+                order: -1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .simulation-main-container {
+                padding: 1rem;
+            }
+            
+            .simulation-header {
+                padding: 1.5rem;
+            }
+            
+            .simulation-title {
+                font-size: 2rem;
+            }
+            
+            .simulation-visual-area,
+            .simulation-controls-panel {
+                padding: 1.5rem;
+            }
+            
+            .simulation-vector-info {
+                grid-template-columns: 1fr;
+            }
+            
+            .simulation-action-controls {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* ===== EFEITOS ESPECIAIS ===== */
+        .simulation-scanline {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                to bottom,
+                transparent 98%,
+                rgba(79, 195, 247, 0.1) 98%,
+                rgba(79, 195, 247, 0.1) 100%
+            );
+            background-size: 100% 8px;
+            pointer-events: none;
+            animation: scanline 8s linear infinite;
+            z-index: 1;
+        }
+
+        @keyframes scanline {
+            from { background-position: 0 0; }
+            to { background-position: 0 100%; }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>🎯 Determinantes, Áreas e Formas Diferenciais</h1>
-        
-        <div class="main-grid">
-            <div class="canvas-container">
-                <h3 style="color: #333; text-align: center; margin-bottom: 15px;">
-                    🎨 Visualização Geométrica
-                </h3>
-                <canvas id="geometryCanvas" width="500" height="400"></canvas>
-                <p style="color: #666; font-size: 0.9em; text-align: center; margin-top: 10px;">
-                    Arraste os pontos para modificar os vetores
-                </p>
-            </div>
-            
-            <div class="controls">
-                <div class="control-group">
-                    <h3>🎛️ Controles dos Vetores</h3>
-                    <label>Vetor u₁: <span id="u1Value">(2.0, 1.0)</span></label>
-                    <input type="range" id="u1x" min="-4" max="4" step="0.1" value="2">
-                    <input type="range" id="u1y" min="-4" max="4" step="0.1" value="1">
-                    
-                    <label>Vetor u₂: <span id="u2Value">(1.0, 3.0)</span></label>
-                    <input type="range" id="u2x" min="-4" max="4" step="0.1" value="1">
-                    <input type="range" id="u2y" min="-4" max="4" step="0.1" value="3">
+    <div class="simulation-main-container">
+        <!-- Cabeçalho -->
+        <div class="simulation-header">
+            <h1 class="simulation-title">🎯 Determinantes, Áreas e Formas Diferenciais</h1>
+            <p class="simulation-subtitle">Exploração interativa dos conceitos fundamentais</p>
+        </div>
+
+        <!-- Layout principal -->
+        <div class="simulation-content-grid">
+            <!-- Área visual -->
+            <div class="simulation-visual-area">
+                <div class="simulation-canvas-container">
+                    <h3 class="simulation-canvas-title">🎨 Visualização Geométrica</h3>
+                    <canvas id="geometryCanvas" width="500" height="400"></canvas>
+                    <p class="simulation-canvas-hint">Arraste os pontos para modificar os vetores</p>
                 </div>
-                
-                <div class="matrix-display">
+            </div>
+
+            <!-- Painel de controles -->
+            <div class="simulation-controls-panel">
+                <div class="simulation-control-group">
+                    <h3 class="simulation-control-group-title">
+                        🎛️ Controles dos Vetores
+                    </h3>
+                    
+                    <label class="simulation-control-label">
+                        Vetor u₁: <span id="u1Value">(2.0, 1.0)</span>
+                    </label>
+                    <input type="range" class="simulation-slider" id="u1x" min="-4" max="4" step="0.1" value="2">
+                    <input type="range" class="simulation-slider" id="u1y" min="-4" max="4" step="0.1" value="1">
+                    
+                    <label class="simulation-control-label">
+                        Vetor u₂: <span id="u2Value">(1.0, 3.0)</span>
+                    </label>
+                    <input type="range" class="simulation-slider" id="u2x" min="-4" max="4" step="0.1" value="1">
+                    <input type="range" class="simulation-slider" id="u2y" min="-4" max="4" step="0.1" value="3">
+                </div>
+
+                <div class="simulation-matrix-display">
                     <div>Matriz de Transformação:</div>
                     <div id="matrixDisplay">
                         [2.0  1.0]<br>
                         [1.0  3.0]
                     </div>
-                    <div class="determinant-value" id="detValue">
+                    <div class="simulation-determinant-value" id="detValue">
                         det = 5.0
                     </div>
                 </div>
-                
-                <div class="area-display">
+
+                <div class="simulation-area-display">
                     <div><strong>Área do Paralelogramo:</strong></div>
                     <div id="areaValue" style="font-size: 1.3em; font-weight: bold;">
                         |det| = 5.0
                     </div>
                 </div>
-                
-                <div class="animation-controls">
-                    <button onclick="animateTransformation()">🎬 Animar Transformação</button>
-                    <button onclick="showUnitSquare()">⬜ Quadrado Unitário</button>
-                    <button onclick="showEigenvectors()">🎯 Autovetores</button>
-                    <button onclick="resetView()">🔄 Resetar</button>
+
+                <div class="simulation-action-controls">
+                    <button class="simulation-action-btn" onclick="animateTransformation()">
+                        🎬 Animar
+                    </button>
+                    <button class="simulation-action-btn" onclick="showUnitSquare()">
+                        ⬜ Unitário
+                    </button>
+                    <button class="simulation-action-btn" onclick="showEigenvectors()">
+                        🎯 Autovetores
+                    </button>
+                    <button class="simulation-action-btn" onclick="resetView()">
+                        🔄 Resetar
+                    </button>
                 </div>
             </div>
         </div>
-        
-        <div class="differential-forms">
-            <h3>📐 Formas Diferenciais e Interpretação Geométrica</h3>
-            
-            <div class="form-equation">
+
+        <!-- Informações matemáticas -->
+        <div class="simulation-math-info">
+            <h3 class="simulation-info-title">
+                📐 Formas Diferenciais e Interpretação Geométrica
+            </h3>
+
+            <div class="simulation-form-equation">
                 <div><strong>Forma Diferencial de Área:</strong></div>
                 <div id="differentialForm">ω = 2dx ∧ dy + 1dx ∧ dy = 3dx ∧ dy</div>
             </div>
-            
-            <div class="vector-info">
-                <div class="vector-card">
+
+            <div class="simulation-vector-info">
+                <div class="simulation-vector-card">
                     <h4>🔹 Primeiro Vetor (u₁)</h4>
                     <div id="vector1Info">
                         Componentes: (2.0, 1.0)<br>
@@ -318,8 +568,8 @@
                         Ângulo: 26.57°
                     </div>
                 </div>
-                
-                <div class="vector-card">
+
+                <div class="simulation-vector-card">
                     <h4>🔹 Segundo Vetor (u₂)</h4>
                     <div id="vector2Info">
                         Componentes: (1.0, 3.0)<br>
@@ -328,17 +578,17 @@
                     </div>
                 </div>
             </div>
-            
-            <div class="interpretation" id="interpretation">
+
+            <div class="simulation-interpretation" id="interpretation">
                 <h4>🎯 Interpretação Geométrica</h4>
                 <div id="interpretationText">
                     O determinante det = 5.0 > 0 indica que a transformação preserva a orientação.
-                    A área do paralelogramo formado pelos vetores é |det| = 5.0 unidades².
+                    A área do paralelogramo formada pelos vetores é |det| = 5.0 unidades².
                     A forma diferencial ω = 5dx ∧ dy representa o elemento de área escalado por este fator.
                 </div>
             </div>
-            
-            <div class="highlight-area" id="highlightArea">
+
+            <div class="simulation-highlight-area" id="highlightArea">
                 <h4>✨ Conexão Fundamental</h4>
                 <div id="connectionText">
                     <strong>Determinante ↔ Área ↔ Forma Diferencial</strong><br>
@@ -346,24 +596,25 @@
                     A transformação linear x' = Ax multiplica áreas por |det(A)|
                 </div>
             </div>
-        </div>
-        
-        <div class="differential-forms">
-            <h3>🧮 Cálculos Detalhados</h3>
-            
-            <div class="form-equation">
-                <div><strong>Produto Vetorial (2D):</strong></div>
-                <div id="crossProduct">u₁ × u₂ = (2)(3) - (1)(1) = 6 - 1 = 5</div>
-            </div>
-            
-            <div class="form-equation">
-                <div><strong>Produto Exterior:</strong></div>
-                <div id="exteriorProduct">u₁ ∧ u₂ = (2dx + 1dy) ∧ (1dx + 3dy) = 2·3(dx ∧ dy) - 1·1(dy ∧ dx) = 5(dx ∧ dy)</div>
-            </div>
-            
-            <div class="form-equation">
-                <div><strong>Jacobiano da Transformação:</strong></div>
-                <div id="jacobian">J = ∂(x',y')/∂(x,y) = det([∂x'/∂x, ∂x'/∂y; ∂y'/∂x, ∂y'/∂y]) = det = 5</div>
+
+            <!-- Cálculos detalhados -->
+            <div class="simulation-control-group">
+                <h3 class="simulation-info-title">🧮 Cálculos Detalhados</h3>
+
+                <div class="simulation-form-equation">
+                    <div><strong>Produto Vetorial (2D):</strong></div>
+                    <div id="crossProduct">u₁ × u₂ = (2)(3) - (1)(1) = 6 - 1 = 5</div>
+                </div>
+
+                <div class="simulation-form-equation">
+                    <div><strong>Produto Exterior:</strong></div>
+                    <div id="exteriorProduct">u₁ ∧ u₂ = (2dx + 1dy) ∧ (1dx + 3dy) = 2·3(dx ∧ dy) - 1·1(dy ∧ dx) = 5(dx ∧ dy)</div>
+                </div>
+
+                <div class="simulation-form-equation">
+                    <div><strong>Jacobiano da Transformação:</strong></div>
+                    <div id="jacobian">J = ∂(x',y')/∂(x,y) = det([∂x'/∂x, ∂x'/∂y; ∂y'/∂x, ∂y'/∂y]) = det = 5</div>
+                </div>
             </div>
         </div>
     </div>
@@ -781,12 +1032,16 @@
             
             // Atualizar destaque de área
             const highlightArea = document.getElementById('highlightArea');
+            const interpretation = document.getElementById('interpretation');
             if (det > 0) {
-                highlightArea.className = 'highlight-area positive-area';
+                highlightArea.className = 'simulation-highlight-area simulation-positive-area';
+                interpretation.className = 'simulation-interpretation simulation-positive-area';
             } else if (det < 0) {
-                highlightArea.className = 'highlight-area negative-area';
+                highlightArea.className = 'simulation-highlight-area simulation-negative-area';
+                interpretation.className = 'simulation-interpretation simulation-negative-area';
             } else {
-                highlightArea.className = 'highlight-area';
+                highlightArea.className = 'simulation-highlight-area';
+                interpretation.className = 'simulation-interpretation';
             }
             
             // Redesenhar a cena

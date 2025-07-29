@@ -26,20 +26,19 @@
             ]
           });"></script>
 </head>
-<body>
-  <button id="toggleMenuBtn" aria-label="Toggle navigation menu">☰</button>
 
+
+<body>
+
+  <button id="toggleMenuBtn" aria-label="Toggle navigation menu">☰</button>
   <div class="container" id="container">
     <div id="sidebar-placeholder"></div>
-    
     <main class="content">
         <div class="reading-container">
-      <h1>Capítulo 16: Pullback</h1>
+      <h1>Pullback</h1>
 <main>
-  <h1>Pullback</h1>
   
   <section>
-    <h2>Pullback</h2>
     
     <p>Nosso objetivo inicial era construir uma teoria de integração sobre curvas, superfícies e volumes. Para nós, curvas e superfícies só fazem sentido enquanto objetos parametrizados.</p>
     
@@ -122,9 +121,34 @@
     + G(\varphi(t)) \sum_{i=1}^{m} \frac{\partial y}{\partial t_i} dt_i
     + H(\varphi(t)) \sum_{i=1}^{m} \frac{\partial z}{\partial t_i} dt_i
     $$
-  </section>
-</div>
-</main>
 
+    <div class="simulation-link-container">
+      <h3 class="simulation-title">Simulações Interativas</h3>
+    
+    <a href="../simulacoes/cap17/pullback.html" class="simulation-link" target="_blank">
+      <span class="simulation-icon">⎈</span>
+      <span class="simulation-text">Ver Simulação: Pullback</span>
+      <span class="simulation-arrow">→</span>
+    </a>
+    
+    </div>
+  
+
+  </section>
+
+
+      <nav class="chapter-nav">
+        <a href="cap15.html" class="nav-prev">← Capítulo Anterior</a>
+        <a href="cap17.html" class="nav-next">Próximo Capítulo →</a>
+      </nav>
+    
+    </div>
+    </main>
+  </div>
+
+  <div id="canvas-holder"></div>
+  <script src="https://cdn.jsdelivr.net/npm/p5@1.9.0/lib/p5.min.js"></script>
+  <script src="../assets/js/fluxo.js"></script>
+  <script src="../assets/js/main.js"></script>
 </body>
 </html>

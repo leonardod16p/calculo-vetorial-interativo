@@ -31,21 +31,15 @@
 
 <main class="content">
   <div class="reading-container">
-    <h1>?</h1>
+    <h1>Teorema de Stokes</h1>
     
-    <div class="warning">
-        <p>CUIDADO. PULEI MUITA COISA AQUI. FALTA UMA COMPREENSAO MELHOR DO QUE TA ROLANDO.</p>
-        <p>CUIDADO. PULEI MUITA COISA AQUI. FALTA UMA COMPREENSAO MELHOR DO QUE TA ROLANDO.</p>
-        <p>CUIDADO. PULEI MUITA COISA AQUI. FALTA UMA COMPREENSAO MELHOR DO QUE TA ROLANDO.</p>
-    </div>
-
     <p>Comecemos com o enunciado do Teorema de Stokes, também conhecido como o <strong>Teorema de Kelvin-Stokes</strong>:</p>
 
-    <div class="equation">
-        \[
+    $$
+        
         \int_{\partial S} \vec{F} \cdot d\vec{r} = \iint_{S} (\nabla \times \vec{F}) \cdot d\vec{S},
-        \]
-    </div>
+        
+    $$
 
     <p>onde:</p>
 
@@ -60,29 +54,29 @@
 
     <p>Vamos agora considerar um exemplo onde a aplicação do Teorema de Stokes <strong>falha</strong>. Seja o campo vetorial:</p>
 
-    <div class="equation">
-        \[
+    $$
+        
         \vec{F}(x,y,z) = \left( \frac{-y}{x^2 + y^2}, \frac{x}{x^2 + y^2}, 0 \right),
-        \]
-    </div>
+        
+    $$
 
     <p>definido em \( \mathbb{R}^3 \setminus Z \), onde \( Z \) é o eixo \( z \) (ou seja, o conjunto de pontos com \( x = y = 0 \)).</p>
 
     <p>Esse campo representa a variação angular no plano \( xy \) e tem a forma de um <strong>campo de rotação em torno do eixo \( z \)</strong>. Podemos mostrar que:</p>
 
-    <div class="equation">
-        \[
+    $$
+        
         \nabla \times \vec{F} = 0 \quad \text{em} \quad \mathbb{R}^3 \setminus Z.
-        \]
-    </div>
+        
+    $$
 
     <p>No entanto, seja \( \gamma \) a curva fechada definida por:</p>
 
-    <div class="equation">
-        \[
+    $$
+        
         \gamma(t) = (\cos t, \sin t, 0), \quad t \in [0, 2\pi].
-        \]
-    </div>
+        
+    $$
 
     <p>Esta curva é o bordo de um disco plano no plano \( z = 0 \). Queremos aplicar o Teorema de Stokes sobre uma superfície \( S \) com \( \partial S = \gamma \). Contudo, qualquer superfície \( S \) com esse bordo necessariamente <strong>intersecta o eixo \( z \)</strong>, isto é, não está inteiramente contida no domínio de definição do campo \( \vec{F} \).</p>
 
@@ -90,30 +84,24 @@
 
     <p>Apesar disso, temos:</p>
 
-    <div class="equation">
-        \[
+    $$
+        
         \int_{\gamma} \vec{F} \cdot d\vec{r} = \int_0^{2\pi} 1\, dt = 2\pi,
-        \]
-    </div>
+        
+    $$
 
     <p>enquanto:</p>
 
-    <div class="equation">
-        \[
+    $$
+        
         \iint_{S} (\nabla \times \vec{F}) \cdot d\vec{S} = \iint_{S} 0 \cdot d\vec{S} = 0,
-        \]
-    </div>
+        
+    $$
 
     <p>caso tentássemos aplicar o teorema ingenuamente. Essa contradição revela que a hipótese do teorema falha: <strong>o campo \( \vec{F} \) não é definido em todo o domínio necessário para garantir a existência de uma superfície regular com bordo \( \gamma \) completamente contida nele</strong>.</p>
 
     <p>Esse exemplo evidencia que a <strong>topologia do domínio importa</strong>. O domínio \( \mathbb{R}^3 \setminus Z \) <strong>não é simplesmente conexo</strong>, e não é possível construir uma homotopia entre certas curvas fechadas nele sem sair do domínio. Esse é um caso onde aparecem <strong>espaços exóticos</strong>, e formas diferenciais nos permitem identificar e quantificar essas falhas.</p>
 
-    <div class="warning">
-        <p>CUIDADO. PULEI MUITA COISA AQUI. FALTA UMA COMPREENSAO MELHOR DO QUE TA ROLANDO.</p>
-        <p>CUIDADO. PULEI MUITA COISA AQUI. FALTA UMA COMPREENSAO MELHOR DO QUE TA ROLANDO.</p>
-        <p>CUIDADO. PULEI MUITA COISA AQUI. FALTA UMA COMPREENSAO MELHOR DO QUE TA ROLANDO.</p>
-        <p>CUIDADO. PULEI MUITA COISA AQUI. FALTA UMA COMPREENSAO MELHOR DO QUE TA ROLANDO.</p>
-    </div>
 
     <p>O fato de o rotacional ser nulo em uma região garante, sob certas condições topológicas, que a integral de linha ao longo de qualquer curva fechada nessa região seja nula. Isso nos leva à interpretação do rotacional como uma medida local de não-conservatividade do campo. Ou seja, o rotacional mede, ponto a ponto, o quanto o campo "gira", ou deixa de ser o gradiente de alguma função escalar.</p>
 
@@ -121,26 +109,26 @@
 
     <p>Agora, considere a 1-forma:</p>
 
-    <div class="equation">
-        \[
+    $$
+        
         \omega = F_1\, dx + F_2\, dy + F_3\, dz,
-        \]
-    </div>
+        
+    $$
 
     <p>e uma curva parametrizada por \( C(t) = (x(t), y(t), z(t)) \). A integral da 1-forma ao longo da curva é:</p>
 
-    <div class="equation">
-        \[
+    $$
+        
         \int_C \omega = \int_a^b F_1(x(t), y(t), z(t)) \, \dot{x}(t)\, dt
         + F_2(x(t), y(t), z(t)) \, \dot{y}(t)\, dt
         + F_3(x(t), y(t), z(t)) \, \dot{z}(t)\, dt.
-        \]
-    </div>
+        
+    $$
 
     <p>Considere agora \( \vec{G} = (G_1, G_2, G_3) \in \mathbb{R}^3 \) e dois vetores \( \vec{u}, \vec{v} \in \mathbb{R}^3 \). O produto escalar de \( \vec{G} \) com o produto vetorial \( \vec{u} \times \vec{v} \) é dado por:</p>
 
-    <div class="equation">
-        \[
+    $$
+        
         \vec{G} \cdot (\vec{u} \times \vec{v}) =
         \det
         \begin{pmatrix}
@@ -148,13 +136,13 @@
         u_1 & u_2 & u_3 \\
         v_1 & v_2 & v_3
         \end{pmatrix}
-        \]
-    </div>
+        
+    $$
 
     <p>Esse determinante pode ser expandido como:</p>
 
-    <div class="equation">
-        \[
+    $$
+        
         G_1
         \begin{vmatrix}
         u_2 & u_3 \\
@@ -170,102 +158,101 @@
         u_1 & u_2 \\
         v_1 & v_2
         \end{vmatrix}
-        \]
-    </div>
+        
+    $$
 
     <p>Cada termo corresponde à área da projeção de \( \vec{u} \) e \( \vec{v} \) no plano ortogonal ao eixo associado. Por exemplo:</p>
 
-    <div class="equation">
-        \[
+    $$
+        
         \begin{vmatrix}
         u_2 & u_3 \\
         v_2 & v_3
         \end{vmatrix}
-        \]
-    </div>
-
+        
+    $$
     <p>é a área da projeção de \( \vec{u} \) e \( \vec{v} \) no plano \( yz \), e está multiplicando \( G_1 \), que mede a componente de \( \vec{G} \) na direção \( x \). Portanto, o produto misto \( \vec{G} \cdot (\vec{u} \times \vec{v}) \) mede o volume orientado definido por esses três vetores, e pode ser interpretado como a contribuição da área projetada de \( \vec{u}, \vec{v} \) em cada plano coordenado, ponderada pelas componentes de \( \vec{G} \).</p>
 
     <p>Podemos representar a projeção de vetores e o cálculo do determinante associado como formas alternadas. Por exemplo, considere:</p>
 
-    <div class="equation">
-        \[
+    $$
+        
         dx \wedge \varepsilon(u, v) = 
         \begin{vmatrix}
         u_1 & u_2 \\
         v_1 & v_2
         \end{vmatrix},
-        \]
-    </div>
+        
+    $$
 
     <p>que representa a projeção de \( u \) e \( v \) no plano \( xy \).</p>
 
     <p>Analogamente:</p>
 
-    <div class="equation">
-        \[
+    $$
+        
         dz \wedge \chi(u, v) = 
         \begin{vmatrix}
         u_3 & u_1 \\
         v_3 & v_1
         \end{vmatrix},
-        \]
-    </div>
+        
+    $$
 
     <p>e</p>
 
-    <div class="equation">
-        \[
+    $$
+        
         dx \wedge \varepsilon(u, v) = 
         \begin{vmatrix}
         u_1 & u_2 \\
         v_1 & v_2
         \end{vmatrix}.
-        \]
-    </div>
+        
+    $$
 
     <p>Os vetores \( u \) e \( v \) podem ser, por exemplo, as derivadas parciais de uma parametrização \( \Phi \), isto é:</p>
 
-    <div class="equation">
-        \[
+    $$
+        
         u = \frac{\partial \Phi}{\partial s}, \quad
         v = \frac{\partial \Phi}{\partial t}.
-        \]
-    </div>
+        
+    $$
 
     <p>No fundo, o produto escalar</p>
 
-    <div class="equation">
-        \[
+    $$
+        
         (G_1, G_2, G_3) \cdot (u \times v)
-        \]
-    </div>
+        
+    $$
 
     <p>pode ser visto como a aplicação de uma transformação bilinear alternada (isto é, uma 2-forma) aos vetores \( u \) e \( v \). Essa transformação associa a cada par de vetores a área orientada da projeção sobre um plano, ponderada pelas componentes do campo \( \vec{G} \).</p>
 
-    <div class="equation">
-        \[
+    $$
+        
         G_1\, dy \wedge dz + G_2\, dz \wedge dx + G_3\, dx \wedge dy.
-        \]
-    </div>
+        
+    $$
 
     <p>Reconsidere o determinante:</p>
 
-    <div class="equation">
-        \[
+    $$
+        
         \begin{vmatrix}
         \vec{i} & \vec{j} & \vec{k} \\
         \frac{\partial}{\partial x} & \frac{\partial}{\partial y} & \frac{\partial}{\partial z} \\
         F_1 & F_2 & F_3
         \end{vmatrix}
         = \nabla \times F
-        \]
-    </div>
+        
+    $$
 
     <p>Desenvolvendo o determinante:</p>
 
-    <div class="equation">
-        \[
+    $$
+        
         \nabla \times \vec{F} =
         \left( 
         \frac{\partial F_3}{\partial y} - \frac{\partial F_2}{\partial z}
@@ -278,13 +265,13 @@
         \left( 
         \frac{\partial F_2}{\partial x} - \frac{\partial F_1}{\partial y}
         \right) \, \vec{k}
-        \]
-    </div>
+        
+    $$
 
     <p>Associando isso à forma diferencial 2-forma correspondente:</p>
 
-    <div class="equation">
-        \[
+    $$
+        
         \omega_{\nabla \times \vec{F}} =
         \left( 
         \frac{\partial F_3}{\partial y} - \frac{\partial F_2}{\partial z}
@@ -297,62 +284,63 @@
         \left( 
         \frac{\partial F_2}{\partial x} - \frac{\partial F_1}{\partial y}
         \right) \, dx \wedge dy
-        \]
-    </div>
+        
+    $$
 
     <p>Considere a 1-forma:</p>
 
-    <div class="equation">
-        \[
+    $$
+        
         \omega = F_1\, dx + F_2\, dy + F_3\, dz.
-        \]
-    </div>
+        
+    $$
 
     <p>O diferencial exterior de \( F_1 \) é dado por:</p>
 
-    <div class="equation">
-        \[
+    $$
+        
         dF_1 = \frac{\partial F_1}{\partial x} dx + \frac{\partial F_1}{\partial y} dy + \frac{\partial F_1}{\partial z} dz.
-        \]
-    </div>
+        
+    $$
 
     <p>Considere os três produtos exteriores:</p>
 
-    <div class="equation">
-        \[
+    $$
+        
         dF_1 \wedge dx, \quad dF_2 \wedge dy, \quad dF_3 \wedge dz.
-        \]
-    </div>
+        
+    $$
 
     <p>O primeiro produto exterior é:</p>
 
-    <div class="equation">
-        \[
+    $$
+        
         dF_1 \wedge dx = \frac{\partial F_1}{\partial y} dy \wedge dx + \frac{\partial F_1}{\partial z} dz \wedge dx = - \frac{\partial F_1}{\partial y} dx \wedge dy + \frac{\partial F_1}{\partial z} dz \wedge dx
-        \]
-    </div>
+        
+    $$
 
     <p>O segundo produto exterior é:</p>
 
-    <div class="equation">
-        \[
+    $$
+        
         dF_2 \wedge dy = \frac{\partial F_2}{\partial x} dx \wedge dy + \frac{\partial F_2}{\partial z} dz \wedge dy =\frac{\partial F_2}{\partial x} dx \wedge dy - \frac{\partial F_2}{\partial z} dy \wedge dz
-        \]
-    </div>
+        
+    $$
 
     <p>E o terceiro produto exterior é:</p>
 
-    <div class="equation">
-        \[
+    $$
+        
         dF_3 \wedge dz = \frac{\partial F_1}{\partial x} dx \wedge dz + \frac{\partial F_1}{\partial y} dy \wedge dz.
-        \]
-    </div>
+        
+    $$
 
     <p>Eu poderia dizer que o Teorema de Kelvin eu estou integrando uma forma linear, porque o campo de vetores está ali só para associar um número a cada vetor. E quando eu faço as contas, aparece uma forma bilinear que eu integro na superfície. A gente perde os vetores que nos davam uma interpretação geométrica. Mas a gente ganhou uma superálgebra. Se você fizer em \(\mathbb{R}^n\), vai funcionar. Mas a gente ainda precisa entender o que diabos é esse diferencial de \(F\).</p>
-<div class="simulation-link-container">
+
+    <div class="simulation-link-container">
   <h3 class="simulation-title">Simulações Interativas</h3>
   
-  <a href="simulacoes/cap2/mecanicav2.html" class="simulation-link" target="_blank">
+  <a href="../simulacoes/cap12/stokes2.html" class="simulation-link" target="_blank">
     <span class="simulation-icon">⎈</span>
     <span class="simulation-text">Ver Simulação: Teorema de Stokes</span>
     <span class="simulation-arrow">→</span>

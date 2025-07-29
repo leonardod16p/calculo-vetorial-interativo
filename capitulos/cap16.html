@@ -32,17 +32,16 @@
       <h1>O que é álgebra exterior?</h1>
 
       <section>
-        <h2>O que é Álgebra Exterior?</h2>
-        <p>Agora que temos um certo entendimento dos objetos que estamos tentando estudar, podemos abstrair algumas de suas propriedades. O resultado dessa abstração é chamado de <strong>álgebra exterior</strong>.</p>
+        <p>Agora que temos um certo entendimento dos objetos que estamos estudando, podemos abstrair algumas de suas propriedades. O resultado dessa abstração é chamado de <strong>álgebra exterior</strong>.</p>
 
         <p>Para nós, a álgebra exterior será consequência da construção do <strong>produto exterior</strong>, que já havíamos definido, juntamente com as regras que essa operação deve obedecer.</p>
 
         <h3>Motivação: o Produto Vetorial no $\mathbb{R}^3$</h3>
         <p>Vamos lembrar o que ocorre no caso familiar do <strong>produto vetorial</strong> em $\mathbb{R}^3$. Dados dois vetores $ \vec{u}, \vec{v} \in \mathbb{R}^3 $, o vetor $ \vec{u} \times \vec{v} $ é perpendicular a ambos, e sua norma é igual à área do paralelogramo formado por $ \vec{u} $ e $ \vec{v} $:</p>
 
-        <div class="equation">
+        
           $$\|\vec{u} \times \vec{v}\| = \|\vec{u}\| \|\vec{v}\| \sin \theta$$
-        </div>
+        
 
         <p>O <strong>produto exterior</strong> $ \vec{u} \wedge \vec{v} $ também mede a área gerada por $ \vec{u} $ e $ \vec{v} $, mas de forma mais geral e sem depender da dimensão do espaço.</p>
 
@@ -53,10 +52,10 @@
         <h3>Regras do Produto Exterior</h3>
         <p>Se $ v $ e $ w $ são vetores, temos:</p>
 
-        <div class="equation">
+        
           $$v \wedge w = -w \wedge v \quad \text{(anticomutatividade)}$$
           $$v \wedge v = 0 \quad \text{(degenerescência)}$$
-        </div>
+        
 
         <h3>Bases da Álgebra Exterior</h3>
         <p>Se estamos em $ \mathbb{R}^3 $, com base $ dx_1, dx_2, dx_3 $, então podemos construir as seguintes formas diferenciais:</p>
@@ -70,9 +69,9 @@
 
         <p>De modo geral, em $ \mathbb{R}^n $, temos as <strong>$k$-formas</strong>, para $ 0 \leq k \leq n $. O número de formas lineares independentes de grau $k$ é dado por:</p>
 
-        <div class="equation">
+        
           $$\binom{n}{k}$$
-        </div>
+        
 
         <div class="comment">
           <p>Por que $ \binom{n}{k} $?</p>
@@ -84,36 +83,36 @@
 
         <div class="example">
           <p><strong>Produto exterior de 1-formas:</strong></p>
-          <div class="equation">
+          
             $$dx_1 \wedge dx_2 = -dx_2 \wedge dx_1, \quad dx_1 \wedge dx_1 = 0$$
-          </div>
+          
         </div>
 
         <div class="example">
           <p><strong>Produto de uma 1-forma com ela mesma:</strong></p>
           <p>Seja $ \omega = x\,dx_1 + y\,dx_2 + z\,dx_3 $, então:</p>
-          <div class="equation">
+          
             $$\omega \wedge \omega = 0$$
-          </div>
+          
           <p>Pois ao expandir, obtemos termos do tipo $ dx_1 \wedge dx_1 $, que são nulos por definição.</p>
         </div>
 
         <div class="example">
           <p><strong>Forma não-trivial de grau 2:</strong></p>
           <p>Considere:</p>
-          <div class="equation">
+          
             $$dx_1 \wedge dx_2 + dx_2 \wedge dx_3 + dx_3 \wedge dx_1$$
-          </div>
+          
           <p>Essa é uma combinação de 2-formas que pode representar áreas orientadas em diferentes planos do espaço tridimensional.</p>
-        </div>
+        
       </section>
 
       <section>
         <h2>O que é uma $ k $-forma?</h2>
         <p>Uma $ k $-forma (ou $ k $-forma diferencial) é um objeto da forma:</p>
-        <div class="equation">
+        
           $$\omega = \sum f_{i_1,\dots,i_k}(x)\, dx_{i_1} \wedge \dots \wedge dx_{i_k}$$
-        </div>
+        
         <p>onde:</p>
         <ul>
           <li>Os $ f_{i_1,\dots,i_k}(x) $ são funções suaves (coeficientes)</li>
@@ -126,9 +125,9 @@
         </div>
 
         <p>A forma geral pode ser escrita como:</p>
-        <div class="equation">
+        
           $$\omega = \sum_{1 \leq i_1 < \dots < i_k \leq n} f_{i_1,\dots,i_k}(x) \, dx_{i_1} \wedge \dots \wedge dx_{i_k}$$
-        </div>
+        
 
         <p>O grau da forma determina sua natureza:</p>
         <ul>
@@ -154,30 +153,30 @@
         </div>
 
         <p>Se $ \omega = f(x)\,\alpha $, com $ f $ uma função e $ \alpha $ uma forma, então:</p>
-        <div class="equation">
+        
           $$d(f\alpha) = df \wedge \alpha + f\, d\alpha$$
-        </div>
+        
 
         <h3>Exemplos</h3>
         <p><strong>Exemplo 1:</strong></p>
         <p>Se $ \omega = x\, dx_2 $, então:</p>
-        <div class="equation">
+        
           $$d\omega = d(x\, dx_2) = dx_1 \wedge dx_2 + x \cdot d(dx_2) = dx_1 \wedge dx_2$$
-        </div>
+        
 
         <p><strong>Exemplo 2:</strong></p>
         <p>Se $ \omega = x\, dx_2 \wedge dx_3 $, então:</p>
-        <div class="equation">
+        
           $$d\omega = dx_1 \wedge dx_2 \wedge dx_3 + x \cdot d(dx_2 \wedge dx_3) = dx_1 \wedge dx_2 \wedge dx_3$$
-        </div>
+        
       </section>
 
       <section>
         <h2>Resumo da definição de $ k $-forma</h2>
         <p>Uma $ k $-forma é uma função que associa a cada ponto uma combinação linear com coeficientes suaves de expressões do tipo:</p>
-        <div class="equation">
+        
           $$dx_{i_1} \wedge dx_{i_2} \wedge \dots \wedge dx_{i_k} \quad \text{com } i_1 < i_2 < \dots < i_k$$
-        </div>
+        
 
         <div class="comment">
           <p>Essa ordem crescente dos índices é crucial para garantir a antissimetria. Por exemplo, $ dx_1 \wedge dx_1 = 0 $ e $ dx_1 \wedge dx_2 = -dx_2 \wedge dx_1 $.</p>
@@ -189,28 +188,28 @@
         <p>1-forma: $ \omega = f_1(x)\, dx_1 + f_2(x)\, dx_2 + \dots + f_n(x)\, dx_n $</p>
 
         <p>2-forma em $ \mathbb{R}^3 $:</p>
-        <div class="equation">
+        
           $$\omega = f_{12}(x)\, dx_1 \wedge dx_2 + f_{13}(x)\, dx_1 \wedge dx_3 + f_{23}(x)\, dx_2 \wedge dx_3$$
-        </div>
+        
 
         <p>Em $ \mathbb{R}^n $, uma $ k $-forma geral se escreve como:</p>
-        <div class="equation">
+        
           $$\omega = \sum_{1 \le i_1 < \dots < i_k \le n} f_{i_1 \dots i_k}(x)\, dx_{i_1} \wedge dx_{i_2} \wedge \dots \wedge dx_{i_k}$$
-        </div>
+        
 
         <p>O sinal de soma percorre todas as combinações ordenadas de $ k $ índices entre 1 e $ n $. Cada termo tem um coeficiente $ f_{i_1 \dots i_k}(x) $, uma função suave. O produto exterior $ dx_{i_1} \wedge \dots \wedge dx_{i_k} $ é completamente antissimétrico.</p>
 
         <h3>Exemplo: 2-forma em $ \mathbb{R}^4 $</h3>
         <p>As combinações $ i < j $ são:</p>
-        <div class="equation">
+        
           $$(1,2),\ (1,3),\ (1,4),\ (2,3),\ (2,4),\ (3,4)$$
-        </div>
+        
 
         <p>Portanto, uma 2-forma geral em $ \mathbb{R}^4 $ pode ser escrita como:</p>
-        <div class="equation">
+        
           $$\omega = f_{12}(x)\, dx_1 \wedge dx_2 + f_{13}(x)\, dx_1 \wedge dx_3 + f_{14}(x)\, dx_1 \wedge dx_4$$
           $$+ f_{23}(x)\, dx_2 \wedge dx_3 + f_{24}(x)\, dx_2 \wedge dx_4 + f_{34}(x)\, dx_3 \wedge dx_4$$
-        </div>
+        
 
         <p>A álgebra exterior tem uma base natural: os produtos $ dx_{i_1} \wedge \dots \wedge dx_{i_k} $ com índices ordenados.</p>
 
@@ -221,24 +220,26 @@
         <p>A álgebra exterior é construída para lidar com objetos antissimétricos, como áreas, volumes e orientações. Por isso, a base natural precisa refletir essa antissimetria.</p>
 
         <p>Vale anotar que:</p>
-        <div class="equation">
+        
           $$dx_1 \wedge dx_2 = -dx_2 \wedge dx_1$$
-        </div>
+        
         <p>Logo, $ dx_1 \wedge dx_2 $ e $ dx_2 \wedge dx_1 $ não são independentes.</p>
 
         <p>Para evitar redundância, só escolhemos uma ordenação crescente dos índices. Assim, a base das 2-formas é o conjunto dos produtos exteriores $ dx_i \wedge dx_j $ tais que $ 1 \le i < j \le n $.</p>
 
         <p>Em geral, a base da álgebra exterior de grau $ k $ é o conjunto:</p>
-        <div class="equation">
+        
           $$dx_{i_1} \wedge dx_{i_2} \wedge \dots \wedge dx_{i_k}, \quad \text{com } i_1 < i_2 < \dots < i_k$$
-        </div>
+
         <p>Esses produtos são linearmente independentes, totalmente antissimétricos, e formam uma base canônica da álgebra exterior de grau $ k $.</p>
+      </div>
       </section>
 
       <nav class="chapter-nav">
         <a href="cap14.html" class="nav-prev">← Capítulo Anterior</a>
         <a href="cap16.html" class="nav-next">Próximo Capítulo →</a>
       </nav>
+    
     </div>
     </main>
   </div>

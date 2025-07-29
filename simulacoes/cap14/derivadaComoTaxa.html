@@ -3,526 +3,930 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Derivada como Densidade de Variação</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>
+    <title>Derivada como Densidade de Variação - Diferenciação de Lebesgue</title>
     <style>
+        :root {
+            --primary-dark: #1a2b4c;
+            --primary-medium: #2c4a78;
+            --accent-blue: #4fc3f7;
+            --accent-green: #81c784;
+            --accent-orange: #ffb74d;
+            --accent-red: #ef5350;
+            --text-light: #e2e8f0;
+            --text-muted: #cbd5e1;
+            --simulation-panel-bg: rgba(15, 23, 42, 0.92);
+            --simulation-border: rgba(79, 195, 247, 0.3);
+        }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'EB Garamond', serif;
             margin: 0;
-            background: linear-gradient(135deg, #1e3c72, #2a5298);
-            color: white;
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary-medium));
+            color: var(--text-light);
             overflow-x: hidden;
         }
-        
+
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 1.5rem;
         }
-        
+
         .header {
             text-align: center;
-            margin-bottom: 30px;
-        }
-        
-        .controls {
-            background: rgba(0,0,0,0.3);
-            padding: 20px;
+            margin-bottom: 1.5rem;
+            background: var(--simulation-panel-bg);
+            backdrop-filter: blur(12px);
+            padding: 1.5rem;
             border-radius: 15px;
-            margin-bottom: 20px;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.1);
+            border: 1px solid var(--simulation-border);
         }
-        
-        .control-group {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-            align-items: center;
-            margin-bottom: 15px;
+
+        .title {
+            font-size: 2.2rem;
+            color: var(--accent-blue);
+            margin-bottom: 0.8rem;
         }
-        
-        .control-item {
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        .main-layout {
             display: flex;
             flex-direction: column;
-            gap: 5px;
+            gap: 1.5rem;
         }
-        
-        label {
-            font-size: 14px;
+
+        .interpretations-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        .interpretation-panel {
+            background: var(--simulation-panel-bg);
+            border-radius: 15px;
+            border: 1px solid var(--simulation-border);
+            height: 400px;
+            position: relative;
+        }
+
+        .canvas-label {
+            position: absolute;
+            top: 10px;
+            left: 15px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            font-weight: bold;
+            z-index: 10;
+            border: 1px solid var(--simulation-border);
+        }
+
+        .density-label { color: var(--accent-green); }
+        .linear-label { color: var(--accent-orange); }
+
+        #density-canvas, #linear-canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        .controls-panel {
+            background: var(--simulation-panel-bg);
+            border-radius: 15px;
+            border: 1px solid var(--simulation-border);
+            padding: 1.5rem;
+        }
+
+        .controls-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            align-items: start;
+        }
+
+        .compact-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .function-buttons {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.5rem;
+        }
+
+        .func-btn {
+            padding: 0.6rem 0.8rem;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--simulation-border);
+            border-radius: 6px;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+
+        .func-btn:hover {
+            background: rgba(79, 195, 247, 0.2);
+            border-color: var(--accent-blue);
+        }
+
+        .func-btn.active {
+            background: var(--accent-blue);
+            color: white;
+            font-weight: bold;
+        }
+
+        .slider-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .slider-row {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+
+        .slider-label {
+            color: var(--text-light);
+            font-size: 0.9rem;
             font-weight: 500;
-            color: #e2e8f0;
         }
-        
-        select, input[type="range"] {
-            padding: 8px 12px;
-            border: none;
-            border-radius: 8px;
-            background: rgba(255,255,255,0.15);
-            color: white;
-            backdrop-filter: blur(5px);
-            border: 1px solid rgba(255,255,255,0.2);
+
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
         }
-        
-        select option {
-            background: #2a5298;
-            color: white;
-        }
-        
+
         input[type="range"] {
-            width: 150px;
-            height: 6px;
-            background: rgba(255,255,255,0.2);
-            outline: none;
-            border-radius: 3px;
+            flex: 1;
+            height: 25px;
+            cursor: pointer;
+            appearance: none;
+            background: linear-gradient(90deg, var(--accent-blue), var(--accent-green));
+            border-radius: 12px;
+            border: none;
         }
-        
+
         input[type="range"]::-webkit-slider-thumb {
             appearance: none;
             width: 18px;
             height: 18px;
-            background: #60a5fa;
+            background: white;
             border-radius: 50%;
             cursor: pointer;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
         }
-        
+
         .value-display {
-            font-size: 12px;
-            color: #cbd5e1;
-            background: rgba(0,0,0,0.2);
-            padding: 4px 8px;
-            border-radius: 4px;
-            min-width: 60px;
-            text-align: center;
-        }
-        
-        .info-panel {
-            background: rgba(0,0,0,0.3);
-            padding: 20px;
-            border-radius: 15px;
-            margin-top: 20px;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-        
-        .formula {
-            background: rgba(0,0,0,0.2);
-            padding: 15px;
-            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
             font-family: 'Courier New', monospace;
-            font-size: 16px;
-            margin: 10px 0;
-            border-left: 4px solid #60a5fa;
-        }
-        
-        .explanation {
-            font-size: 14px;
-            line-height: 1.6;
-            margin-top: 15px;
-        }
-        
-        #canvas-container {
+            font-size: 0.85rem;
+            color: var(--accent-blue);
             text-align: center;
-            margin: 20px 0;
+            border: 1px solid var(--simulation-border);
+            min-width: 60px;
         }
-        
-        .legend {
-            display: flex;
-            justify-content: center;
-            gap: 30px;
-            margin-top: 15px;
-            flex-wrap: wrap;
+
+        .formula-section {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--simulation-border);
+            margin-bottom: 1rem;
         }
-        
-        .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 14px;
+
+        .formula-title {
+            color: var(--accent-blue);
+            font-size: 1rem;
+            margin-bottom: 0.8rem;
+            font-weight: bold;
+            border-bottom: 1px solid var(--simulation-border);
+            padding-bottom: 0.3rem;
         }
-        
-        .legend-color {
-            width: 20px;
-            height: 4px;
-            border-radius: 2px;
+
+        .formula-display {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 0.8rem;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.8rem;
+            color: var(--text-light);
+            white-space: pre-line;
+            line-height: 1.4;
+        }
+
+        .lebesgue-formula {
+            border-left: 3px solid var(--accent-green);
+            background: rgba(129, 199, 132, 0.1);
+        }
+
+        .linear-formula {
+            border-left: 3px solid var(--accent-orange);
+            background: rgba(255, 183, 77, 0.1);
+        }
+
+        .concept-box {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--simulation-border);
+            margin-bottom: 1rem;
+        }
+
+        .concept-title {
+            color: var(--accent-blue);
+            font-size: 0.95rem;
+            margin-bottom: 0.6rem;
+            font-weight: bold;
+        }
+
+        .concept-text {
+            font-size: 0.85rem;
+            line-height: 1.4;
+            color: var(--text-muted);
+        }
+
+        .highlight-value {
+            color: var(--accent-orange);
+            font-weight: bold;
+        }
+
+        .undefined-point {
+            color: var(--accent-red);
+            font-weight: bold;
+        }
+
+        @media (max-width: 1024px) {
+            .interpretations-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .controls-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            .title {
+                font-size: 1.8rem;
+            }
+            .interpretation-panel {
+                height: 300px;
+            }
+            .function-buttons {
+                grid-template-columns: repeat(2, 1fr);
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>🌊 Derivada como Densidade de Variação</h1>
-            <p>Visualização interativa do conceito de derivada através da analogia do fluxo em um tubo</p>
+            <h1 class="title">📊 Derivada como Densidade de Variação</h1>
+            <p class="subtitle">
+                Explore como a <strong>diferenciação de Lebesgue</strong> revela a derivada como densidade de fluxo,
+                funcionando mesmo para funções com <strong>descontinuidades pontuais</strong> onde a aproximação linear falha
+            </p>
         </div>
-        
-        <div class="controls">
-            <div class="control-group">
-                <div class="control-item">
-                    <label for="function-select">Função:</label>
-                    <select id="function-select">
-                        <option value="quadratic">f(x) = x²/4</option>
-                        <option value="cubic">f(x) = x³/12</option>
-                        <option value="sine">f(x) = 2sin(x/2)</option>
-                        <option value="exponential">f(x) = e^(x/3)</option>
-                    </select>
+
+        <div class="main-layout">
+            <div class="interpretations-container">
+                <div class="interpretation-panel">
+                    <div class="canvas-label density-label">
+                        📈 DENSIDADE DE FLUXO: f'(x) = lim [f(β) - f(α)]/(β - α) quando β,α → x
+                    </div>
+                    <canvas id="density-canvas"></canvas>
                 </div>
-                
-                <div class="control-item">
-                    <label for="interval-size">Tamanho do Intervalo (β - α):</label>
-                    <input type="range" id="interval-size" min="0.1" max="3" step="0.1" value="1">
-                    <div class="value-display" id="interval-display">1.0</div>
-                </div>
-                
-                <div class="control-item">
-                    <label for="point-x">Ponto x:</label>
-                    <input type="range" id="point-x" min="-2" max="6" step="0.1" value="2">
-                    <div class="value-display" id="point-display">2.0</div>
-                </div>
-                
-                <div class="control-item">
-                    <label for="show-particles">Mostrar Partículas:</label>
-                    <input type="checkbox" id="show-particles" checked>
+                <div class="interpretation-panel">
+                    <div class="canvas-label linear-label">
+                        📐 APROXIMAÇÃO LINEAR: y ≈ f(x) + f'(x)·(t-x)
+                    </div>
+                    <canvas id="linear-canvas"></canvas>
                 </div>
             </div>
-        </div>
-        
-        <div id="canvas-container"></div>
-        
-        <div class="legend">
-            <div class="legend-item">
-                <div class="legend-color" style="background: #60a5fa;"></div>
-                <span>Função f(x)</span>
-            </div>
-            <div class="legend-item">
-                <div class="legend-color" style="background: #ef4444;"></div>
-                <span>Intervalo [α, β]</span>
-            </div>
-            <div class="legend-item">
-                <div class="legend-color" style="background: #10b981;"></div>
-                <span>Densidade Média</span>
-            </div>
-            <div class="legend-item">
-                <div class="legend-color" style="background: #f59e0b;"></div>
-                <span>Taxa Instantânea (Derivada)</span>
-            </div>
-        </div>
-        
-        <div class="info-panel">
-            <h3>📊 Interpretação Física</h3>
-            <div class="formula" id="calculation-display">
-                Saldo Líquido: f(β) - f(α) = ?<br>
-                Densidade Média: [f(β) - f(α)] / (β - α) = ?<br>
-                Taxa Instantânea: f'(x) = ?
-            </div>
-            
-            <div class="explanation">
-                <strong>Analogia do Tubo:</strong> Imagine um tubo onde algo (massa, energia, carga) está fluindo. 
-                O <strong>saldo líquido</strong> representa o quanto foi acumulado no intervalo [α, β]. 
-                A <strong>densidade média</strong> é esse saldo dividido pelo comprimento do intervalo. 
-                Quando o intervalo se torna infinitesimalmente pequeno, obtemos a <strong>taxa instantânea</strong> 
-                de geração no ponto x, que é exatamente a derivada f'(x).
+
+            <div class="controls-panel">
+                <div class="controls-grid">
+                    <div class="compact-controls">
+                        <h3 style="color: var(--accent-blue); margin: 0 0 0.5rem 0; font-size: 1.1rem;">⚙️ Função</h3>
+                        <div class="function-buttons">
+                            <button class="func-btn active" data-func="quadratic">x²</button>
+                            <button class="func-btn" data-func="cubic">x³/3</button>
+                            <button class="func-btn" data-func="sine">sin(x)</button>
+                            <button class="func-btn" data-func="holes">Furos</button>
+                            <button class="func-btn" data-func="rational">x²/(x²-1)</button>
+                            <button class="func-btn" data-func="oscillating">Oscilante</button>
+                        </div>
+
+                        <div style="margin-top: 1rem;">
+                            <h3 style="color: var(--accent-blue); margin: 0 0 0.5rem 0; font-size: 1.1rem;">🌊 Taxa de Fluxo Instantânea</h3>
+                            <div class="concept-text">
+                                A derivada é a <strong>densidade de fluxo</strong>. Para um intervalo [α,β] contendo x:
+                                <br><br>
+                                <strong>f'(x) = lim[β,α→x] [f(β) - f(α)]/(β - α)</strong>
+                                <br><br>
+                                Funciona mesmo quando f(x) não está definida em pontos isolados, 
+                                pois mede o fluxo <em>através</em> do ponto, não <em>no</em> ponto.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="slider-controls">
+                        <h3 style="color: var(--accent-blue); margin: 0 0 0.5rem 0; font-size: 1.1rem;">🎛️ Controles</h3>
+                        <div class="slider-row">
+                            <span class="slider-label">Posição x:</span>
+                            <div class="slider-container">
+                                <input type="range" id="position-slider" min="-2.5" max="2.5" step="0.1" value="1">
+                                <div class="value-display" id="position-display">1.0</div>
+                            </div>
+                        </div>
+                        
+                        <div class="slider-row">
+                            <span class="slider-label">Semi-intervalo h:</span>
+                            <div class="slider-container">
+                                <input type="range" id="interval-slider" min="0.05" max="0.8" step="0.025" value="0.3">
+                                <div class="value-display" id="interval-display">0.30</div>
+                            </div>
+                        </div>
+
+                        <div style="margin-top: 1rem; display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                            <div class="formula-section">
+                                <h3 class="formula-title">🧮 Taxa de Fluxo (Lebesgue)</h3>
+                                <div class="formula-display lebesgue-formula" id="lebesgue-calc">
+                                    Calculando densidade de fluxo...
+                                </div>
+                            </div>
+
+                            <div class="formula-section">
+                                <h3 class="formula-title">📏 Aproximação Linear</h3>
+                                <div class="formula-display linear-formula" id="linear-calc">
+                                    Calculando aproximação linear...
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
-        let functions = {
+        // Estado global
+        let currentFunction = 'quadratic';
+        let position = 1.0;
+        let semiInterval = 0.3;
+        
+        // Canvas contexts
+        let densityCtx, linearCtx;
+        let densityCanvas, linearCanvas;
+
+        // Definições das funções com descontinuidades pontuais
+        const functions = {
             quadratic: {
-                name: 'f(x) = x²/4',
-                f: x => x * x / 4,
-                derivative: x => x / 2,
-                color: [96, 165, 250]
+                name: 'f(x) = x²',
+                f: x => x * x,
+                derivative: x => 2 * x,
+                color: '#4fc3f7',
+                holes: []
             },
             cubic: {
-                name: 'f(x) = x³/12',
-                f: x => x * x * x / 12,
-                derivative: x => x * x / 4,
-                color: [239, 68, 68]
+                name: 'f(x) = x³/3',
+                f: x => (x * x * x) / 3,
+                derivative: x => x * x,
+                color: '#81c784',
+                holes: []
             },
             sine: {
-                name: 'f(x) = 2sin(x/2)',
-                f: x => 2 * Math.sin(x / 2),
-                derivative: x => Math.cos(x / 2),
-                color: [16, 185, 129]
+                name: 'f(x) = sin(x)',
+                f: x => Math.sin(x),
+                derivative: x => Math.cos(x),
+                color: '#ffb74d',
+                holes: []
             },
-            exponential: {
-                name: 'f(x) = e^(x/3)',
-                f: x => Math.exp(x / 3),
-                derivative: x => Math.exp(x / 3) / 3,
-                color: [245, 158, 11]
+            holes: {
+                name: 'Furos pontuais',
+                f: x => {
+                    // Função não definida em x = ±1, ±0.5
+                    const holes = [-1, -0.5, 0.5, 1];
+                    if (holes.some(h => Math.abs(x - h) < 0.01)) return undefined;
+                    return x * x + Math.sin(3 * x) * 0.3;
+                },
+                derivative: x => {
+                    const holes = [-1, -0.5, 0.5, 1];
+                    if (holes.some(h => Math.abs(x - h) < 0.01)) return 2 * x + Math.cos(3 * x) * 0.9; // densidade via limite
+                    return 2 * x + Math.cos(3 * x) * 0.9;
+                },
+                color: '#ef5350',
+                holes: [-1, -0.5, 0.5, 1]
+            },
+            rational: {
+                name: 'Racional com polos',
+                f: x => {
+                    // f(x) = x²/(x²-1), não definida em x = ±1
+                    if (Math.abs(Math.abs(x) - 1) < 0.01) return undefined;
+                    const denom = x * x - 1;
+                    if (Math.abs(denom) < 0.001) return undefined;
+                    return (x * x) / denom;
+                },
+                derivative: x => {
+                    // f'(x) = -2x/(x²-1)² via regra do quociente
+                    const denom = x * x - 1;
+                    if (Math.abs(denom) < 0.001) return 0; // densidade limitada via Lebesgue
+                    return (-2 * x) / (denom * denom);
+                },
+                color: '#9c27b0',
+                holes: [-1, 1]
+            },
+            oscillating: {
+                name: 'Oscilante com furos',
+                f: x => {
+                    // Função não definida em múltiplos de 0.4
+                    const holes = [-1.2, -0.8, -0.4, 0, 0.4, 0.8, 1.2];
+                    if (holes.some(h => Math.abs(x - h) < 0.02)) return undefined;
+                    return Math.sin(5 * x) * x * x * 0.5 + x;
+                },
+                derivative: x => {
+                    // Derivada existe via densidade mesmo nos furos
+                    return Math.cos(5 * x) * x * x * 2.5 + Math.sin(5 * x) * x + 1;
+                },
+                color: '#ff5722',
+                holes: [-1.2, -0.8, -0.4, 0, 0.4, 0.8, 1.2]
             }
         };
-        
-        let currentFunction = 'quadratic';
-        let intervalSize = 1.0;
-        let pointX = 2.0;
-        let showParticles = true;
-        let particles = [];
-        let time = 0;
-        
-        function setup() {
-            let canvas = createCanvas(800, 600);
-            canvas.parent('canvas-container');
-            
-            // Initialize particles
-            for (let i = 0; i < 60; i++) {
-                particles.push({
-                    x: random(width),
-                    y: height/2 + random(-30, 30),
-                    baseY: height/2,
-                    speed: random(0.5, 2),
-                    phase: random(TWO_PI),
-                    size: random(2, 5),
-                    color: random(['#60a5fa', '#ef4444', '#10b981', '#f59e0b'])
-                });
-            }
-            
+
+        function init() {
+            // Setup canvas
+            densityCanvas = document.getElementById('density-canvas');
+            densityCanvas.width = densityCanvas.offsetWidth;
+            densityCanvas.height = densityCanvas.offsetHeight;
+            densityCtx = densityCanvas.getContext('2d');
+
+            linearCanvas = document.getElementById('linear-canvas');
+            linearCanvas.width = linearCanvas.offsetWidth;
+            linearCanvas.height = linearCanvas.offsetHeight;
+            linearCtx = linearCanvas.getContext('2d');
+
             setupControls();
+            render();
         }
-        
-        function draw() {
-            // Dark gradient background
-            for (let i = 0; i <= height; i++) {
-                let inter = map(i, 0, height, 0, 1);
-                let c = lerpColor(color(30, 60, 114), color(42, 82, 152), inter);
-                stroke(c);
-                line(0, i, width, i);
-            }
-            
-            time += 0.02;
-            
-            drawCoordinateSystem();
-            drawFunction();
-            drawInterval();
-            
-            if (showParticles) {
-                drawParticles();
-            }
-            
-            drawInfoBox();
+
+        function setupControls() {
+            // Botões de função
+            document.querySelectorAll('.func-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    document.querySelectorAll('.func-btn').forEach(b => b.classList.remove('active'));
+                    e.target.classList.add('active');
+                    currentFunction = e.target.dataset.func;
+                    render();
+                });
+            });
+
+            document.getElementById('position-slider').addEventListener('input', (e) => {
+                position = parseFloat(e.target.value);
+                document.getElementById('position-display').textContent = position.toFixed(1);
+                render();
+            });
+
+            document.getElementById('interval-slider').addEventListener('input', (e) => {
+                semiInterval = parseFloat(e.target.value);
+                document.getElementById('interval-display').textContent = semiInterval.toFixed(2);
+                render();
+            });
+        }
+
+        function render() {
+            drawDensityView();
+            drawLinearView();
             updateCalculations();
         }
-        
-        function drawCoordinateSystem() {
-            stroke(255, 255, 255, 100);
-            strokeWeight(1);
+
+        function drawDensityView() {
+            const ctx = densityCtx;
+            const canvas = densityCanvas;
+            const w = canvas.width;
+            const h = canvas.height;
             
-            // Grid lines
-            for (let x = 0; x <= width; x += 40) {
-                line(x, 0, x, height);
+            ctx.clearRect(0, 0, w, h);
+            
+            // Background
+            const gradient = ctx.createLinearGradient(0, 0, 0, h);
+            gradient.addColorStop(0, '#1a2b4c');
+            gradient.addColorStop(1, '#2c4a78');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, w, h);
+
+            const func = functions[currentFunction];
+            
+            drawGrid(ctx, w, h);
+            drawFunction(ctx, w, h, func);
+            drawFluxDensityCalculation(ctx, w, h, func);
+        }
+
+        function drawLinearView() {
+            const ctx = linearCtx;
+            const canvas = linearCanvas;
+            const w = canvas.width;
+            const h = canvas.height;
+            
+            ctx.clearRect(0, 0, w, h);
+            
+            // Background
+            const gradient = ctx.createLinearGradient(0, 0, 0, h);
+            gradient.addColorStop(0, '#4a6741');
+            gradient.addColorStop(1, '#3a4b3d');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, w, h);
+
+            const func = functions[currentFunction];
+            
+            drawGrid(ctx, w, h);
+            drawFunction(ctx, w, h, func);
+            drawLinearApproximation(ctx, w, h, func);
+        }
+
+        function drawGrid(ctx, w, h) {
+            // Grid básico
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+            ctx.lineWidth = 1;
+            
+            for (let x = 0; x <= w; x += 40) {
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, h);
+                ctx.stroke();
             }
-            for (let y = 0; y <= height; y += 40) {
-                line(0, y, width, y);
+            
+            for (let y = 0; y <= h; y += 40) {
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(w, y);
+                ctx.stroke();
             }
             
-            // Main axes
-            stroke(255, 255, 255, 200);
-            strokeWeight(2);
-            line(0, height/2, width, height/2); // x-axis
-            line(width/2, 0, width/2, height); // y-axis
+            // Eixos principais
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+            ctx.lineWidth = 2;
             
-            // Axis labels
-            fill(255, 255, 255, 180);
-            noStroke();
-            textAlign(CENTER);
-            textSize(12);
+            ctx.beginPath();
+            ctx.moveTo(0, h/2);
+            ctx.lineTo(w, h/2);
+            ctx.stroke();
             
-            for (let i = -4; i <= 4; i++) {
-                if (i !== 0) {
-                    let x = map(i, -4, 4, 0, width);
-                    text(i, x, height/2 + 20);
+            ctx.beginPath();
+            ctx.moveTo(w/2, 0);
+            ctx.lineTo(w/2, h);
+            ctx.stroke();
+        }
+
+        function drawFunction(ctx, w, h, func) {
+            ctx.strokeStyle = func.color;
+            ctx.lineWidth = 3;
+            
+            ctx.beginPath();
+            let started = false;
+            
+            for (let px = 50; px <= w - 50; px += 2) {
+                const x = mapValue(px, 50, w - 50, -3, 3);
+                const y = func.f(x);
+                
+                if (y !== undefined && !isNaN(y) && isFinite(y)) {
+                    const py = mapValue(y, -3, 4, h - 50, 50);
+                    
+                    if (py >= 0 && py <= h) {
+                        if (!started || ctx.currentX === undefined || Math.abs(px - ctx.currentX) > 10) {
+                            ctx.moveTo(px, py);
+                            started = true;
+                        } else {
+                            ctx.lineTo(px, py);
+                        }
+                        ctx.currentX = px;
+                    }
+                } else {
+                    started = false;
+                    ctx.currentX = undefined;
                 }
             }
+            ctx.stroke();
             
-            for (let i = -3; i <= 3; i++) {
-                if (i !== 0) {
-                    let y = map(i, -3, 3, height - 50, 50);
-                    text(i, width/2 + 20, y);
+            // Marcar furos/descontinuidades
+            ctx.fillStyle = '#ef5350';
+            func.holes.forEach(holeX => {
+                const px = mapValue(holeX, -3, 3, 50, w - 50);
+                if (px >= 50 && px <= w - 50) {
+                    // Círculo vazio indicando furo
+                    ctx.beginPath();
+                    ctx.arc(px, h/2, 8, 0, 2 * Math.PI);
+                    ctx.strokeStyle = '#ef5350';
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                    
+                    // X indicando indefinido
+                    ctx.strokeStyle = '#ef5350';
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.moveTo(px - 6, h/2 - 6);
+                    ctx.lineTo(px + 6, h/2 + 6);
+                    ctx.moveTo(px + 6, h/2 - 6);
+                    ctx.lineTo(px - 6, h/2 + 6);
+                    ctx.stroke();
                 }
+            });
+        }
+
+        function drawFluxDensityCalculation(ctx, w, h, func) {
+            const alpha = position - semiInterval;
+            const beta = position + semiInterval;
+            
+            const alphaX = mapValue(alpha, -3, 3, 50, w - 50);
+            const betaX = mapValue(beta, -3, 3, 50, w - 50);
+            const centerX = mapValue(position, -3, 3, 50, w - 50);
+            
+            // Intervalo [α, β]
+            ctx.fillStyle = 'rgba(129, 199, 132, 0.2)';
+            ctx.fillRect(alphaX, 50, betaX - alphaX, h - 100);
+            
+            // Bordas α e β
+            ctx.strokeStyle = '#81c784';
+            ctx.lineWidth = 3;
+            
+            [alphaX, betaX].forEach((x, i) => {
+                ctx.beginPath();
+                ctx.moveTo(x, 60);
+                ctx.lineTo(x, h - 60);
+                ctx.stroke();
+                
+                // Labels
+                ctx.fillStyle = '#81c784';
+                ctx.font = '14px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText(i === 0 ? 'α' : 'β', x, h - 15);
+            });
+            
+            // Ponto central x
+            ctx.strokeStyle = '#ffb74d';
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            ctx.moveTo(centerX, 70);
+            ctx.lineTo(centerX, h - 70);
+            ctx.stroke();
+            
+            ctx.fillStyle = '#ffb74d';
+            ctx.font = '14px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('x', centerX, h - 15);
+            
+            // Valores da função (se definidos)
+            const alphaVal = func.f(alpha);
+            const betaVal = func.f(beta);
+            
+            if (alphaVal !== undefined && betaVal !== undefined) {
+                const alphaY = mapValue(alphaVal, -3, 4, h - 50, 50);
+                const betaY = mapValue(betaVal, -3, 4, h - 50, 50);
+                
+                // Pontos nos extremos
+                ctx.fillStyle = '#ef5350';
+                [[alphaX, alphaY], [betaX, betaY]].forEach(([x, y]) => {
+                    ctx.beginPath();
+                    ctx.arc(x, y, 6, 0, 2 * Math.PI);
+                    ctx.fill();
+                });
+                
+                // Linha de fluxo total
+                ctx.strokeStyle = '#ef5350';
+                ctx.lineWidth = 3;
+                ctx.setLineDash([8, 4]);
+                ctx.beginPath();
+                ctx.moveTo(alphaX, alphaY);
+                ctx.lineTo(betaX, betaY);
+                ctx.stroke();
+                ctx.setLineDash([]);
+                
+                // Seta indicando direção do fluxo
+                const dx = betaX - alphaX;
+                const dy = betaY - alphaY;
+                const len = Math.sqrt(dx*dx + dy*dy);
+                const ux = dx / len;
+                const uy = dy / len;
+                
+                const midX = (alphaX + betaX) / 2;
+                const midY = (alphaY + betaY) / 2;
+                
+                ctx.strokeStyle = '#ef5350';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.moveTo(midX - ux * 15, midY - uy * 15);
+                ctx.lineTo(midX + ux * 15, midY + uy * 15);
+                ctx.lineTo(midX + ux * 10 - uy * 5, midY + uy * 10 + ux * 5);
+                ctx.moveTo(midX + ux * 15, midY + uy * 15);
+                ctx.lineTo(midX + ux * 10 + uy * 5, midY + uy * 10 - ux * 5);
+                ctx.stroke();
             }
         }
-        
-        function drawFunction() {
-            let func = functions[currentFunction];
-            stroke(func.color[0], func.color[1], func.color[2]);
-            strokeWeight(3);
-            noFill();
+
+        function drawLinearApproximation(ctx, w, h, func) {
+            const centerX = mapValue(position, -3, 3, 50, w - 50);
+            const centerVal = func.f(position);
+            const derivative = func.derivative(position);
             
-            beginShape();
-            for (let px = 0; px <= width; px += 2) {
-                let x = map(px, 0, width, -4, 4);
-                let y = func.f(x);
-                let py = map(y, -3, 3, height - 50, 50);
+            // Verificar se f(x) está definida no ponto
+            if (centerVal === undefined) {
+                // Marcar ponto indefinido
+                ctx.fillStyle = '#ef5350';
+                ctx.beginPath();
+                ctx.arc(centerX, h/2, 12, 0, 2 * Math.PI);
+                ctx.strokeStyle = '#ef5350';
+                ctx.lineWidth = 3;
+                ctx.stroke();
                 
-                if (py >= 0 && py <= height) {
-                    vertex(px, py);
-                }
+                // X grande indicando indefinido
+                ctx.strokeStyle = '#ef5350';
+                ctx.lineWidth = 4;
+                ctx.beginPath();
+                ctx.moveTo(centerX - 10, h/2 - 10);
+                ctx.lineTo(centerX + 10, h/2 + 10);
+                ctx.moveTo(centerX + 10, h/2 - 10);
+                ctx.lineTo(centerX - 10, h/2 + 10);
+                ctx.stroke();
+                
+                // Texto explicativo
+                ctx.fillStyle = '#ef5350';
+                ctx.font = 'bold 16px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText('INDEFINIDO', centerX, h/2 + 35);
+                ctx.fillText('Aproximação linear falha!', centerX, h/2 + 55);
+                
+                return;
             }
-            endShape();
             
-            // Function label
-            fill(func.color[0], func.color[1], func.color[2]);
-            noStroke();
-            textAlign(LEFT);
-            textSize(16);
-            text(func.name, 20, 30);
-        }
-        
-        function drawInterval() {
-            let func = functions[currentFunction];
+            const centerY = mapValue(centerVal, -3, 4, h - 50, 50);
             
-            // Calculate α and β
-            let alpha = pointX - intervalSize / 2;
-            let beta = pointX + intervalSize / 2;
+            // Ponto central
+            ctx.fillStyle = '#ffb74d';
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, 8, 0, 2 * Math.PI);
+            ctx.fill();
             
-            // Convert to pixel coordinates
-            let alphaX = map(alpha, -4, 4, 0, width);
-            let betaX = map(beta, -4, 4, 0, width);
-            let pointPX = map(pointX, -4, 4, 0, width);
+            // Reta tangente (aproximação linear)
+            ctx.strokeStyle = '#81c784';
+            ctx.lineWidth = 4;
             
-            let alphaY = map(func.f(alpha), -3, 3, height - 50, 50);
-            let betaY = map(func.f(beta), -3, 3, height - 50, 50);
-            let pointY = map(func.f(pointX), -3, 3, height - 50, 50);
+            const tanLength = 200;
+            const scale = (w - 100) / 6;
             
-            // Draw interval on x-axis
-            stroke(239, 68, 68, 200);
-            strokeWeight(6);
-            line(alphaX, height/2 - 10, betaX, height/2 - 10);
+            const leftTanX = centerX - tanLength/2;
+            const rightTanX = centerX + tanLength/2;
+            const leftTanY = centerY - derivative * (tanLength/2) / scale;
+            const rightTanY = centerY + derivative * (tanLength/2) / scale;
             
-            // Draw vertical lines
-            stroke(239, 68, 68, 150);
-            strokeWeight(2);
-            strokeDasharray([5, 5]);
-            line(alphaX, height/2 - 10, alphaX, alphaY);
-            line(betaX, height/2 - 10, betaX, betaY);
-            line(pointPX, height/2 - 10, pointPX, pointY);
-            strokeDasharray([]);
+            ctx.beginPath();
+            ctx.moveTo(leftTanX, leftTanY);
+            ctx.lineTo(rightTanX, rightTanY);
+            ctx.stroke();
             
-            // Draw points
-            fill(239, 68, 68);
-            noStroke();
-            ellipse(alphaX, alphaY, 8);
-            ellipse(betaX, betaY, 8);
-            
-            fill(245, 158, 11);
-            ellipse(pointPX, pointY, 10);
-            
-            // Draw average rate line
-            stroke(16, 185, 129, 180);
-            strokeWeight(2);
-            line(alphaX, alphaY, betaX, betaY);
-            
-            // Draw instantaneous rate (tangent line)
-            let derivative = func.derivative(pointX);
-            let tangentLength = 100;
-            let tangentX1 = pointPX - tangentLength/2;
-            let tangentX2 = pointPX + tangentLength/2;
-            let tangentY1 = pointY - derivative * tangentLength/2 * (width/8); // Scale factor
-            let tangentY2 = pointY + derivative * tangentLength/2 * (width/8);
-            
-            stroke(245, 158, 11, 200);
-            strokeWeight(3);
-            line(tangentX1, tangentY1, tangentX2, tangentY2);
-            
-            // Labels
-            fill(255);
-            noStroke();
-            textAlign(CENTER);
-            textSize(14);
-            text('α', alphaX, height/2 + 35);
-            text('β', betaX, height/2 + 35);
-            text('x', pointPX, height/2 + 35);
-        }
-        
-        function drawParticles() {
-            let func = functions[currentFunction];
-            
-            for (let particle of particles) {
-                // Move particles
-                particle.x += particle.speed;
-                if (particle.x > width + 10) {
-                    particle.x = -10;
+            // Mostra alguns pontos da aproximação vs função real
+            const testPoints = [-0.6, -0.3, 0.3, 0.6];
+            testPoints.forEach(offset => {
+                const testX = position + offset;
+                const testPx = mapValue(testX, -3, 3, 50, w - 50);
+                
+                if (testPx >= 50 && testPx <= w - 50) {
+                    // Valor real da função
+                    const realY = func.f(testX);
+                    
+                    // Aproximação linear: f(x) + f'(x)(t-x)
+                    const approxY = centerVal + derivative * (testX - position);
+                    const approxPy = mapValue(approxY, -3, 4, h - 50, 50);
+                    
+                    // Ponto da aproximação
+                    ctx.fillStyle = '#81c784';
+                    ctx.beginPath();
+                    ctx.arc(testPx, approxPy, 5, 0, 2 * Math.PI);
+                    ctx.fill();
+                    
+                    if (realY !== undefined && !isNaN(realY) && isFinite(realY)) {
+                        const realPy = mapValue(realY, -3, 4, h - 50, 50);
+                        
+                        // Ponto real
+                        ctx.fillStyle = func.color;
+                        ctx.beginPath();
+                        ctx.arc(testPx, realPy, 5, 0, 2 * Math.PI);
+                        ctx.fill();
+                        
+                        // Linha conectando (erro)
+                        ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
+                        ctx.lineWidth = 1;
+                        ctx.setLineDash([3, 3]);
+                        ctx.beginPath();
+                        ctx.moveTo(testPx, realPy);
+                        ctx.lineTo(testPx, approxPy);
+                        ctx.stroke();
+                        ctx.setLineDash([]);
+                    } else {
+                        // Se o ponto real é indefinido, marcar com X
+                        ctx.strokeStyle = '#ef5350';
+                        ctx.lineWidth = 2;
+                        ctx.beginPath();
+                        ctx.moveTo(testPx - 4, approxPy - 4);
+                        ctx.lineTo(testPx + 4, approxPy + 4);
+                        ctx.moveTo(testPx + 4, approxPy - 4);
+                        ctx.lineTo(testPx - 4, approxPy + 4);
+                        ctx.stroke();
+                    }
                 }
-                
-                // Oscillate based on derivative at current position
-                let worldX = map(particle.x, 0, width, -4, 4);
-                let oscillation = Math.sin(time + particle.phase) * 15;
-                let derivativeEffect = func.derivative(worldX) * 10;
-                particle.y = particle.baseY + oscillation + derivativeEffect;
-                
-                // Draw particle
-                fill(particle.color + '80'); // Add transparency
-                noStroke();
-                ellipse(particle.x, particle.y, particle.size);
-                
-                // Trail effect
-                fill(particle.color + '40');
-                ellipse(particle.x - particle.speed * 2, particle.y, particle.size * 0.7);
-                ellipse(particle.x - particle.speed * 4, particle.y, particle.size * 0.4);
-            }
+            });
         }
-        
-        function drawInfoBox() {
-            // Semi-transparent background
-            fill(0, 0, 0, 100);
-            noStroke();
-            rect(width - 280, 10, 270, 120, 10);
-            
-            fill(255);
-            textAlign(LEFT);
-            textSize(12);
-            text('Interpretação Física:', width - 270, 30);
-            text('• Azul: Função f(x)', width - 270, 50);
-            text('• Vermelho: Intervalo [α, β]', width - 270, 70);
-            text('• Verde: Densidade média', width - 270, 90);
-            text('• Amarelo: Taxa instantânea (derivada)', width - 270, 110);
-        }
-        
+
         function updateCalculations() {
-            let func = functions[currentFunction];
-            let alpha = pointX - intervalSize / 2;
-            let beta = pointX + intervalSize / 2;
+            const func = functions[currentFunction];
+            const alpha = position - semiInterval;
+            const beta = position + semiInterval;
             
-            let fAlpha = func.f(alpha);
-            let fBeta = func.f(beta);
-            let netFlow = fBeta - fAlpha;
-            let avgDensity = netFlow / intervalSize;
-            let instantRate = func.derivative(pointX);
+            // Cálculo da densidade de fluxo
+            const leftVal = func.f(alpha);
+            const rightVal = func.f(beta);
+            const centerVal = func.f(position);
+            const exactDerivative = func.derivative(position);
             
-            let calcDisplay = document.getElementById('calculation-display');
-            calcDisplay.innerHTML = `
-                Saldo Líquido: f(${beta.toFixed(2)}) - f(${alpha.toFixed(2)}) = ${netFlow.toFixed(3)}<br>
-                Densidade Média: ${netFlow.toFixed(3)} / ${intervalSize.toFixed(2)} = ${avgDensity.toFixed(3)}<br>
-                Taxa Instantânea: f'(${pointX.toFixed(1)}) = ${instantRate.toFixed(3)}
-            `;
+            let lebesgueText = `Taxa de Fluxo no Intervalo [α,β]:\n\n`;
+            lebesgueText += `α = ${alpha.toFixed(3)}, β = ${beta.toFixed(3)}\n`;
+            lebesgueText += `Tamanho do intervalo = β - α = ${(2 * semiInterval).toFixed(3)}\n\n`;
+            
+            if (leftVal !== undefined && rightVal !== undefined) {
+                const totalVariation = rightVal - leftVal;
+                const densityApprox = totalVariation / (2 * semiInterval);
+                const densityError = Math.abs(densityApprox - exactDerivative);
+                
+                lebesgueText += `f(α) = ${leftVal.toFixed(3)}\n`;
+                lebesgueText += `f(β) = ${rightVal.toFixed(3)}\n\n`;
+                lebesgueText += `Fluxo Total = f(β) - f(α) = ${totalVariation.toFixed(3)}\n`;
+                lebesgueText += `Densidade ≈ ${totalVariation.toFixed(3)} / ${(2 * semiInterval).toFixed(3)} = ${densityApprox.toFixed(3)}\n\n`;
+                lebesgueText += `f'(${position.toFixed(2)}) exato = ${exactDerivative.toFixed(3)}\n`;
+                lebesgueText += `Erro = ${densityError.toFixed(4)}`;
+            } else {
+                lebesgueText += `f(α) = ${leftVal !== undefined ? leftVal.toFixed(3) : 'INDEFINIDO'}\n`;
+                lebesgueText += `f(β) = ${rightVal !== undefined ? rightVal.toFixed(3) : 'INDEFINIDO'}\n\n`;
+                lebesgueText += `⚠️ Alguns pontos indefinidos no intervalo,\n`;
+                lebesgueText += `mas densidade existe via limite:\n`;
+                lebesgueText += `f'(${position.toFixed(2)}) = ${exactDerivative.toFixed(3)}`;
+            }
+            
+            document.getElementById('lebesgue-calc').textContent = lebesgueText;
+            
+            // Aproximação linear
+            let linearText = `Aproximação Linear no ponto x = ${position.toFixed(2)}:\n\n`;
+            
+            if (centerVal !== undefined) {
+                linearText += `f(${position.toFixed(2)}) = ${centerVal.toFixed(3)}\n`;
+                linearText += `f'(${position.toFixed(2)}) = ${exactDerivative.toFixed(3)}\n\n`;
+                linearText += `Fórmula: y ≈ f(x) + f'(x)·(t-x)\n`;
+                linearText += `       y ≈ ${centerVal.toFixed(3)} + ${exactDerivative.toFixed(3)}·(t-${position.toFixed(2)})\n\n`;
+                linearText += `✅ Aproximação linear válida!\n`;
+                linearText += `A MESMA derivada calculada como densidade.`;
+            } else {
+                linearText += `f(${position.toFixed(2)}) = INDEFINIDO\n`;
+                linearText += `f'(${position.toFixed(2)}) = ${exactDerivative.toFixed(3)} (via densidade)\n\n`;
+                linearText += `❌ Aproximação linear FALHA!\n`;
+                linearText += `Não podemos usar f(x) + f'(x)·(t-x)\n`;
+                linearText += `quando f(x) não existe.\n\n`;
+                linearText += `Mas a derivada como DENSIDADE\n`;
+                linearText += `ainda existe e faz sentido!`;
+            }
+            
+            document.getElementById('linear-calc').textContent = linearText;
         }
+
+        function mapValue(value, fromMin, fromMax, toMin, toMax) {
+            return (value - fromMin) * (toMax - toMin) / (fromMax - fromMin) + toMin;
+        }
+
+        // Inicialização
+        window.addEventListener('load', init);
         
-        function setupControls() {
-            document.getElementById('function-select').addEventListener('change', (e) => {
-                currentFunction = e.target.value;
-            });
-            
-            document.getElementById('interval-size').addEventListener('input', (e) => {
-                intervalSize = parseFloat(e.target.value);
-                document.getElementById('interval-display').textContent = intervalSize.toFixed(1);
-            });
-            
-            document.getElementById('point-x').addEventListener('input', (e) => {
-                pointX = parseFloat(e.target.value);
-                document.getElementById('point-display').textContent = pointX.toFixed(1);
-            });
-            
-            document.getElementById('show-particles').addEventListener('change', (e) => {
-                showParticles = e.target.checked;
-            });
-        }
-        
-        // Helper function for dashed lines (p5.js doesn't have built-in support)
-        function strokeDasharray(pattern) {
-            // This is a simplified implementation
-            // In practice, you might need a more sophisticated dashing function
-        }
+        window.addEventListener('resize', () => {
+            densityCanvas.width = densityCanvas.offsetWidth;
+            densityCanvas.height = densityCanvas.offsetHeight;
+            linearCanvas.width = linearCanvas.offsetWidth;
+            linearCanvas.height = linearCanvas.offsetHeight;
+            render();
+        });
     </script>
 </body>
 </html>

@@ -6,233 +6,419 @@
     <title>Variação de Ângulo - Integral de Linha</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        :root {
+            /* Cores do tema Árvore */
+            --primary-dark: #1a2b4c;
+            --primary-medium: #2c4a78;
+            --primary-light: #4a6741;
+            --primary-extra-light: #3a4b3d;
+            --accent-blue: #4fc3f7;
+            --accent-green: #81c784;
+            --accent-orange: #ffb74d;
+            --wood-dark: #6d4c41;
+            --wood-light: #8d6e63;
+            --leaf-green: #4caf50;
+            
+            /* Cores específicas da simulação */
+            --simulation-bg: rgba(15, 23, 42, 0.95);
+            --simulation-panel-bg: rgba(26, 43, 76, 0.9);
+            --simulation-border: rgba(79, 195, 247, 0.3);
+            --simulation-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            --simulation-accent: var(--accent-blue);
+            --simulation-accent-secondary: var(--accent-green);
+            --simulation-accent-tertiary: var(--accent-orange);
+            --text-light: #e2e8f0;
+            --text-muted: #cbd5e1;
+            --transition-smooth: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        * {
             margin: 0;
-            background: linear-gradient(135deg, #0f172a, #1e293b, #334155);
-            color: white;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'EB Garamond', serif;
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary-medium), var(--primary-light));
+            color: var(--text-light);
+            min-height: 100vh;
             overflow-x: hidden;
         }
-        
-        .container {
-            max-width: 1400px;
+
+        /* Container principal da simulação */
+        .simulation-main-container {
+            max-width: 1600px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 2rem;
+            min-height: 100vh;
         }
-        
-        .header {
+
+        /* Cabeçalho da simulação */
+        .simulation-header {
             text-align: center;
-            margin-bottom: 30px;
+            padding: 2rem;
+            background: var(--simulation-panel-bg);
+            border-radius: 20px;
+            margin-bottom: 2rem;
+            backdrop-filter: blur(15px);
+            border: 1px solid var(--simulation-border);
+            box-shadow: var(--simulation-shadow);
         }
-        
-        .main-content {
+
+        .simulation-title {
+            font-size: 2.5rem;
+            color: var(--simulation-accent);
+            margin-bottom: 1rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .simulation-subtitle {
+            font-size: 1.3rem;
+            color: var(--text-muted);
+            font-weight: 300;
+        }
+
+        /* Grid de conteúdo */
+        .simulation-content-grid {
             display: grid;
-            grid-template-columns: 1fr 380px;
-            gap: 20px;
+            grid-template-columns: 1fr 400px;
+            gap: 2rem;
             align-items: start;
         }
-        
-        .simulation-area {
-            background: rgba(0,0,0,0.3);
-            border-radius: 15px;
-            padding: 20px;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.1);
+
+        /* Área visual principal */
+        .simulation-visual-area {
+            background: var(--simulation-panel-bg);
+            border-radius: 20px;
+            padding: 2rem;
+            backdrop-filter: blur(15px);
+            border: 1px solid var(--simulation-border);
+            box-shadow: var(--simulation-shadow);
+            position: relative;
+            overflow: hidden;
         }
-        
-        .controls-panel {
-            background: rgba(0,0,0,0.3);
-            border-radius: 15px;
-            padding: 20px;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.1);
+
+        /* Painel de controles */
+        .simulation-controls-panel {
+            background: var(--simulation-panel-bg);
+            border-radius: 20px;
+            padding: 2rem;
+            backdrop-filter: blur(15px);
+            border: 1px solid var(--simulation-border);
+            box-shadow: var(--simulation-shadow);
             height: fit-content;
+            position: sticky;
+            top: 2rem;
         }
-        
-        .control-group {
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
+
+        /* Grupos de controles */
+        .simulation-control-group {
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--simulation-border);
         }
-        
-        .control-group:last-child {
+
+        .simulation-control-group:last-child {
             border-bottom: none;
             margin-bottom: 0;
         }
-        
-        .control-group h3 {
-            margin: 0 0 15px 0;
-            color: #60a5fa;
-            font-size: 16px;
-        }
-        
-        .control-item {
+
+        .simulation-control-group-title {
+            color: var(--simulation-accent);
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
             display: flex;
-            flex-direction: column;
-            gap: 8px;
-            margin-bottom: 15px;
+            align-items: center;
+            gap: 0.5rem;
         }
-        
-        .control-item:last-child {
+
+        /* Itens de controle */
+        .simulation-control-item {
+            margin-bottom: 1.5rem;
+        }
+
+        .simulation-control-item:last-child {
             margin-bottom: 0;
         }
-        
-        label {
-            font-size: 14px;
+
+        .simulation-control-label {
+            display: block;
+            font-size: 1rem;
             font-weight: 500;
-            color: #e2e8f0;
+            color: var(--text-light);
+            margin-bottom: 0.8rem;
         }
-        
-        select, input[type="range"] {
-            padding: 8px 12px;
-            border: none;
-            border-radius: 8px;
-            background: rgba(255,255,255,0.15);
-            color: white;
-            backdrop-filter: blur(5px);
-            border: 1px solid rgba(255,255,255,0.2);
-        }
-        
-        select option {
-            background: #2a5298;
-            color: white;
-        }
-        
-        input[type="range"] {
+
+        /* Seletores e inputs */
+        .simulation-select,
+        .simulation-slider {
             width: 100%;
-            height: 6px;
-            background: rgba(255,255,255,0.2);
-            outline: none;
-            border-radius: 3px;
+            padding: 0.8rem 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--simulation-border);
+            border-radius: 10px;
+            color: var(--text-light);
+            font-size: 1rem;
+            transition: var(--transition-smooth);
+            backdrop-filter: blur(5px);
         }
-        
-        input[type="range"]::-webkit-slider-thumb {
+
+        .simulation-select:hover,
+        .simulation-slider:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: var(--simulation-accent);
+        }
+
+        .simulation-select:focus,
+        .simulation-slider:focus {
+            outline: none;
+            border-color: var(--simulation-accent);
+            box-shadow: 0 0 0 3px rgba(79, 195, 247, 0.2);
+        }
+
+        .simulation-select option {
+            background: var(--primary-dark);
+            color: var(--text-light);
+        }
+
+        /* Sliders customizados */
+        .simulation-slider {
+            -webkit-appearance: none;
             appearance: none;
-            width: 18px;
-            height: 18px;
-            background: #60a5fa;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+            padding: 0;
+        }
+
+        .simulation-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: var(--simulation-accent);
             border-radius: 50%;
             cursor: pointer;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+            transition: var(--transition-smooth);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
         }
-        
-        .value-display {
-            font-size: 12px;
-            color: #cbd5e1;
-            background: rgba(0,0,0,0.3);
-            padding: 6px 10px;
-            border-radius: 6px;
+
+        .simulation-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(79, 195, 247, 0.4);
+        }
+
+        .simulation-slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            background: var(--simulation-accent);
+            border-radius: 50%;
+            cursor: pointer;
+            border: none;
+            transition: var(--transition-smooth);
+        }
+
+        /* Display de valores */
+        .simulation-value-display {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 0.6rem 1rem;
+            border-radius: 8px;
             text-align: center;
             font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            color: var(--simulation-accent);
+            margin-top: 0.5rem;
+            border: 1px solid rgba(79, 195, 247, 0.2);
         }
-        
-        .button {
-            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-            border: none;
-            color: white;
-            padding: 12px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 500;
-            transition: all 0.3s ease;
+
+        /* Botões de ação */
+        .simulation-action-btn {
             width: 100%;
-            margin: 5px 0;
+            padding: 1rem 1.5rem;
+            background: linear-gradient(135deg, var(--simulation-accent), rgba(79, 195, 247, 0.8));
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            margin: 0.5rem 0;
+            position: relative;
+            overflow: hidden;
         }
-        
-        .button:hover {
-            background: linear-gradient(135deg, #2563eb, #1e40af);
+
+        .simulation-action-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+            box-shadow: 0 8px 25px rgba(79, 195, 247, 0.3);
         }
-        
-        .button.reset {
+
+        .simulation-action-btn.reset {
             background: linear-gradient(135deg, #ef4444, #dc2626);
         }
-        
-        .button.reset:hover {
-            background: linear-gradient(135deg, #dc2626, #b91c1c);
+
+        .simulation-action-btn.reset:hover {
+            box-shadow: 0 8px 25px rgba(239, 68, 68, 0.3);
         }
-        
-        .data-display {
-            background: rgba(0,0,0,0.2);
-            padding: 15px;
-            border-radius: 10px;
+
+        /* Checkboxes customizados */
+        .simulation-checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin: 1rem 0;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 8px;
+            transition: var(--transition-smooth);
+        }
+
+        .simulation-checkbox-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .simulation-checkbox {
+            width: 20px;
+            height: 20px;
+            accent-color: var(--simulation-accent);
+            cursor: pointer;
+        }
+
+        .simulation-checkbox-label {
+            font-size: 1rem;
+            color: var(--text-light);
+            cursor: pointer;
+        }
+
+        /* Display de dados */
+        .simulation-data-display {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 1.5rem;
+            border-radius: 12px;
             font-family: 'Courier New', monospace;
-            font-size: 13px;
+            font-size: 0.95rem;
             line-height: 1.6;
+            border: 1px solid var(--simulation-border);
+            color: var(--text-light);
         }
-        
-        .formula-box {
-            background: rgba(0,0,0,0.4);
-            padding: 15px;
-            border-radius: 10px;
+
+        /* Caixa de fórmula */
+        .simulation-formula-box {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 1.5rem;
+            border-radius: 12px;
             font-family: 'Courier New', monospace;
-            font-size: 12px;
-            line-height: 1.4;
-            border-left: 4px solid #60a5fa;
-            margin: 10px 0;
+            font-size: 1rem;
+            line-height: 1.5;
+            border-left: 4px solid var(--simulation-accent);
+            color: var(--text-light);
         }
-        
-        .legend {
+
+        /* Legenda */
+        .simulation-legend {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-top: 15px;
+            gap: 1rem;
+            margin-top: 1.5rem;
         }
-        
-        .legend-item {
+
+        .simulation-legend-item {
             display: flex;
             align-items: center;
-            gap: 8px;
-            font-size: 12px;
+            gap: 0.8rem;
+            font-size: 0.9rem;
+            color: var(--text-muted);
         }
-        
-        .legend-color {
-            width: 16px;
-            height: 3px;
+
+        .simulation-legend-color {
+            width: 18px;
+            height: 4px;
             border-radius: 2px;
         }
-        
-        .checkbox-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin: 8px 0;
+
+        /* Canvas container */
+        #canvas-container {
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid var(--simulation-border);
+            background: rgba(0, 0, 0, 0.2);
         }
-        
-        input[type="checkbox"] {
-            width: 18px;
-            height: 18px;
-            accent-color: #60a5fa;
-        }
-        
-        @media (max-width: 768px) {
-            .main-content {
+
+        /* Responsividade */
+        @media (max-width: 1024px) {
+            .simulation-content-grid {
                 grid-template-columns: 1fr;
             }
+            
+            .simulation-controls-panel {
+                position: static;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .simulation-main-container {
+                padding: 1rem;
+            }
+            
+            .simulation-header {
+                padding: 1.5rem;
+            }
+            
+            .simulation-title {
+                font-size: 2rem;
+            }
+            
+            .simulation-subtitle {
+                font-size: 1.1rem;
+            }
+            
+            .simulation-visual-area,
+            .simulation-controls-panel {
+                padding: 1.5rem;
+            }
+            
+            .simulation-control-group-title {
+                font-size: 1.1rem;
+            }
+        }
+
+        /* Efeitos especiais */
+        .simulation-glow {
+            box-shadow: 0 0 20px rgba(79, 195, 247, 0.3);
+        }
+
+        .simulation-pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.8; }
+            50% { opacity: 1; }
+            100% { opacity: 0.8; }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>📐 Variação de Ângulo em Curvas</h1>
-            <p>Visualização da integral ∫⟨u'(t), u⊥(t)⟩dt para medir variação angular</p>
+    <div class="simulation-main-container">
+        <div class="simulation-header">
+            <h1 class="simulation-title">📐 Variação de Ângulo em Curvas</h1>
+            <p class="simulation-subtitle">Visualização da integral ∫⟨u'(t), u⊥(t)⟩dt para medir variação angular</p>
         </div>
         
-        <div class="main-content">
-            <div class="simulation-area">
+        <div class="simulation-content-grid">
+            <div class="simulation-visual-area">
                 <div id="canvas-container"></div>
             </div>
             
-            <div class="controls-panel">
-                <div class="control-group">
-                    <h3>📈 Tipo de Curva</h3>
+            <div class="simulation-controls-panel">
+                <div class="simulation-control-group">
+                    <h3 class="simulation-control-group-title">📈 Tipo de Curva</h3>
                     
-                    <div class="control-item">
-                        <label for="curve-select">Curva c(t):</label>
-                        <select id="curve-select">
+                    <div class="simulation-control-item">
+                        <label class="simulation-control-label" for="curve-select">Curva c(t):</label>
+                        <select id="curve-select" class="simulation-select">
                             <option value="ellipse">Elipse</option>
                             <option value="spiral">Espiral</option>
                             <option value="heart">Cardioide</option>
@@ -242,80 +428,80 @@
                         </select>
                     </div>
                     
-                    <div class="control-item">
-                        <label for="scale-slider">Escala da Curva:</label>
-                        <input type="range" id="scale-slider" min="0.5" max="3" step="0.1" value="1.5">
-                        <div class="value-display" id="scale-display">1.5</div>
+                    <div class="simulation-control-item">
+                        <label class="simulation-control-label" for="scale-slider">Escala da Curva:</label>
+                        <input type="range" id="scale-slider" class="simulation-slider" min="0.5" max="3" step="0.1" value="1.5">
+                        <div class="simulation-value-display" id="scale-display">1.5</div>
                     </div>
                     
-                    <div class="control-item">
-                        <label for="offset-x-slider">Deslocamento X:</label>
-                        <input type="range" id="offset-x-slider" min="-200" max="200" step="10" value="0">
-                        <div class="value-display" id="offset-x-display">0</div>
+                    <div class="simulation-control-item">
+                        <label class="simulation-control-label" for="offset-x-slider">Deslocamento X:</label>
+                        <input type="range" id="offset-x-slider" class="simulation-slider" min="-200" max="200" step="10" value="0">
+                        <div class="simulation-value-display" id="offset-x-display">0</div>
                     </div>
                     
-                    <div class="control-item">
-                        <label for="offset-y-slider">Deslocamento Y:</label>
-                        <input type="range" id="offset-y-slider" min="-200" max="200" step="10" value="0">
-                        <div class="value-display" id="offset-y-display">0</div>
+                    <div class="simulation-control-item">
+                        <label class="simulation-control-label" for="offset-y-slider">Deslocamento Y:</label>
+                        <input type="range" id="offset-y-slider" class="simulation-slider" min="-200" max="200" step="10" value="0">
+                        <div class="simulation-value-display" id="offset-y-display">0</div>
                     </div>
                 </div>
                 
-                <div class="control-group">
-                    <h3>⚙️ Parâmetros</h3>
+                <div class="simulation-control-group">
+                    <h3 class="simulation-control-group-title">⚙️ Parâmetros</h3>
                     
-                    <div class="control-item">
-                        <label for="t-slider">Parâmetro t:</label>
-                        <input type="range" id="t-slider" min="0" max="6.28" step="0.01" value="0">
-                        <div class="value-display" id="t-display">0.00</div>
+                    <div class="simulation-control-item">
+                        <label class="simulation-control-label" for="t-slider">Parâmetro t:</label>
+                        <input type="range" id="t-slider" class="simulation-slider" min="0" max="6.28" step="0.01" value="0">
+                        <div class="simulation-value-display" id="t-display">0.00</div>
                     </div>
                     
-                    <div class="control-item">
-                        <label for="speed-slider">Velocidade:</label>
-                        <input type="range" id="speed-slider" min="0" max="0.05" step="0.005" value="0.02">
-                        <div class="value-display" id="speed-display">0.02</div>
-                    </div>
-                </div>
-                
-                <div class="control-group">
-                    <h3>🎮 Controles</h3>
-                    <button class="button" id="play-btn">▶️ Animar</button>
-                    <button class="button" id="pause-btn">⏸️ Pausar</button>
-                    <button class="button reset" id="reset-btn">🔄 Reiniciar</button>
-                </div>
-                
-                <div class="control-group">
-                    <h3>👁️ Visualização</h3>
-                    
-                    <div class="checkbox-item">
-                        <input type="checkbox" id="show-circle" checked>
-                        <label for="show-circle">Mostrar Circunferência</label>
-                    </div>
-                    
-                    <div class="checkbox-item">
-                        <input type="checkbox" id="show-vectors" checked>
-                        <label for="show-vectors">Mostrar Vetores u(t) e u⊥(t)</label>
-                    </div>
-                    
-                    <div class="checkbox-item">
-                        <input type="checkbox" id="show-trail" checked>
-                        <label for="show-trail">Mostrar Rastro</label>
-                    </div>
-                    
-                    <div class="checkbox-item">
-                        <input type="checkbox" id="show-derivative" checked>
-                        <label for="show-derivative">Mostrar u'(t)</label>
-                    </div>
-                    
-                    <div class="checkbox-item">
-                        <input type="checkbox" id="show-radial" checked>
-                        <label for="show-radial">Mostrar Linha Radial</label>
+                    <div class="simulation-control-item">
+                        <label class="simulation-control-label" for="speed-slider">Velocidade:</label>
+                        <input type="range" id="speed-slider" class="simulation-slider" min="0" max="0.05" step="0.005" value="0.02">
+                        <div class="simulation-value-display" id="speed-display">0.02</div>
                     </div>
                 </div>
                 
-                <div class="control-group">
-                    <h3>📊 Dados Atuais</h3>
-                    <div class="data-display" id="data-display">
+                <div class="simulation-control-group">
+                    <h3 class="simulation-control-group-title">🎮 Controles</h3>
+                    <button class="simulation-action-btn" id="play-btn">▶️ Animar</button>
+                    <button class="simulation-action-btn" id="pause-btn">⏸️ Pausar</button>
+                    <button class="simulation-action-btn reset" id="reset-btn">🔄 Reiniciar</button>
+                </div>
+                
+                <div class="simulation-control-group">
+                    <h3 class="simulation-control-group-title">👁️ Visualização</h3>
+                    
+                    <div class="simulation-checkbox-item">
+                        <input type="checkbox" id="show-circle" class="simulation-checkbox" checked>
+                        <label for="show-circle" class="simulation-checkbox-label">Mostrar Circunferência</label>
+                    </div>
+                    
+                    <div class="simulation-checkbox-item">
+                        <input type="checkbox" id="show-vectors" class="simulation-checkbox" checked>
+                        <label for="show-vectors" class="simulation-checkbox-label">Mostrar Vetores u(t) e u⊥(t)</label>
+                    </div>
+                    
+                    <div class="simulation-checkbox-item">
+                        <input type="checkbox" id="show-trail" class="simulation-checkbox" checked>
+                        <label for="show-trail" class="simulation-checkbox-label">Mostrar Rastro</label>
+                    </div>
+                    
+                    <div class="simulation-checkbox-item">
+                        <input type="checkbox" id="show-derivative" class="simulation-checkbox" checked>
+                        <label for="show-derivative" class="simulation-checkbox-label">Mostrar u'(t)</label>
+                    </div>
+                    
+                    <div class="simulation-checkbox-item">
+                        <input type="checkbox" id="show-radial" class="simulation-checkbox" checked>
+                        <label for="show-radial" class="simulation-checkbox-label">Mostrar Linha Radial</label>
+                    </div>
+                </div>
+                
+                <div class="simulation-control-group">
+                    <h3 class="simulation-control-group-title">📊 Dados Atuais</h3>
+                    <div class="simulation-data-display" id="data-display">
                         t = 0.00<br>
                         c(t) = (0.0, 0.0)<br>
                         ||c(t)|| = 0.00<br>
@@ -324,29 +510,29 @@
                     </div>
                 </div>
                 
-                <div class="control-group">
-                    <h3>∫ Variação Angular</h3>
-                    <div class="formula-box" id="angle-display">
+                <div class="simulation-control-group">
+                    <h3 class="simulation-control-group-title">∫ Variação Angular</h3>
+                    <div class="simulation-formula-box" id="angle-display">
                         ∫⟨u'(t), u⊥(t)⟩dt = 0.00 rad<br>
                         = 0.0°
                     </div>
                 </div>
                 
-                <div class="legend">
-                    <div class="legend-item">
-                        <div class="legend-color" style="background: #60a5fa;"></div>
+                <div class="simulation-legend">
+                    <div class="simulation-legend-item">
+                        <div class="simulation-legend-color" style="background: #60a5fa;"></div>
                         <span>Curva c(t)</span>
                     </div>
-                    <div class="legend-item">
-                        <div class="legend-color" style="background: #10b981;"></div>
+                    <div class="simulation-legend-item">
+                        <div class="simulation-legend-color" style="background: #10b981;"></div>
                         <span>Vetor u(t)</span>
                     </div>
-                    <div class="legend-item">
-                        <div class="legend-color" style="background: #f59e0b;"></div>
+                    <div class="simulation-legend-item">
+                        <div class="simulation-legend-color" style="background: #f59e0b;"></div>
                         <span>Vetor u⊥(t)</span>
                     </div>
-                    <div class="legend-item">
-                        <div class="legend-color" style="background: #ef4444;"></div>
+                    <div class="simulation-legend-item">
+                        <div class="simulation-legend-color" style="background: #ef4444;"></div>
                         <span>Derivada u'(t)</span>
                     </div>
                 </div>
