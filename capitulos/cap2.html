@@ -86,48 +86,142 @@
     <main class="content">
         <div class="reading-container">
 
-        <h1>Integrais</h1>
-        
-        <h3>Integrais Iteradas</h3>
-        <p>Temos uma função de \( \mathbb{R}^2 \) em \( \mathbb{R} \). Isso define uma tripla \((x, y, f(x, y))\), uma superfície. Por algum motivo queremos descobrir o volume debaixo dessa superfície. Ou então, imagine que \( f \) seja uma densidade de massa. Como calculamos o centro de massa?</p>
-        <p>No caso unidimensional, a integral aparece como cálculo de área sob uma curva. O que acontece quando subimos a dimensão? Podemos imaginar um plano fixado intersectando a superfície. Teremos um caso unidimensional repetido duas vezes: primeiro calculamos a área para um parâmetro fixado, depois somamos todas essas áreas.</p>
-        <p>Isso leva naturalmente ao <strong>Teorema Fundamental do Cálculo</strong> para integrais iteradas.</p>
-        <h3>Estudo de caso: \( f(x, y) = e^{-(x^2 + y^2)} \)</h3>
-        <p>Vamos calcular a integral dessa função sobre o disco de raio \( R \).</p>
-        <h3>Mudança de Variáveis</h3>
-        <p>Queremos fazer uma mudança de variáveis para facilitar a integração. Mas como isso altera todo o resto? Podemos representar graficamente a composição de funções. Isso nos leva ao <strong>fator de esticamento</strong>.</p>
-        <h3>Integrais</h3>
-        <p>Temos uma função \( f : [a_1, b_1] \times [a_2, b_2] \to \mathbb{R} \). Podemos dividir seu domínio em blocos e calcular integrais sobre esses blocos.</p>
-        <h4>Uma variável</h4>
-        <p>Se a largura depende da altura \( L(h) \) e a altura varia de 0 até \( H \):</p>
-        <p>Área total:</p>
-        $$ \int_0^H L(h)\, dh $$
-        <p>Área parcial até altura \( h \):</p>
-        $$ S(h) = \int_0^h L(t)\, dt $$
-        <h4>Teorema Fundamental do Cálculo</h4>
-        $$ \int_a^b f'(x)\, dx = f(b) - f(a) $$
-        <h4>Extensão ao volume</h4>
-        <p>Área \( S(h) \) variando com a altura:</p>
-        $$ V = \int_0^H S(h)\, dh $$
-        <h4>Integrais iteradas</h4>
-        $$ \int_{a_1}^{b_1} \left( \int_{a_2}^{b_2} f(x, y)\, dy \right) dx $$
-        <p>Fixamos \( x \) e integramos \( y \), depois usamos esse resultado para integrar em \( x \).</p>
-        <h4>Estudo de caso</h4>
-        $$ f(x, y) = e^{-(x^2 + y^2)} $$
-        <p>Usamos coordenadas polares:</p>
-        $$ x = r \cos\theta, \quad y = r \sin\theta $$
-        <p>Com \( r \in [0, R] \), \( \theta \in [0, 2\pi] \):</p>
-        $$ \iint_D f(x, y)\, dx\, dy = \int_0^{2\pi} \int_0^R f(r\cos\theta, r\sin\theta)\, r\, dr\, d\theta $$
-        <h4>Motivação do fator de esticamento</h4>
-        <p>Com mudança \( \varphi(\theta) = \sin\theta \):</p>
-        $$ dx = \varphi'(\theta)\, d\theta $$
-        $$ \int_{-1}^{1} f(x)\, dx = \int_{-\pi}^{\pi} f(\varphi(\theta))\, \varphi'(\theta)\, d\theta $$
-        <p>Ao mudar de coordenadas, multiplicamos pelo Jacobiano:</p>
-        $$ \frac{dx\, dy}{dr\, d\theta} = r $$
-        <p>Logo:</p>
-        $$ \iint_D f(x, y)\, dx\, dy = \int_0^{2\pi} \int_0^R f(r\cos\theta, r\sin\theta)\, r\, dr\, d\theta $$
-        <p>No caso de \( f(x, y) = e^{-(x^2 + y^2)} = e^{-r^2} \):</p>
-        $$ \iint_D e^{-(x^2 + y^2)}\, dx\, dy = \int_0^{2\pi} \int_0^R e^{-r^2}\, r\, dr\, d\theta $$
+<section>
+  <h2>Integrais</h2>
+
+  <p>Temos uma função $f \colon [a_1, b_1] \times [a_2, b_2] \to \mathbb{R}$, que associa aos pares ordenados $(x_1, x_2)$ o valor $f(x_1, x_2)$.</p>
+
+  <p>Considere a partição $P = \{a = A_0 < A_1 < \dots < A_n = b\}$. Mais geralmente, temos um bloco $B \subset \mathbb{R}^n$, uma função $f \colon B \to \mathbb{R}$, uma partição $P$ de $B$, e $S(P)$ o conjunto dos subblocos de $P$.</p>
+
+  <p>O domínio da função pode ser subdividido em blocos.</p>
+
+  <h3>Uma variável</h3>
+
+  <p>Voltando ao cálculo de uma variável: temos um objeto geométrico plano cuja largura depende da altura, $L(h)$, e cuja altura varia de 0 até $H$.</p>
+
+  <p>A área do objeto pode ser calculada pela integral:</p>
+  <p>$$\int_0^H L(h)\, dh$$</p>
+
+  <p>Também podemos calcular a área parcial do objeto, dependente de uma altura variável $h$, como:</p>
+  <p>$$S(h) = \int_0^h L(t)\, dt$$</p>
+
+  <h3>Teorema Fundamental do Cálculo</h3>
+
+  <p>Lembramos uma das versões do Teorema Fundamental do Cálculo:</p>
+  <p>$$\int_a^b f'(x)\, dx = f(b) - f(a)$$</p>
+
+  <h3>Extensão ao volume</h3>
+
+  <p>Estendendo ao caso de um sólido geométrico: agora temos uma área que depende da altura, $S(h)$, e a altura varia de 0 a $H$.</p>
+
+  <p>O volume do sólido será:</p>
+  <p>$$V = \int_0^H S(h)\, dh$$</p>
+
+  <p>Podemos reescrever $S(h)$ como:</p>
+  <p>$$S(h) = \int_0^h L(t)\, dt$$</p>
+
+  <p>É importante observar que não precisamos pensar necessariamente em interpretações geométricas.<br>
+  Podemos ter grandezas que dependem de outras, expressas por funções.</p>
+
+  <p>Por exemplo, considere as seguintes grandezas que podem ser modeladas por funções em uma região do espaço:</p>
+
+  <ul>
+    <li><strong>Temperatura acumulada em um volume:</strong><br>
+    Uma função $T(x,y,z)$ representa a temperatura em cada ponto. A integral tripla de $T$ sobre o volume representa a soma total da temperatura acumulada naquele espaço, que pode ser interpretada como energia térmica total.</li>
+
+    <li><strong>Massa de um sólido com densidade variável:</strong><br>
+    Uma função densidade $\rho(x,y,z)$ varia ao longo do sólido. A integral tripla calcula a massa total, somando pequenas parcelas de massa, que são o produto da densidade pelo volume infinitesimal.</li>
+
+    <li><strong>Carga elétrica total em uma região:</strong><br>
+    Se $\rho(x,y,z)$ representa a densidade de carga elétrica, a integral tripla calcula a carga total contida na região.</li>
+
+    <li><strong>Quantidade de substância em uma mistura:</strong><br>
+    Uma concentração $c(x,y,z)$ pode ser integrada para obter a quantidade total da substância.</li>
+
+    <li><strong>Fluxo total de calor, energia ou outra propriedade física:</strong><br>
+    Integrais iteradas podem representar composições de grandezas físicas envolvendo somas e produtos de propriedades.</li>
+  </ul>
+
+  <p>Dessa forma, a interpretação de integrais iteradas não precisa ser primariamente geométrica, como cálculo de áreas e volumes.<br>
+  Elas podem ser vistas como uma <em>composição ordenada de grandezas</em>, em que cada integral acumula a contribuição em uma dimensão, resultando na grandeza final desejada.</p>
+
+  <h3>Integrais iteradas</h3>
+
+  <p>Esse processo é chamado de <em>integral iterada</em>. De forma geral, temos:</p>
+  <p>$$\int_{a_1}^{b_1} \left( \int_{a_2}^{b_2} f(x, y)\, dy \right) dx$$</p>
+
+  <p>Calculamos primeiro a integral de dentro com relação a $y$, e o resultado disso será utilizado na integral de fora com relação a $x$.</p>
+
+  <p>Do ponto de vista da integral externa, para cada $x$ fixado, temos uma área associada:</p>
+  <p>$$\text{área}(x) = \int_{a_2}^{b_2} f(x, y)\, dy$$</p>
+
+  <p>Você pode imaginar um plano paralelo ao eixo $YZ$, que intercepta um valor fixado $x$ e corta o gráfico da função $f(x, y)$, formando uma curva cuja área está sendo integrada.</p>
+
+  <h3>Estudo de caso</h3>
+
+  <p>Considere a função:</p>
+  <p>$$f(x, y) = e^{-(x^2 + y^2)}$$</p>
+
+  <p>Considere o domínio sendo o disco $D = \{ (x, y) \in \mathbb{R}^2 \mid x^2 + y^2 \le R^2 \}$.</p>
+
+  <p>Vamos usar coordenadas polares: cada ponto $(x, y)$ é dado por:</p>
+  <p>$$x = r \cos\theta, \quad y = r \sin\theta$$</p>
+  <p>com $r \in [0, R]$ e $\theta \in [0, 2\pi]$.</p>
+
+  <p>Essa mudança de variáveis é uma função:</p>
+  <p>$$\phi(r, \theta) = (r \cos\theta, r \sin\theta)$$</p>
+
+  <p>A integral da função no disco pode ser reescrita como:</p>
+  <p>$$\iint_D f(x, y)\, dx\, dy = \int_0^{2\pi} \int_0^R f(r\cos\theta, r\sin\theta)\, r\, dr\, d\theta$$</p>
+
+  <p>Esse fator $r$ é o fator de esticamento (jacobiano da transformação), que compensa a distorção nas áreas provocada pela mudança de coordenadas.</p>
+
+  <h3>Motivação do fator de esticamento</h3>
+
+  <p>Considere a mudança $\varphi(\theta) = \sin\theta$, de $\theta \in [-\pi, \pi]$ para $x \in [-1, 1]$. Temos:</p>
+  <p>$$dx = \varphi'(\theta)\, d\theta$$</p>
+
+  <p>Então:</p>
+  <p>$$\int_{-1}^{1} f(x)\, dx = \int_{-\pi}^{\pi} f(\varphi(\theta))\, \varphi'(\theta)\, d\theta$$</p>
+
+  <p>Ou seja, ao mudar de variável, é necessário multiplicar pela derivada da função de mudança, o fator de correção.</p>
+
+  <h3>Conclusão</h3>
+
+  <p>No caso da função:</p>
+  <p>$$f(x, y) = e^{-(x^2 + y^2)}$$</p>
+  <p>no disco $D$, temos:</p>
+  <p>$$\iint_D e^{-(x^2 + y^2)}\, dx\, dy = \int_0^{2\pi} \int_0^R e^{-r^2}\, r\, dr\, d\theta$$</p>
+
+  <p>Esse $r$ vem do jacobiano da transformação para coordenadas polares, e mede o quanto a mudança de coordenadas estica a região integrada.</p>
+
+  <blockquote>
+    De alguma forma, precisamos deduzir o fator de correção ao mudar para coordenadas polares.
+  </blockquote>
+
+  <p>Considere um pequeno elemento de área em coordenadas polares. Podemos escrever:</p>
+  <p>$$\frac{r + \Delta r}{2} \cdot \Delta\theta \approx r\, \Delta r\, \Delta\theta + \frac{(\Delta r)^2}{2} \cdot \Delta\theta$$</p>
+
+  <p>Dividindo por $\Delta r \Delta\theta$, temos:</p>
+  <p>$$\frac{r\, \Delta r\, \Delta\theta + \frac{(\Delta r)^2}{2} \cdot \Delta\theta}{\Delta r \Delta\theta} = r + \frac{\Delta r}{2}$$</p>
+
+  <p>No limite em que $\Delta r \to 0$, esse valor tende a $r$. Isso nos motiva a introduzir o fator $r$ como fator de correção da área ao fazermos a mudança para coordenadas polares.</p>
+
+  <p>Assim, a razão entre os elementos diferenciais é:</p>
+  <p>$$\frac{dx\, dy}{dr\, d\theta} = r$$</p>
+
+  <p>Logo, nossa integral original</p>
+  <p>$$\iint_D f(x, y)\, dx\, dy$$</p>
+  <p>em coordenadas polares se torna:</p>
+  <p>$$\int_0^{2\pi} \int_0^{R} f(r\cos\theta, r\sin\theta)\, r\, dr\, d\theta$$</p>
+
+  <p>No caso de:</p>
+  <p>$$f(x, y) = e^{-(x^2 + y^2)} = e^{-r^2}$$</p>
+
+  <p>temos:</p>
+  <p>$$\iint_D e^{-(x^2 + y^2)}\, dx\, dy = \int_0^{2\pi} \int_0^R e^{-r^2} \cdot r\, dr\, d\theta$$</p>
+</section>
+
 
 <div class="simulation-link-container">
   <h3 class="Queda Livre">Simulações Interativas</h3>

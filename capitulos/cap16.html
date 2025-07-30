@@ -45,10 +45,6 @@
 
         <p>O <strong>produto exterior</strong> $ \vec{u} \wedge \vec{v} $ também mede a área gerada por $ \vec{u} $ e $ \vec{v} $, mas de forma mais geral e sem depender da dimensão do espaço.</p>
 
-        <div class="comment">
-          <p>COMO ASSIM N DEPENDE DE DIMENSAO? EH MAIS GERAL COMO? SERIA LEGAL MOSTRAR COMO</p>
-        </div>
-
         <h3>Regras do Produto Exterior</h3>
         <p>Se $ v $ e $ w $ são vetores, temos:</p>
 
@@ -137,6 +133,33 @@
           <li>$ 3 $-forma: volume orientado</li>
           <li>E assim por diante</li>
         </ul>
+        <h3>Exemplos</h3>
+        <p>0-formas: uma função $ f(x_1, \dots, x_n) $</p>
+
+        <p>1-forma: $ \omega = f_1(x)\, dx_1 + f_2(x)\, dx_2 + \dots + f_n(x)\, dx_n $</p>
+
+        <p>2-forma em $ \mathbb{R}^3 $:</p>
+        
+          $$\omega = f_{12}(x)\, dx_1 \wedge dx_2 + f_{13}(x)\, dx_1 \wedge dx_3 + f_{23}(x)\, dx_2 \wedge dx_3$$
+        
+
+        <p>Em $ \mathbb{R}^n $, uma $ k $-forma geral se escreve como:</p>
+        
+          $$\omega = \sum_{1 \le i_1 < \dots < i_k \le n} f_{i_1 \dots i_k}(x)\, dx_{i_1} \wedge dx_{i_2} \wedge \dots \wedge dx_{i_k}$$
+        
+
+        <p>O sinal de soma percorre todas as combinações ordenadas de $ k $ índices entre 1 e $ n $. Cada termo tem um coeficiente $ f_{i_1 \dots i_k}(x) $, uma função suave. O produto exterior $ dx_{i_1} \wedge \dots \wedge dx_{i_k} $ é completamente antissimétrico.</p>
+
+        <h3>Entendendo o comportamento dos índices: 2-forma em $ \mathbb{R}^4 $</h3>
+        <p>As combinações $ i < j $ são:</p>
+        
+          $$(1,2),\ (1,3),\ (1,4),\ (2,3),\ (2,4),\ (3,4)$$
+        
+
+        <p>Portanto, uma 2-forma geral em $ \mathbb{R}^4 $ pode ser escrita como:</p>
+        
+          $$\omega = f_{12}(x)\, dx_1 \wedge dx_2 + f_{13}(x)\, dx_1 \wedge dx_3 + f_{14}(x)\, dx_1 \wedge dx_4$$
+          $$+ f_{23}(x)\, dx_2 \wedge dx_3 + f_{24}(x)\, dx_2 \wedge dx_4 + f_{34}(x)\, dx_3 \wedge dx_4$$
       </section>
 
       <section>
@@ -172,43 +195,8 @@
       </section>
 
       <section>
-        <h2>Resumo da definição de $ k $-forma</h2>
-        <p>Uma $ k $-forma é uma função que associa a cada ponto uma combinação linear com coeficientes suaves de expressões do tipo:</p>
         
-          $$dx_{i_1} \wedge dx_{i_2} \wedge \dots \wedge dx_{i_k} \quad \text{com } i_1 < i_2 < \dots < i_k$$
         
-
-        <div class="comment">
-          <p>Essa ordem crescente dos índices é crucial para garantir a antissimetria. Por exemplo, $ dx_1 \wedge dx_1 = 0 $ e $ dx_1 \wedge dx_2 = -dx_2 \wedge dx_1 $.</p>
-        </div>
-
-        <h3>Exemplos</h3>
-        <p>0-formas: uma função $ f(x_1, \dots, x_n) $</p>
-
-        <p>1-forma: $ \omega = f_1(x)\, dx_1 + f_2(x)\, dx_2 + \dots + f_n(x)\, dx_n $</p>
-
-        <p>2-forma em $ \mathbb{R}^3 $:</p>
-        
-          $$\omega = f_{12}(x)\, dx_1 \wedge dx_2 + f_{13}(x)\, dx_1 \wedge dx_3 + f_{23}(x)\, dx_2 \wedge dx_3$$
-        
-
-        <p>Em $ \mathbb{R}^n $, uma $ k $-forma geral se escreve como:</p>
-        
-          $$\omega = \sum_{1 \le i_1 < \dots < i_k \le n} f_{i_1 \dots i_k}(x)\, dx_{i_1} \wedge dx_{i_2} \wedge \dots \wedge dx_{i_k}$$
-        
-
-        <p>O sinal de soma percorre todas as combinações ordenadas de $ k $ índices entre 1 e $ n $. Cada termo tem um coeficiente $ f_{i_1 \dots i_k}(x) $, uma função suave. O produto exterior $ dx_{i_1} \wedge \dots \wedge dx_{i_k} $ é completamente antissimétrico.</p>
-
-        <h3>Exemplo: 2-forma em $ \mathbb{R}^4 $</h3>
-        <p>As combinações $ i < j $ são:</p>
-        
-          $$(1,2),\ (1,3),\ (1,4),\ (2,3),\ (2,4),\ (3,4)$$
-        
-
-        <p>Portanto, uma 2-forma geral em $ \mathbb{R}^4 $ pode ser escrita como:</p>
-        
-          $$\omega = f_{12}(x)\, dx_1 \wedge dx_2 + f_{13}(x)\, dx_1 \wedge dx_3 + f_{14}(x)\, dx_1 \wedge dx_4$$
-          $$+ f_{23}(x)\, dx_2 \wedge dx_3 + f_{24}(x)\, dx_2 \wedge dx_4 + f_{34}(x)\, dx_3 \wedge dx_4$$
         
 
         <p>A álgebra exterior tem uma base natural: os produtos $ dx_{i_1} \wedge \dots \wedge dx_{i_k} $ com índices ordenados.</p>
@@ -219,7 +207,7 @@
         <h3>Por que a base natural exige índices ordenados?</h3>
         <p>A álgebra exterior é construída para lidar com objetos antissimétricos, como áreas, volumes e orientações. Por isso, a base natural precisa refletir essa antissimetria.</p>
 
-        <p>Vale anotar que:</p>
+        <p>Vale notar que:</p>
         
           $$dx_1 \wedge dx_2 = -dx_2 \wedge dx_1$$
         

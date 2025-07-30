@@ -33,7 +33,7 @@
   <div class="reading-container">
     <h1>Teorema de Stokes</h1>
     
-    <p>Comecemos com o enunciado do Teorema de Stokes, também conhecido como o <strong>Teorema de Kelvin-Stokes</strong>:</p>
+    <p>Comecemos com o enunciado do Teorema de Stokes no \( \mathbb{R}^3 \), também conhecido como o <strong>Teorema de Kelvin-Stokes</strong>:</p>
 
     $$
         
@@ -144,31 +144,37 @@
     $$
         
         G_1
-        \begin{vmatrix}
+        \cdot
+        \det
+        \begin{pmatrix}
         u_2 & u_3 \\
         v_2 & v_3
-        \end{vmatrix}
+        \end{pmatrix}
         - G_2
-        \begin{vmatrix}
+        \cdot
+        \det
+        \begin{pmatrix}
         u_1 & u_3 \\
         v_1 & v_3
-        \end{vmatrix}
+        \end{pmatrix}
         + G_3
-        \begin{vmatrix}
+        \cdot
+        \det
+        \begin{pmatrix}
         u_1 & u_2 \\
         v_1 & v_2
-        \end{vmatrix}
+        \end{pmatrix}
         
     $$
 
     <p>Cada termo corresponde à área da projeção de \( \vec{u} \) e \( \vec{v} \) no plano ortogonal ao eixo associado. Por exemplo:</p>
 
     $$
-        
-        \begin{vmatrix}
+        \det
+        \begin{pmatrix}
         u_2 & u_3 \\
         v_2 & v_3
-        \end{vmatrix}
+        \end{pmatrix}
         
     $$
     <p>é a área da projeção de \( \vec{u} \) e \( \vec{v} \) no plano \( yz \), e está multiplicando \( G_1 \), que mede a componente de \( \vec{G} \) na direção \( x \). Portanto, o produto misto \( \vec{G} \cdot (\vec{u} \times \vec{v}) \) mede o volume orientado definido por esses três vetores, e pode ser interpretado como a contribuição da área projetada de \( \vec{u}, \vec{v} \) em cada plano coordenado, ponderada pelas componentes de \( \vec{G} \).</p>
@@ -177,11 +183,12 @@
 
     $$
         
-        dx \wedge \varepsilon(u, v) = 
-        \begin{vmatrix}
+        dx \wedge dy(u, v) = 
+        \det
+        \begin{pmatrix}
         u_1 & u_2 \\
         v_1 & v_2
-        \end{vmatrix},
+        \end{pmatrix},
         
     $$
 
@@ -191,11 +198,12 @@
 
     $$
         
-        dz \wedge \chi(u, v) = 
-        \begin{vmatrix}
+        - dx \wedge dz (u, v) = dz \wedge dx (u, v) = 
+        \det
+        \begin{pmatrix}
         u_3 & u_1 \\
         v_3 & v_1
-        \end{vmatrix},
+        \end{pmatrix},
         
     $$
 
@@ -203,11 +211,12 @@
 
     $$
         
-        dx \wedge \varepsilon(u, v) = 
-        \begin{vmatrix}
-        u_1 & u_2 \\
-        v_1 & v_2
-        \end{vmatrix}.
+        dy \wedge dz (u, v) = 
+        \det
+        \begin{pmatrix}
+        u_2 & u_3 \\
+        v_2 & v_3
+        \end{pmatrix}.
         
     $$
 
@@ -240,16 +249,16 @@
 
     $$
         
-        \begin{vmatrix}
+        \begin{pmatrix}
         \vec{i} & \vec{j} & \vec{k} \\
         \frac{\partial}{\partial x} & \frac{\partial}{\partial y} & \frac{\partial}{\partial z} \\
         F_1 & F_2 & F_3
-        \end{vmatrix}
+        \end{pmatrix}
         = \nabla \times F
         
     $$
 
-    <p>Desenvolvendo o determinante:</p>
+    <p>Desenvolvendo o determinante obtemos o campo:</p>
 
     $$
         
@@ -268,7 +277,7 @@
         
     $$
 
-    <p>Associando isso à forma diferencial 2-forma correspondente:</p>
+    <p>Podemos associar ao campo uma 2-forma diferencial:</p>
 
     $$
         
@@ -335,7 +344,14 @@
         
     $$
 
-    <p>Eu poderia dizer que o Teorema de Kelvin eu estou integrando uma forma linear, porque o campo de vetores está ali só para associar um número a cada vetor. E quando eu faço as contas, aparece uma forma bilinear que eu integro na superfície. A gente perde os vetores que nos davam uma interpretação geométrica. Mas a gente ganhou uma superálgebra. Se você fizer em \(\mathbb{R}^n\), vai funcionar. Mas a gente ainda precisa entender o que diabos é esse diferencial de \(F\).</p>
+    <p>Na nossa construção do Teorema de Stokes, partimos de um campo de vetores. O campo de vetores estava ali para nos dar um número. Este campo de vetores estava associado a uma 1-forma linear. Era esse o objeto que nós estávamos interessados em integrar.</p>
+
+<p>E isso acontecia quando, por esse campo de vetores, passava uma curva. Fizemos as contas e uma 2-forma bilinear alternada surgiu. Dessa vez, nós integrávamos essa forma bilinear alternada na superfície.</p>
+
+<p>Nosso cálculo vetorial, que tinha uma certa interpretação geométrica e uma clara motivação física, se transforma em uma teoria de integração sobre formas diferenciais.</p>
+
+<p>A vantagem de falar em integração de formas diferenciais e abandonar os vetores é que agora nós podemos falar em <span class="math">$\mathbb{R}^n$</span>. Nossa teoria se torna mais geral. E, além disso, ganhamos uma álgebra muito poderosa.</p>
+
 
     <div class="simulation-link-container">
   <h3 class="simulation-title">Simulações Interativas</h3>

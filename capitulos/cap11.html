@@ -78,17 +78,65 @@
       \int_C \omega = \int_a^b \vec{F}(C(t)) \cdot \dot{C}(t)\, dt = \int_C \vec{F} \cdot d\vec{r}.
       $$
       <p>Portanto, a integral de linha de um campo vetorial ao longo de uma curva é <strong>a integral da 1-forma associada ao campo</strong> ao longo dessa curva.</p>
-      <p>Considere uma função $ \Phi(t_1, t_2) = \left( x_1(t_1, t_2), x_2(t_1, t_2), x_3(t_1, t_2) \right) $, e um campo vetorial $ \vec{G} = (G_1, G_2, G_3) $.</p>
+      <p>Considere uma função $ \phi(t_1, t_2) = \left( x_1(t_1, t_2), x_2(t_1, t_2), x_3(t_1, t_2) \right) $, e um campo vetorial $ \vec{G} = (G_1, G_2, G_3) $.</p>
       <p>Considere o determinante:</p>
-      $$
-      \det
-      \begin{pmatrix}
-      G_1 & G_2 & G_3 \\
-      \frac{\partial x_1}{\partial t_1} & \frac{\partial x_2}{\partial t_1} & \frac{\partial x_3}{\partial t_1} \\
-      \frac{\partial x_1}{\partial t_2} & \frac{\partial x_2}{\partial t_2} & \frac{\partial x_3}{\partial t_2}
-      \end{pmatrix}
-      $$
-      <p>Identificamos os menores de ordem 2 como:</p>
+
+$$
+\det
+\begin{pmatrix}
+G_1 & G_2 & G_3 \\
+\frac{\partial x_1}{\partial t_1} & \frac{\partial x_2}{\partial t_1} & \frac{\partial x_3}{\partial t_1} \\
+\frac{\partial x_1}{\partial t_2} & \frac{\partial x_2}{\partial t_2} & \frac{\partial x_3}{\partial t_2}
+\end{pmatrix}
+= G_1 \cdot \det\begin{pmatrix}
+\frac{\partial x_2}{\partial t_1} & \frac{\partial x_3}{\partial t_1} \\
+\frac{\partial x_2}{\partial t_2} & \frac{\partial x_3}{\partial t_2}
+\end{pmatrix}
+- G_2 \cdot \det\begin{pmatrix}
+\frac{\partial x_1}{\partial t_1} & \frac{\partial x_3}{\partial t_1} \\
+\frac{\partial x_1}{\partial t_2} & \frac{\partial x_3}{\partial t_2}
+\end{pmatrix}
++ G_3 \cdot \det\begin{pmatrix}
+\frac{\partial x_1}{\partial t_1} & \frac{\partial x_2}{\partial t_1} \\
+\frac{\partial x_1}{\partial t_2} & \frac{\partial x_2}{\partial t_2}
+\end{pmatrix}
+$$
+      
+<p>Aqui, a nossa analogia não exigirá cuidado.</p>
+
+<p>Temos que tomar cuidado ao analisar as unidades de cada componente dos vetores. Estamos compondo um determinante com um campo de forças e derivadas parciais de uma parametrização. No fundo, estamos tentando medir alguma coisa, que é a composição de três vetores.</p>
+
+<p>Um desses vetores mede força, e dois desses vetores estão relacionados com a nossa superfície parametrizada. Associada a essa parametrização, é de se esperar que exista uma noção de comprimento.</p>
+
+<p>As componentes \(x_1, x_2, x_3\) formam um vetor posição.</p>
+
+<p>Quando consideramos as derivadas parciais do vetor posição com relação a \(t_1\) e \(t_2\), obtemos uma reta tangente na direção de \(t_1\) e \(t_2\), tangente à superfície.</p>
+
+<p>O determinante \(3 \times 3\) é uma composição no campo de vetores e uma aproximação linear do vetor posição nas direções \(t_1\) e \(t_2\), respectivamente, que são tangentes à superfície.</p>
+
+<p>A aproximação linear formada por esses dois vetores posição, derivados parcialmente com relação a \(t_1\) e \(t_2\), nos dá uma aproximação da área no ponto \(\mathbf{x}\), com orientação \(t_1\) e \(t_2\).</p>
+
+<p>Quando consideramos o campo \(\mathbf{G}\), percebemos que esse determinante nos dá a projeção do campo \(\mathbf{G}\) na superfície formada pela aproximação linear do vetor posição.</p>
+
+
+<p>Agora vamos analisar o lado direito da equação. Desenvolvemos o determinante \(3 \times 3\) em determinantes \(2 \times 2\) multiplicados pelos componentes do campo vetorial.</p>
+
+<p>Ainda temos uma estrutura de aproximação linear. Porém, retiramos a coordenada relacionada a \(x_1\), \(x_2\) e \(x_3\), respectivamente.</p>
+
+<p>Ou seja, o primeiro determinante é a projeção da aproximação linear da superfície no plano \(x_2x_3\).</p>
+
+<p>O segundo é a projeção da aproximação linear da superfície no plano \(x_1x_3\).</p>
+
+<p>O terceiro determinante é a projeção da aproximação linear da superfície no plano \(x_1x_2\).</p>
+
+<p>Como é relativamente custoso escrever os determinantes desses componentes toda hora, podemos renomear esses determinantes e tentar capturar o que é de fato relevante.</p>
+
+<p>O que temos de relevante para cada um desses determinantes é que cada um representa a projeção da aproximação linear nos seus respectivos planos.</p>
+
+<p>Vamos, então, utilizar uma notação que leve em conta onde essa projeção está sendo feita.</p>
+
+
+<p>Podemos identificar os determinantes de ordem 2 como:</p>
       $$
       \begin{aligned}
       \det
