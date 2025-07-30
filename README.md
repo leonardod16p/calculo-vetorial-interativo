@@ -5,7 +5,7 @@
 
 
 
-## ✅ Progresso das Simulações
+## ✅ Tarefas a serem feitas para as simulações
 
 ### 🧮 Integrais Iteradas
 - [ ] Deixar as fatias mais claras visualmente
@@ -34,7 +34,7 @@
 
 ---
 
-## 🖼️ Figuras
+## 🖼️ Tarefas a serem feitas para as Figuras
 
 - [ ] Parametrização de uma superfície num bloco no $\mathbb{R}^2$ 
 - [ ] **Cap. 9** — "Voltando ao Trabalho":  
