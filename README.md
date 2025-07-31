@@ -41,3 +41,11 @@
   Reproduzir figuras do quadro — curva caminhando gera uma superfície com bordos nos momentos inicial e final
 - [ ] **Cap. 13** — Teorema de Green:  
   Adicionar um bloco com bordo orientado e indicar onde há campo atuando
+
+---
+
+## 🌳 Página Inicial
+
+- [ ] Ajustar animação da **aparição dos tópicos e folhas**
+- [ ] Aumentar o **tamanho da caixa dos tópicos**
+- [ ] Ajustar a **posição das caixas arrastáveis**
