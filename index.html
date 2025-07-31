@@ -5,36 +5,41 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Árvore das Abstrações Matemáticas</title>
     <style>
+        * {
+            box-sizing: border-box;
+        }
+
         body {
             margin: 0;
             padding: 0;
             font-family: 'Georgia', serif;
             background: linear-gradient(to bottom, #1a2b4c 0%, #2c4a78 30%, #4a6741 70%, #2d3b2d 100%);
             color: #ffffff;
-            overflow: hidden;
-            height: 100vh;
+            overflow-x: hidden;
+            min-height: 100vh;
         }
 
         .book-cover {
-            max-width: 100%;
-            margin: 0;
-            padding: 10px;
             position: relative;
-            height: 100vh;
+            width: 100%;
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
         }
 
         .header {
             position: absolute;
-            top: 20px;
-            left: 20px;
+            top: 10px;
+            left: 10px;
             z-index: 100;
-            max-width: 320px;
+            max-width: min(90vw, 400px);
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
         }
 
         .title {
-            font-size: 2.2rem;
+            font-size: clamp(1.2rem, 4vw, 2.2rem);
             font-weight: bold;
             background: linear-gradient(45deg, #4fc3f7, #81c784, #ffb74d);
             background-clip: text;
@@ -45,17 +50,17 @@
         }
 
         .subtitle {
-            font-size: 1.2rem;
+            font-size: clamp(0.8rem, 2.5vw, 1.2rem);
             color: #e0e0e0;
             font-style: italic;
             margin-bottom: 10px;
         }
 
         .instructions {
-            font-size: 0.85rem;
+            font-size: clamp(0.7rem, 2vw, 0.85rem);
             color: #b0bec5;
             background: rgba(0, 0, 0, 0.3);
-            padding: 12px;
+            padding: 8px;
             border-radius: 8px;
             border: 1px solid rgba(79, 195, 247, 0.3);
             line-height: 1.4;
@@ -64,15 +69,16 @@
         .tree-container {
             position: relative;
             width: 100%;
-            height: 100vh;
-            margin: 0 auto;
             flex-grow: 1;
+            min-height: 80vh;
+            padding: 10px;
+            margin-top: max(120px, 15vh);
         }
 
         .controls {
             position: absolute;
-            top: 20px;
-            right: 20px;
+            top: 10px;
+            right: 10px;
             z-index: 200;
         }
 
@@ -80,11 +86,11 @@
             background: linear-gradient(45deg, #f44336, #e57373);
             border: none;
             color: white;
-            padding: 12px 24px;
+            padding: clamp(8px, 2vw, 12px) clamp(12px, 3vw, 24px);
             border-radius: 25px;
             cursor: pointer;
             font-weight: bold;
-            font-size: 14px;
+            font-size: clamp(10px, 2.5vw, 14px);
             transition: all 0.3s ease;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
             opacity: 0.3;
@@ -105,7 +111,7 @@
             background: linear-gradient(45deg, #795548, #8d6e63);
         }
 
-        /* Raízes e Tronco SVG */
+        /* SVG Responsivo */
         .roots-svg {
             position: absolute;
             top: 0;
@@ -133,13 +139,13 @@
             100% { opacity: 0.6; transform: scale(0.9); }
         }
 
-        /* Slots do Tronco - Segmentos delimitados */
+        /* Slots do Tronco - Responsivos */
         .trunk-slot {
             position: absolute;
             left: 50%;
             transform: translateX(-50%);
-            width: 140px;
-            height: 50px;
+            width: clamp(100px, 20vw, 140px);
+            height: clamp(35px, 7vh, 50px);
             border: 2px dashed rgba(255, 193, 7, 0.6);
             border-radius: 4px;
             background: transparent;
@@ -148,10 +154,11 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 10px;
+            font-size: clamp(8px, 2vw, 10px);
             color: rgba(255, 255, 255, 0.7);
             text-align: center;
             cursor: pointer;
+            padding: 5px;
         }
 
         .trunk-slot.disabled {
@@ -173,7 +180,7 @@
             border-style: solid;
             color: #ffffff;
             font-weight: bold;
-            font-size: 11px;
+            font-size: clamp(9px, 2.2vw, 11px);
         }
 
         .trunk-slot.unavailable {
@@ -183,27 +190,27 @@
             cursor: not-allowed;
         }
 
-        /* Posicionamento dos slots do tronco */
-        .trunk-slot.intuition-slot { bottom: 380px; }
-        .trunk-slot.geometry-slot { bottom: 530px; }
-        .trunk-slot.analysis-slot { bottom: 680px; }
-        .trunk-slot.topology-slot { bottom: 830px; }
+        /* Posicionamento dos slots do tronco - Responsivo */
+        .trunk-slot.intuition-slot { bottom: min(30vh, 380px); }
+        .trunk-slot.geometry-slot { bottom: min(40vh, 480px); }
+        .trunk-slot.analysis-slot { bottom: min(50vh, 580px); }
+        .trunk-slot.topology-slot { bottom: min(60vh, 680px); }
 
         /* Delimitadores visuais do tronco */
         .trunk-delimiter {
             position: absolute;
             left: 50%;
             transform: translateX(-50%);
-            width: 200px;
+            width: clamp(120px, 30vw, 200px);
             height: 2px;
             background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
             z-index: 35;
         }
 
-        .trunk-delimiter.d1 { bottom: 360px; }
-        .trunk-delimiter.d2 { bottom: 510px; }
-        .trunk-delimiter.d3 { bottom: 660px; }
-        .trunk-delimiter.d4 { bottom: 810px; }
+        .trunk-delimiter.d1 { bottom: calc(min(30vh, 380px) - 20px); }
+        .trunk-delimiter.d2 { bottom: calc(min(40vh, 480px) - 20px); }
+        .trunk-delimiter.d3 { bottom: calc(min(50vh, 580px) - 20px); }
+        .trunk-delimiter.d4 { bottom: calc(min(60vh, 680px) - 20px); }
 
         /* Folhas SVG */
         .leaves-group ellipse {
@@ -223,30 +230,31 @@
             filter: sepia(0.8) hue-rotate(30deg);
         }
 
-        /* Perguntas e Nomes das Abstrações Arrastáveis */
+        /* Perguntas e Nomes das Abstrações Arrastáveis - Responsivos */
         .draggable-questions, .draggable-abstractions {
             position: absolute;
-            left: 20px;
+            left: 10px;
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: clamp(4px, 1vh, 8px);
             z-index: 100;
+            max-width: min(40vw, 200px);
         }
 
         .draggable-questions {
-            bottom: 300px;
+            bottom: clamp(150px, 25vh, 300px);
         }
 
         .draggable-abstractions {
-            bottom: 420px;
+            bottom: clamp(200px, 35vh, 420px);
         }
 
         .question-bubble, .abstraction-bubble {
             background: transparent;
             color: #ffffff;
-            padding: 8px 12px;
+            padding: clamp(6px, 1.5vw, 8px) clamp(8px, 2vw, 12px);
             border-radius: 4px;
-            font-size: 11px;
+            font-size: clamp(9px, 2vw, 11px);
             cursor: grab;
             transition: all 0.2s ease;
             font-family: 'Georgia', serif;
@@ -254,7 +262,7 @@
             user-select: none;
             position: relative;
             touch-action: none;
-            min-width: 140px;
+            min-width: clamp(100px, 25vw, 140px);
             border: 1px solid rgba(255, 255, 255, 0.5);
         }
 
@@ -307,11 +315,11 @@
             pointer-events: none;
         }
 
-        /* Slots das Raízes */
+        /* Slots das Raízes - Responsivos */
         .root-slot {
             position: absolute;
-            width: 80px;
-            height: 40px;
+            width: clamp(60px, 12vw, 80px);
+            height: clamp(30px, 6vh, 40px);
             border: 2px dashed rgba(79, 195, 247, 0.6);
             border-radius: 4px;
             background: transparent;
@@ -320,8 +328,10 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 10px;
+            font-size: clamp(7px, 1.8vw, 10px);
             color: rgba(255, 255, 255, 0.7);
+            padding: 2px;
+            text-align: center;
         }
 
         .root-slot.highlight {
@@ -338,14 +348,28 @@
             font-weight: bold;
         }
 
-        /* Tópicos nas Folhas - Melhor posicionamento */
+        /* Posicionamento dos slots das raízes - Responsivo */
+        #slot1 { 
+            bottom: clamp(30px, 8vh, 50px); 
+            left: calc(50% - min(25vw, 200px)); 
+        }
+        #slot2 { 
+            bottom: clamp(30px, 8vh, 50px); 
+            left: calc(50% - min(6vw, 40px)); 
+        }
+        #slot3 { 
+            bottom: clamp(30px, 8vh, 50px); 
+            left: calc(50% + min(15vw, 120px)); 
+        }
+
+        /* Tópicos nas Folhas - Responsivos */
         .leaf-topic {
             position: absolute;
             background: rgba(0, 0, 0, 0.8);
             color: #ffffff;
-            padding: 6px 10px;
+            padding: clamp(3px, 1vh, 6px) clamp(5px, 1.5vw, 10px);
             border-radius: 12px;
-            font-size: 9px;
+            font-size: clamp(7px, 1.8vw, 9px);
             font-weight: bold;
             transition: all 0.5s ease;
             border: 1px solid rgba(255, 255, 255, 0.4);
@@ -355,7 +379,7 @@
             cursor: pointer;
             text-decoration: none;
             display: block;
-            min-width: 120px;
+            min-width: clamp(80px, 20vw, 120px);
             text-align: center;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
         }
@@ -392,6 +416,7 @@
             opacity: 0;
             pointer-events: none;
             transition: all 0.8s ease;
+            padding: 20px;
         }
 
         .chapter-transition.active {
@@ -411,21 +436,21 @@
         }
 
         .transition-title {
-            font-size: 2.5rem;
+            font-size: clamp(1.5rem, 6vw, 2.5rem);
             font-weight: bold;
             margin-bottom: 20px;
             text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
         }
 
         .transition-subtitle {
-            font-size: 1.2rem;
+            font-size: clamp(0.9rem, 3vw, 1.2rem);
             opacity: 0.8;
             margin-bottom: 30px;
         }
 
         .loading-animation {
-            width: 80px;
-            height: 80px;
+            width: clamp(50px, 15vw, 80px);
+            height: clamp(50px, 15vw, 80px);
             border: 3px solid rgba(255, 255, 255, 0.3);
             border-top: 3px solid white;
             border-radius: 50%;
@@ -467,7 +492,7 @@
             color: white;
             padding: 5px 8px;
             border-radius: 6px;
-            font-size: 8px;
+            font-size: clamp(6px, 1.5vw, 8px);
             white-space: nowrap;
             opacity: 0;
             pointer-events: none;
@@ -480,15 +505,55 @@
             transform: translateX(-50%) translateY(-10px);
         }
 
+        /* Media queries para ajustes específicos */
         @media (max-width: 768px) {
-            .title { font-size: 1.5rem; }
-            .subtitle { font-size: 0.9rem; }
-            .instructions { font-size: 0.8rem; }
-            .question-bubble, .abstraction-bubble { font-size: 10px; padding: 8px 12px; }
-            .leaf-topic { font-size: 8px; padding: 4px 8px; min-width: 100px; }
-            .draggable-questions, .draggable-abstractions { flex-direction: column; gap: 8px; }
-            .transition-title { font-size: 2rem; }
-            .transition-subtitle { font-size: 1rem; }
+            .header {
+                position: static;
+                margin-bottom: 20px;
+            }
+            
+            .tree-container {
+                margin-top: 0;
+            }
+            
+            .draggable-questions, .draggable-abstractions {
+                position: fixed;
+                bottom: 10px;
+                max-width: 45vw;
+            }
+            
+            .draggable-questions {
+                left: 10px;
+            }
+            
+            .draggable-abstractions {
+                right: 10px;
+                left: auto;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .trunk-slot {
+                width: clamp(80px, 25vw, 120px);
+                height: clamp(30px, 8vh, 45px);
+            }
+            
+            .root-slot {
+                width: clamp(50px, 15vw, 70px);
+                height: clamp(25px, 7vh, 35px);
+            }
+        }
+
+        @media (orientation: landscape) and (max-height: 600px) {
+            .trunk-slot.intuition-slot { bottom: 25vh; }
+            .trunk-slot.geometry-slot { bottom: 35vh; }
+            .trunk-slot.analysis-slot { bottom: 45vh; }
+            .trunk-slot.topology-slot { bottom: 55vh; }
+            
+            .trunk-delimiter.d1 { bottom: calc(25vh - 15px); }
+            .trunk-delimiter.d2 { bottom: calc(35vh - 15px); }
+            .trunk-delimiter.d3 { bottom: calc(45vh - 15px); }
+            .trunk-delimiter.d4 { bottom: calc(55vh - 15px); }
         }
     </style>
 </head>
@@ -497,6 +562,9 @@
         <div class="header">
             <h1 class="title">Formas Diferenciais, Topologia e Física</h1>
             <p class="subtitle">Um Resgate Interativo à Intuição</p>
+            <div class="instructions">
+                Arraste as perguntas para as raízes e as abstrações para o tronco
+            </div>
         </div>
 
         <div class="controls">
@@ -527,17 +595,17 @@
             </div>
 
             <!-- Slots das Raízes -->
-            <div class="root-slot" id="slot1" style="bottom: 50px; left: calc(50% - 200px);">
+            <div class="root-slot" id="slot1">
                 Arraste aqui
             </div>
-            <div class="root-slot" id="slot2" style="bottom: 50px; left: calc(50% - 40px);">
+            <div class="root-slot" id="slot2">
                 Arraste aqui
             </div>
-            <div class="root-slot" id="slot3" style="bottom: 50px; left: calc(50% + 120px);">
+            <div class="root-slot" id="slot3">
                 Arraste aqui
             </div>
 
-            <svg class="roots-svg" viewBox="0 0 2000 1200" preserveAspectRatio="xMidYMax meet">
+            <svg class="roots-svg" viewBox="0 0 2000 1200" preserveAspectRatio="xMidYMeet meet">
                 <rect x="-1000" y="900" width="50000" height="300" fill="#8d6e63" opacity="0.8"/>
                 
                 <!-- Raízes mais detalhadas -->
@@ -661,82 +729,7 @@
                     <ellipse cx="1315" cy="155" rx="42" ry="30" fill="#a5d6a7"/>
                     <ellipse cx="1355" cy="140" rx="38" ry="26" fill="#66bb6a"/>
 
-                    <!-- RAMIFICAÇÃO: M790 120 C 755 90, 715 50, 685 30 -->
-                    <ellipse cx="755" cy="105" rx="35" ry="24" fill="#a5d6a7"/>
-                    <ellipse cx="735" cy="70" rx="38" ry="26" fill="#66bb6a"/>
-                    <ellipse cx="700" cy="40" rx="40" ry="28" fill="#4caf50"/>
-                    <ellipse cx="685" cy="30" rx="35" ry="24" fill="#81c784"/>
-
-                    <!-- RAMIFICAÇÃO: M1210 120 C 1245 90, 1285 50, 1315 30 -->
-                    <ellipse cx="1245" cy="105" rx="35" ry="24" fill="#a5d6a7"/>
-                    <ellipse cx="1265" cy="70" rx="38" ry="26" fill="#66bb6a"/>
-                    <ellipse cx="1300" cy="40" rx="40" ry="28" fill="#4caf50"/>
-                    <ellipse cx="1315" cy="30" rx="35" ry="24" fill="#81c784"/>
-
-                    <!-- RAMIFICAÇÃO: M975 400 C 925 350, 848 280, 805 240 -->
-                    <ellipse cx="925" cy="375" rx="42" ry="30" fill="#4caf50"/>
-                    <ellipse cx="890" cy="325" rx="40" ry="28" fill="#66bb6a"/>
-                    <ellipse cx="870" cy="300" rx="38" ry="26" fill="#81c784"/>
-                    <ellipse cx="830" cy="260" rx="45" ry="32" fill="#a5d6a7"/>
-                    <ellipse cx="805" cy="240" rx="42" ry="30" fill="#4caf50"/>
-
-                    <!-- RAMIFICAÇÃO: M1025 400 C 1075 350, 1152 280, 1195 240 -->
-                    <ellipse cx="1075" cy="375" rx="42" ry="30" fill="#4caf50"/>
-                    <ellipse cx="1110" cy="325" rx="40" ry="28" fill="#66bb6a"/>
-                    <ellipse cx="1130" cy="300" rx="38" ry="26" fill="#81c784"/>
-                    <ellipse cx="1170" cy="260" rx="45" ry="32" fill="#a5d6a7"/>
-                    <ellipse cx="1195" cy="240" rx="42" ry="30" fill="#4caf50"/>
-
-                    <!-- OUTRAS RAMIFICAÇÕES MENORES -->
-                    <!-- M725 150 C 675 120, 610 80, 565 60 -->
-                    <ellipse cx="675" cy="135" rx="35" ry="24" fill="#a5d6a7"/>
-                    <ellipse cx="640" cy="100" rx="38" ry="26" fill="#66bb6a"/>
-                    <ellipse cx="590" cy="70" rx="40" ry="28" fill="#4caf50"/>
-                    <ellipse cx="565" cy="60" rx="35" ry="24" fill="#81c784"/>
-
-                    <!-- M1275 150 C 1325 120, 1390 80, 1435 60 -->
-                    <ellipse cx="1325" cy="135" rx="35" ry="24" fill="#a5d6a7"/>
-                    <ellipse cx="1360" cy="100" rx="38" ry="26" fill="#66bb6a"/>
-                    <ellipse cx="1410" cy="70" rx="40" ry="28" fill="#4caf50"/>
-                    <ellipse cx="1435" cy="60" rx="35" ry="24" fill="#81c784"/>
-
-                    <!-- M645 140 C 615 110, 575 70, 545 50 -->
-                    <ellipse cx="615" cy="125" rx="32" ry="22" fill="#66bb6a"/>
-                    <ellipse cx="595" cy="90" rx="35" ry="24" fill="#4caf50"/>
-                    <ellipse cx="560" cy="60" rx="38" ry="26" fill="#81c784"/>
-                    <ellipse cx="545" cy="50" rx="32" ry="22" fill="#a5d6a7"/>
-
-                    <!-- M1355 140 C 1385 110, 1425 70, 1455 50 -->
-                    <ellipse cx="1385" cy="125" rx="32" ry="22" fill="#66bb6a"/>
-                    <ellipse cx="1405" cy="90" rx="35" ry="24" fill="#4caf50"/>
-                    <ellipse cx="1440" cy="60" rx="38" ry="26" fill="#81c784"/>
-                    <ellipse cx="1455" cy="50" rx="32" ry="22" fill="#a5d6a7"/>
-
-                    <!-- M838 50 C 815 30, 785 10, 763 5 -->
-                    <ellipse cx="815" cy="40" rx="30" ry="20" fill="#a5d6a7"/>
-                    <ellipse cx="800" cy="20" rx="32" ry="22" fill="#66bb6a"/>
-                    <ellipse cx="775" cy="8" rx="35" ry="24" fill="#4caf50"/>
-                    <ellipse cx="763" cy="5" rx="30" ry="20" fill="#81c784"/>
-
-                    <!-- M1162 50 C 1185 30, 1215 10, 1237 5 -->
-                    <ellipse cx="1185" cy="40" rx="30" ry="20" fill="#a5d6a7"/>
-                    <ellipse cx="1200" cy="20" rx="32" ry="22" fill="#66bb6a"/>
-                    <ellipse cx="1225" cy="8" rx="35" ry="24" fill="#4caf50"/>
-                    <ellipse cx="1237" cy="5" rx="30" ry="20" fill="#81c784"/>
-
-                    <!-- M805 240 C 765 200, 718 150, 685 120 -->
-                    <ellipse cx="765" cy="220" rx="35" ry="24" fill="#4caf50"/>
-                    <ellipse cx="740" cy="175" rx="38" ry="26" fill="#66bb6a"/>
-                    <ellipse cx="700" cy="135" rx="40" ry="28" fill="#81c784"/>
-                    <ellipse cx="685" cy="120" rx="35" ry="24" fill="#a5d6a7"/>
-
-                    <!-- M1195 240 C 1235 200, 1282 150, 1315 120 -->
-                    <ellipse cx="1235" cy="220" rx="35" ry="24" fill="#4caf50"/>
-                    <ellipse cx="1260" cy="175" rx="38" ry="26" fill="#66bb6a"/>
-                    <ellipse cx="1300" cy="135" rx="40" ry="28" fill="#81c784"/>
-                    <ellipse cx="1315" cy="120" rx="35" ry="24" fill="#a5d6a7"/>
-
-                    <!-- Preenchimento adicional para árvore densa -->
+                    <!-- Mais folhas distribuídas -->
                     <ellipse cx="990" cy="430" rx="45" ry="32" fill="#4caf50"/>
                     <ellipse cx="1010" cy="420" rx="42" ry="30" fill="#66bb6a"/>
                     <ellipse cx="985" cy="400" rx="48" ry="35" fill="#81c784"/>
@@ -751,47 +744,6 @@
                     <ellipse cx="1005" cy="240" rx="40" ry="28" fill="#81c784"/>
                     <ellipse cx="990" cy="220" rx="45" ry="32" fill="#a5d6a7"/>
                     <ellipse cx="1010" cy="210" rx="42" ry="30" fill="#66bb6a"/>
-
-                    <!-- Mais folhas para completar espaços -->
-                    <ellipse cx="970" cy="360" rx="40" ry="28" fill="#66bb6a"/>
-                    <ellipse cx="1030" cy="360" rx="38" ry="26" fill="#4caf50"/>
-                    <ellipse cx="950" cy="320" rx="42" ry="30" fill="#81c784"/>
-                    <ellipse cx="1050" cy="320" rx="40" ry="28" fill="#a5d6a7"/>
-                    <ellipse cx="980" cy="280" rx="45" ry="32" fill="#4caf50"/>
-                    <ellipse cx="1020" cy="280" rx="42" ry="30" fill="#66bb6a"/>
-                    <ellipse cx="960" cy="250" rx="38" ry="26" fill="#81c784"/>
-                    <ellipse cx="1040" cy="250" rx="40" ry="28" fill="#a5d6a7"/>
-                    <ellipse cx="975" cy="230" rx="42" ry="30" fill="#4caf50"/>
-                    <ellipse cx="1025" cy="230" rx="38" ry="26" fill="#66bb6a"/>
-
-                    <!-- Folhas adicionais nas extremidades -->
-                    <ellipse cx="850" cy="200" rx="35" ry="24" fill="#a5d6a7"/>
-                    <ellipse cx="820" cy="180" rx="38" ry="26" fill="#66bb6a"/>
-                    <ellipse cx="880" cy="160" rx="40" ry="28" fill="#4caf50"/>
-                    <ellipse cx="860" cy="140" rx="35" ry="24" fill="#81c784"/>
-                    <ellipse cx="890" cy="120" rx="38" ry="26" fill="#a5d6a7"/>
-                    <ellipse cx="870" cy="100" rx="40" ry="28" fill="#66bb6a"/>
-                    <ellipse cx="850" cy="80" rx="35" ry="24" fill="#4caf50"/>
-                    <ellipse cx="880" cy="60" rx="38" ry="26" fill="#81c784"/>
-
-                    <ellipse cx="1150" cy="200" rx="35" ry="24" fill="#a5d6a7"/>
-                    <ellipse cx="1180" cy="180" rx="38" ry="26" fill="#66bb6a"/>
-                    <ellipse cx="1120" cy="160" rx="40" ry="28" fill="#4caf50"/>
-                    <ellipse cx="1140" cy="140" rx="35" ry="24" fill="#81c784"/>
-                    <ellipse cx="1110" cy="120" rx="38" ry="26" fill="#a5d6a7"/>
-                    <ellipse cx="1130" cy="100" rx="40" ry="28" fill="#66bb6a"/>
-                    <ellipse cx="1150" cy="80" rx="35" ry="24" fill="#4caf50"/>
-                    <ellipse cx="1120" cy="60" rx="38" ry="26" fill="#81c784"/>
-
-                    <!-- Folhas finais -->
-                    <ellipse cx="750" cy="120" rx="32" ry="22" fill="#66bb6a"/>
-                    <ellipse cx="780" cy="100" rx="35" ry="24" fill="#4caf50"/>
-                    <ellipse cx="720" cy="100" rx="38" ry="26" fill="#81c784"/>
-                    <ellipse cx="760" cy="80" rx="32" ry="22" fill="#a5d6a7"/>
-                    <ellipse cx="1250" cy="120" rx="32" ry="22" fill="#66bb6a"/>
-                    <ellipse cx="1220" cy="100" rx="35" ry="24" fill="#4caf50"/>
-                    <ellipse cx="1280" cy="100" rx="38" ry="26" fill="#81c784"/>
-                    <ellipse cx="1240" cy="80" rx="32" ry="22" fill="#a5d6a7"/>
                 </g>
             </svg>
         </div>
@@ -950,28 +902,42 @@
             }
         ];
 
-        // Posições melhor distribuídas pela árvore, sem sobreposição
+        // Função responsiva para calcular posições das folhas
+        function calculateLeafPosition(baseX, baseY) {
+            const container = document.getElementById('treeContainer');
+            const containerRect = container.getBoundingClientRect();
+            const viewBoxWidth = 2000;
+            const viewBoxHeight = 1200;
+            
+            // Converter coordenadas do viewBox para porcentagem relativa ao container
+            const leftPercent = (baseX / viewBoxWidth) * 100;
+            const topPercent = (baseY / viewBoxHeight) * 100;
+            
+            return { left: leftPercent, top: topPercent };
+        }
+
+        // Posições das folhas adaptadas para responsividade
         const leafPositions = [
-            {x: 565, y: 60},    // 1. Prefácio (extremidade esquerda)
+            {x: 565, y: 60},    // 1. Introdução
             {x: 645, y: 140},   // 2. Integrais sobre Elementos 
-            {x: 725, y: 150},   // 3. Mecânica (galho principal esquerdo)
-            {x: 790, y: 120},   // 4. Trabalho e Energia (galho médio esquerdo)
-            {x: 838, y: 50},    // 5. Variação de Ângulo (galho superior esquerdo)
-            {x: 805, y: 240},   // 6. Campos - Fluxos (ramificação esquerda)
-            {x: 925, y: 375},   // 7. Ângulo Sólido (galho principal baixo esquerdo)
-            {x: 975, y: 425},   // 8. Determinante (galho principal central)
-            {x: 985, y: 220},   // 9. Voltando ao Trabalho (centro superior)
-            {x: 1015, y: 280},  // 10. Bordo (centro médio)
-            {x: 1025, y: 425},  // 11. Trabalho: Parte 2 (galho principal central direito)
-            {x: 1075, y: 375},  // 12. Teorema de Stokes (galho principal baixo direito)
-            {x: 1195, y: 240},  // 13. Teorema de Green (ramificação direita)
-            {x: 1162, y: 50},   // 14. Reinterpretando Derivada (galho superior direito)
-            {x: 1210, y: 120},  // 15. Teorema da Divergência (galho médio direito)
-            {x: 1275, y: 150},  // 16. Álgebra Exterior (galho principal direito)
-            {x: 1355, y: 140},  // 17. Pullback (meio-direita)
-            {x: 685, y: 30},    // Apêndice A (topo esquerdo)
-            {x: 1315, y: 30},   // Apêndice B (topo direito)
-            {x: 1435, y: 60}    // Apêndice C (extremidade direita)
+            {x: 725, y: 150},   // 3. Mecânica
+            {x: 790, y: 120},   // 4. Trabalho e Energia
+            {x: 838, y: 50},    // 5. Variação de Ângulo
+            {x: 805, y: 240},   // 6. Campos - Fluxos
+            {x: 925, y: 375},   // 7. Ângulo Sólido
+            {x: 975, y: 425},   // 8. Determinante
+            {x: 985, y: 220},   // 9. Voltando ao Trabalho
+            {x: 1015, y: 280},  // 10. Bordo
+            {x: 1025, y: 425},  // 11. Trabalho: Parte 2
+            {x: 1075, y: 375},  // 12. Teorema de Stokes
+            {x: 1195, y: 240},  // 13. Teorema de Green
+            {x: 1162, y: 50},   // 14. Reinterpretando Derivada
+            {x: 1210, y: 120},  // 15. Teorema da Divergência
+            {x: 1275, y: 150},  // 16. Álgebra Exterior
+            {x: 1355, y: 140},  // 17. Pullback
+            {x: 685, y: 30},    // Apêndice A
+            {x: 1315, y: 30},   // Apêndice B
+            {x: 1435, y: 60}    // Apêndice C
         ];
 
         // Função para navegar para capítulo com animação
@@ -1013,14 +979,10 @@
             });
             
             const container = document.getElementById('treeContainer');
-            const viewBoxWidth = 2000;
-            const viewBoxHeight = 1200;
+            const position = calculateLeafPosition(x, y);
             
-            const leftPercent = (x / viewBoxWidth) * 100;
-            const topPercent = (y / viewBoxHeight) * 100;
-            
-            topicEl.style.left = `${leftPercent}%`;
-            topicEl.style.top = `${topPercent}%`;
+            topicEl.style.left = `${position.left}%`;
+            topicEl.style.top = `${position.top}%`;
             
             container.appendChild(topicEl);
         }
@@ -1135,7 +1097,7 @@
             }
         }
 
-        // Sistema de Drag and Drop
+        // Sistema de Drag and Drop responsivo
         let isDragging = false;
         let currentDragElement = null;
         let offset = { x: 0, y: 0 };
@@ -1301,7 +1263,7 @@
         function placeQuestionInSlot(question, slot) {
             slot.classList.add('filled');
             slot.textContent = question.textContent;
-            slot.style.fontSize = '9px';
+            slot.style.fontSize = 'clamp(7px, 1.8vw, 9px)';
             
             question.classList.add('placed');
             handleRootQuestionPlacement();
@@ -1312,7 +1274,7 @@
             
             slot.classList.add('filled');
             slot.textContent = abstraction.textContent;
-            slot.style.fontSize = '10px';
+            slot.style.fontSize = 'clamp(8px, 2vw, 10px)';
             
             abstraction.classList.add('placed');
             handleTrunkAbstractionPlacement(abstractionType);
@@ -1391,6 +1353,28 @@
             }
         }
 
+        // Função para reposicionar elementos em mudanças de tela
+        function handleResize() {
+            // Reposicionar tópicos das folhas
+            const topics = document.querySelectorAll('.leaf-topic');
+            topics.forEach((topic, i) => {
+                if (leafPositions[i]) {
+                    const position = calculateLeafPosition(leafPositions[i].x, leafPositions[i].y);
+                    topic.style.left = `${position.left}%`;
+                    topic.style.top = `${position.top}%`;
+                }
+            });
+        }
+
+        // Event listener para redimensionamento
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                handleResize();
+            }, 250);
+        });
+
         // Inicialização
         window.addEventListener('load', () => {
             createLeafTopics();
@@ -1410,6 +1394,11 @@
         // Adicionar estilo inicial para fade-in
         document.body.style.opacity = '0';
         document.body.style.transition = 'opacity 0.5s ease';
+
+        // Detectar orientação e ajustar se necessário
+        window.addEventListener('orientationchange', () => {
+            setTimeout(handleResize, 500);
+        });
     </script>
 </body>
 </html>
