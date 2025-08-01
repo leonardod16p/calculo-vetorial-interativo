@@ -5,41 +5,42 @@
 
 
 
-## ✅ Tarefas a serem feitas para as simulações
+# ✅ Tarefas 
 
-### 🧮 Integrais Iteradas
+## Simulações
+
+### Integrais Iteradas
 - [ ] Deixar as fatias mais claras visualmente
       
-### 🌬️ Campos e Fluxos
+### Campos e Fluxos
 - [ ] Corrigir artefato visual (rastro gera um "deadline" branco)
 
-### 🔁 Variação do Ângulo
+### Variação do Ângulo
 - [ ] Ajustar forma de cálculo da variação do ângulo (**urgente**)
 
-### 🧮 Determinantes
+### Determinantes
 - [ ] Revisar: estrutura parece ok, mas falta impacto visual ("sal")
 
-### 🔄 Bordo e Orientação
+### Bordo e Orientação
 - [ ] Compactar layout — ocupa espaço demais para conteúdo simples
 
-### 🧩 k-Cadeias e Cancelamento em Bordos
+### k-Cadeias e Cancelamento em Bordos
 - [ ] Compactar layout — ocupa espaço demais para conteúdo simples
 
 ### Teorema de Stokes 
 - [ ] Reformular completamente a simulação
       
-### 📥 Pullback
+### Pullback
 - [ ] Verificar se as contas estão corretas
 - [ ] Explicitar as contas feitas na simulação
 - [ ] Incluir explicação sobre pullback de formas em geral:
   - [ ] Qual a fórmula do pullback de uma 1-forma geral?
   - [ ] Qual a fórmula do pullback de uma 2-forma geral?
 
- 
 
 ---
 
-## 🖼️ Tarefas a serem feitas para as Figuras
+## Figuras
 
 - [ ] Parametrização de uma superfície num bloco no $\mathbb{R}^2$ 
 - [ ] **Cap. 9** — "Voltando ao Trabalho":  
@@ -49,7 +50,12 @@
 
 ---
 
-## 🌳 Página Inicial
+## Capítulos
+
+- [ ] Adicionar o apêndice A
+
+
+## Página Inicial
 
 - [ ] Ajustar animação da **aparição dos tópicos e folhas**
 - [ ] Aumentar o **tamanho da caixa dos tópicos**
