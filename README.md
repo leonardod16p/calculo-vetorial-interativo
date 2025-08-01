@@ -25,12 +25,17 @@
 ### 🧩 k-Cadeias e Cancelamento em Bordos
 - [ ] Compactar layout — ocupa espaço demais para conteúdo simples
 
+### Teorema de Stokes 
+- [ ] Reformular completamente a simulação
+      
 ### 📥 Pullback
 - [ ] Verificar se as contas estão corretas
 - [ ] Explicitar as contas feitas na simulação
 - [ ] Incluir explicação sobre pullback de formas em geral:
   - [ ] Qual a fórmula do pullback de uma 1-forma geral?
   - [ ] Qual a fórmula do pullback de uma 2-forma geral?
+
+ 
 
 ---
 
